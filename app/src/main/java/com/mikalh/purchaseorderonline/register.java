@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -101,11 +102,15 @@ public class register extends AppCompatActivity {
                                 }
                             });
                         }
+                        else {
+                            FirebaseAuthException e = (FirebaseAuthException) task.getException();
+                            Toast.makeText(register.this,e.getMessage(),Toast.LENGTH_LONG).show();
+                        }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-
+                Toast.makeText(register.this,e.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
     }
