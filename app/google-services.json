@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "856096009789",
+    "firebase_url": "https://purchase-order-online.firebaseio.com",
+    "project_id": "purchase-order-online",
+    "storage_bucket": "purchase-order-online.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856096009789:android:ef3c29e1f1e9c4d5",
+        "android_client_info": {
+          "package_name": "com.mikalh.purchaseorderonline"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "856096009789-ssp9gv5cg2ka73fhmecd3dokcal3omsg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mikalh.purchaseorderonline",
+            "certificate_hash": "110c7279943d73316a0b8bbbe864cef4d05deb2b"
+          }
+        },
+        {
+          "client_id": "856096009789-fo45huenegb6h81joc9d032hpaju3bfq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH2o5sA1hWmnBKBsFBmyb83F-Z-Pzds8k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "856096009789-fo45huenegb6h81joc9d032hpaju3bfq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
