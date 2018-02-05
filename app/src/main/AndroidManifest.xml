@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".register" />
-        <activity android:name=".userUI"></activity>
+        <activity android:name=".userUI" />
+        <activity android:name=".addItem"></activity>
     </application>
 
 </manifest>
