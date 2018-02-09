@@ -146,6 +146,12 @@ public class userUI extends AppCompatActivity implements ItemAdapter.OnItemSelec
         startActivity(i);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(false);
+    }
+
     public class ItemHolder extends RecyclerView.ViewHolder{
         TextView namaBarang_list, jenisBarang_list, hargaBarang_list;
         ConstraintLayout myConstrain;
@@ -157,4 +163,5 @@ public class userUI extends AppCompatActivity implements ItemAdapter.OnItemSelec
             myConstrain = itemView.findViewById(R.id.myConstrain);
         }
     }
+
 }
