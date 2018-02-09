@@ -1,6 +1,7 @@
 package com.mikalh.purchaseorderonline;
 
 import android.content.Intent;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,17 +16,23 @@ import android.widget.TextView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.mikalh.purchaseorderonline.Adapter.ItemAdapter;
 import com.mikalh.purchaseorderonline.Model.Item;
 
-public class userUI extends AppCompatActivity {
+public class userUI extends AppCompatActivity implements ItemAdapter.OnItemSelectedListener {
     FloatingActionButton addItem;
     RecyclerView myRecyler;
     Query query;
     FirebaseFirestore firestore;
-    FirestoreRecyclerAdapter adapter;
+    //FirestoreRecyclerAdapter adapter;
+    ItemAdapter adapter;
+    public static final String KEY_ITEM_ID = "keyItemID";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +42,7 @@ public class userUI extends AppCompatActivity {
         query = FirebaseFirestore.getInstance().collection("Items").orderBy("banyak_stock")
                 .limit(50);
 
-        FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
+       /* FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
                 .setQuery(query,Item.class)
                 .build();
 
@@ -49,10 +56,17 @@ public class userUI extends AppCompatActivity {
             }
 
             @Override
-            protected void onBindViewHolder(ItemHolder holder, int position, Item model) {
+            protected void onBindViewHolder(ItemHolder holder, int position, final Item model) {
                holder.namaBarang_list.setText(model.getNama_barang());
                holder.jenisBarang_list.setText(model.getJenis_barang());
                holder.hargaBarang_list.setText(model.getHarga_barang()+"");
+               holder.myConstrain.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View view) {
+                    Intent i = new Intent(userUI.this, detailItem.class);
+                    //i.putExtra(KEY_ITEM_ID,)
+                   }
+               });
             }
 
             @Override
@@ -64,7 +78,32 @@ public class userUI extends AppCompatActivity {
             public void onDataChanged() {
                 super.onDataChanged();
             }
-        };
+        };*/
+       adapter = new ItemAdapter(query,this){
+           @Override
+           protected void onDataChanged() {
+               super.onDataChanged();
+           }
+
+           @Override
+           public void onBindViewHolder(ItemAdapter.ViewHolder holder, int position) {
+               super.onBindViewHolder(holder, position);
+           }
+
+           @Override
+           public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+               return super.onCreateViewHolder(parent, viewType);
+           }
+
+           @Override
+           protected void onError(FirebaseFirestoreException e) {
+               super.onError(e);
+               Log.e("Error Adapter",e.getMessage());
+           }
+       };
+
+
+
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         myRecyler.setLayoutManager(llm);
@@ -92,13 +131,30 @@ public class userUI extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (adapter != null){
+            adapter.stopListening();
+        }
+    }
+
+    @Override
+    public void onItemSelected(DocumentSnapshot item) {
+        Intent i = new Intent(this,detailItem.class);
+        i.putExtra(KEY_ITEM_ID,item.getId());
+        startActivity(i);
+    }
+
     public class ItemHolder extends RecyclerView.ViewHolder{
         TextView namaBarang_list, jenisBarang_list, hargaBarang_list;
+        ConstraintLayout myConstrain;
         public ItemHolder(View itemView) {
             super(itemView);
             namaBarang_list = itemView.findViewById(R.id.namaBarang_list);
             jenisBarang_list = itemView.findViewById(R.id.jenisBarang_list);
             hargaBarang_list = itemView.findViewById(R.id.hargaBarang_list);
+            myConstrain = itemView.findViewById(R.id.myConstrain);
         }
     }
 }

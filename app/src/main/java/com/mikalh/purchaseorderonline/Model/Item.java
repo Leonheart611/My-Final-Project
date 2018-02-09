@@ -1,10 +1,11 @@
 package com.mikalh.purchaseorderonline.Model;
 
+
 /**
  * Created by mika.frentzen on 02/02/2018.
  */
 
-public class Item {
+public class Item  {
     private String nama_barang, jenis_barang, diskripsi_barang, quantitas, userId;
     private int harga_barang, banyak_stock;
 

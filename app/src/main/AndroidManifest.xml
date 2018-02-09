@@ -18,7 +18,8 @@
         </activity>
         <activity android:name=".register" />
         <activity android:name=".userUI" />
-        <activity android:name=".addItem"></activity>
+        <activity android:name=".addItem" />
+        <activity android:name=".detailItem"></activity>
     </application>
 
 </manifest>
