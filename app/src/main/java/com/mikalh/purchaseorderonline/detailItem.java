@@ -54,13 +54,13 @@ public class detailItem extends AppCompatActivity {
 
                     namaBarang_detail.setText(item.getNama_barang());
                     namaBarang_detail.setVisibility(View.VISIBLE);
-                    jenisBarang_detail.setText(item.getJenis_barang());
+                    //jenisBarang_detail.setText(item.getJenis_barang());
                     jenisBarang_detail.setVisibility(View.VISIBLE);
                     hargaBarang_detail.setText(item.getHarga_barang()+"");
                     hargaBarang_detail.setVisibility(View.VISIBLE);
                     quantitasBarang_detail.setText(item.getNama_barang());
                     quantitasBarang_detail.setVisibility(View.VISIBLE);
-                    diskripsiBarang_detail.setText(item.getDiskripsi_barang());
+                    //diskripsiBarang_detail.setText(item.getDiskripsi_barang());
                     diskripsiBarang_detail.setVisibility(View.VISIBLE);
                 }
             }

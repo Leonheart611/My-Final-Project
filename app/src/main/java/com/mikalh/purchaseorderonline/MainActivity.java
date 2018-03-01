@@ -72,4 +72,9 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this,"Please input Email and Password",Toast.LENGTH_LONG).show();
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 }

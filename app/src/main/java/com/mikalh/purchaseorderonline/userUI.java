@@ -10,12 +10,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,6 +34,7 @@ public class userUI extends AppCompatActivity implements ItemAdapter.OnItemSelec
     Query query;
     FirebaseFirestore firestore;
     //FirestoreRecyclerAdapter adapter;
+
     ItemAdapter adapter;
     public static final String KEY_ITEM_ID = "keyItemID";
 
@@ -39,7 +44,7 @@ public class userUI extends AppCompatActivity implements ItemAdapter.OnItemSelec
         setContentView(R.layout.activity_user_ui);
         myRecyler = findViewById(R.id.myRecyler);
         firestore = FirebaseFirestore.getInstance();
-        query = FirebaseFirestore.getInstance().collection("Items").orderBy("banyak_stock")
+        query = FirebaseFirestore.getInstance().collection("Items")
                 .limit(50);
 
        /* FirestoreRecyclerOptions<Item> options = new FirestoreRecyclerOptions.Builder<Item>()
@@ -147,9 +152,34 @@ public class userUI extends AppCompatActivity implements ItemAdapter.OnItemSelec
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.user_ui,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.signOut:
+                signOut();
+                return true;
+            case R.id.profile:
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    void signOut(){
+        FirebaseAuth.getInstance().signOut();
+        Intent i = new Intent(userUI.this, MainActivity.class);
+        startActivity(i);
+    }
+
+    @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        moveTaskToBack(false);
+        moveTaskToBack(true);
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder{

@@ -6,17 +6,32 @@ package com.mikalh.purchaseorderonline.Model;
  */
 
 public class Item  {
-    private String nama_barang, jenis_barang, diskripsi_barang, quantitas, userId;
-    private int harga_barang, banyak_stock;
+    private String nama_barang, userId, unit, deskripsi_barang, imageItemUrl;
+    private int harga_barang;
 
-    public Item(String nama_barang, String jenis_barang, String diskripsi_barang, String quantitas, String userId, int harga_barang, int banyak_stock) {
+    public Item(String nama_barang, String userId, String unit, String deskripsi_barang, String imageItemUrl, int harga_barang) {
         this.nama_barang = nama_barang;
-        this.jenis_barang = jenis_barang;
-        this.diskripsi_barang = diskripsi_barang;
-        this.quantitas = quantitas;
         this.userId = userId;
+        this.unit = unit;
+        this.deskripsi_barang = deskripsi_barang;
+        this.imageItemUrl = imageItemUrl;
         this.harga_barang = harga_barang;
-        this.banyak_stock = banyak_stock;
+    }
+
+    public String getImageItemUrl() {
+        return imageItemUrl;
+    }
+
+    public void setImageItemUrl(String imageItemUrl) {
+        this.imageItemUrl = imageItemUrl;
+    }
+
+    public String getDeskripsi_barang() {
+        return deskripsi_barang;
+    }
+
+    public void setDeskripsi_barang(String deskripsi_barang) {
+        this.deskripsi_barang = deskripsi_barang;
     }
 
     public Item() {
@@ -30,28 +45,12 @@ public class Item  {
         this.nama_barang = nama_barang;
     }
 
-    public String getJenis_barang() {
-        return jenis_barang;
+    public String getUnit() {
+        return unit;
     }
 
-    public void setJenis_barang(String jenis_barang) {
-        this.jenis_barang = jenis_barang;
-    }
-
-    public String getDiskripsi_barang() {
-        return diskripsi_barang;
-    }
-
-    public void setDiskripsi_barang(String diskripsi_barang) {
-        this.diskripsi_barang = diskripsi_barang;
-    }
-
-    public String getQuantitas() {
-        return quantitas;
-    }
-
-    public void setQuantitas(String quantitas) {
-        this.quantitas = quantitas;
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public String getUserId() {
@@ -70,11 +69,4 @@ public class Item  {
         this.harga_barang = harga_barang;
     }
 
-    public int getBanyak_stock() {
-        return banyak_stock;
-    }
-
-    public void setBanyak_stock(int banyak_stock) {
-        this.banyak_stock = banyak_stock;
-    }
 }

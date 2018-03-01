@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ public class register extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseUser user;
     FirebaseFirestore firestore;
+    ProgressBar loadingBar_register;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +44,7 @@ public class register extends AppCompatActivity {
         email_register = findViewById(R.id.email_register);
         password_register = findViewById(R.id.password_register);
         registerDo = findViewById(R.id.registerDo);
-
+        loadingBar_register = findViewById(R.id.loadingBar_register);
         registerDo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,12 +76,13 @@ public class register extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()){
                             user = auth.getCurrentUser();
+                            loadingBar_register.setVisibility(View.VISIBLE);
                             UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(nama).build();
                             user.updateProfile(profileChangeRequest).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    if (e != null){
+                                    if (e == null){
                                         Log.e("Error :",e.getMessage());
                                     }
                                 }
@@ -92,12 +95,13 @@ public class register extends AppCompatActivity {
                                     }
                                 }
                             });
-                            User user1 = new User(nama,"",Nohp,Email,"","",user.getUid());
+                            User user1 = new User(nama,Nohp,Email,"","",user.getUid(),"","","","");
                             firestore.collection("Users").document(user.getUid())
                                     .set(user1).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()){
+                                        loadingBar_register.setVisibility(View.GONE);
                                         Toast.makeText(register.this,"Register Berhasil",Toast.LENGTH_LONG).show();
                                         Intent i = new Intent(register.this,userUI.class);
                                         startActivity(i);

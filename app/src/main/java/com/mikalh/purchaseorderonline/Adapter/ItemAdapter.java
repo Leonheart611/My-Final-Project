@@ -63,7 +63,7 @@ public class ItemAdapter extends FirestoreAdapter<ItemAdapter.ViewHolder> {
             //Resources resources = itemView.getResources();
 
             namaBarang_list.setText(item.getNama_barang());
-            jenisBarang_list.setText(item.getJenis_barang());
+            jenisBarang_list.setText(item.getUnit());
             hargaBarang_list.setText(item.getHarga_barang()+"");
 
             itemView.setOnClickListener(new View.OnClickListener() {

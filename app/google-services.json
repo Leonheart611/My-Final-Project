@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "856096009789-riaq68e4mpqfjght4g8lb4465kvo6ddg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mikalh.purchaseorderonline",
+            "certificate_hash": "582b6dec96072d588229e9dbd78f76111113f6eb"
+          }
+        },
+        {
           "client_id": "856096009789-ssp9gv5cg2ka73fhmecd3dokcal3omsg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

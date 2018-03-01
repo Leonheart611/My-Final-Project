@@ -5,36 +5,27 @@ package com.mikalh.purchaseorderonline.Model;
  */
 
 public class User {
-    private String nama, tanggal_lahir, no_hp, email, alamat_perusahaan, nama_perusahaan,userID;
+    private String nama_PIC,
+            no_hp, email, alamat_perusahaan,
+            nama_perusahaan,userID, no_fax, kota, Provinsi, jabatan_PIC
+            , url_pict;
 
-    public User(String nama, String tanggal_lahir, String no_hp, String email, String alamat_perusahaan, String nama_perusahaan, String userID) {
-        this.nama = nama;
-        this.tanggal_lahir = tanggal_lahir;
+    public User(String nama_PIC, String no_hp, String email, String alamat_perusahaan, String nama_perusahaan, String userID, String no_fax, String kota, String provinsi, String jabatan_PIC) {
+        this.nama_PIC = nama_PIC;
         this.no_hp = no_hp;
         this.email = email;
         this.alamat_perusahaan = alamat_perusahaan;
         this.nama_perusahaan = nama_perusahaan;
         this.userID = userID;
+        this.no_fax = no_fax;
+        this.kota = kota;
+        Provinsi = provinsi;
+        this.jabatan_PIC = jabatan_PIC;
     }
 
     public User() {
     }
 
-    public String getNama() {
-        return nama;
-    }
-
-    public void setNama(String nama) {
-        this.nama = nama;
-    }
-
-    public String getTanggal_lahir() {
-        return tanggal_lahir;
-    }
-
-    public void setTanggal_lahir(String tanggal_lahir) {
-        this.tanggal_lahir = tanggal_lahir;
-    }
 
     public String getNo_hp() {
         return no_hp;
