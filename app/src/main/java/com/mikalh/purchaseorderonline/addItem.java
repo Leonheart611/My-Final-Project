@@ -222,8 +222,39 @@ public class addItem extends AppCompatActivity {
         });
 
     }
-    void TakePicture(){
 
+
+
+    public Bitmap decodeSampledBitmapFromUri(Uri uri,int reqWidth, int reqHeight){
+        Bitmap bm = null;
+        try{
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(addItem.this.getContentResolver().openInputStream(uri),null ,options);
+            options.inSampleSize = calculateInSampleSize(options,reqWidth,reqHeight);
+            options.inJustDecodeBounds = false;
+
+            bm = BitmapFactory.decodeStream(addItem.this.getContentResolver().openInputStream(uri)
+            ,null, options);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+        }
+        return bm;
     }
-
+    public int calculateInSampleSize(BitmapFactory.Options options,
+                                     int reqWidth, int reqHeight) {
+// Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+        if (height > reqHeight || width > reqWidth) {
+            if (width > height) {
+                inSampleSize = Math.round((float) height / (float) reqHeight);
+            } else {
+                inSampleSize = Math.round((float) width / (float) reqWidth);
+            }
+        }
+        return inSampleSize;
+    }
 }
