@@ -131,6 +131,7 @@ public class userUI extends AppCompatActivity implements ItemAdapter.OnItemSelec
     @Override
     protected void onStart() {
         super.onStart();
+        adapter.startListening();
         if (adapter != null){
             adapter.startListening();
         }

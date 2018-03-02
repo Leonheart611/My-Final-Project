@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -63,7 +65,13 @@ public class ItemAdapter extends FirestoreAdapter<ItemAdapter.ViewHolder> {
                          final OnItemSelectedListener listener) {
             Item item = snapshot.toObject(Item.class);
             //Resources resources = itemView.getResources();
-
+            if (!item.getImageItemUrl().isEmpty()) {
+                Glide.with(barangImage_list.getContext())
+                        .load(item.getImageItemUrl())
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true)
+                        .into(barangImage_list);
+            }
             namaBarang_list.setText(item.getNama_barang());
             jenisBarang_list.setText(item.getUnit());
             hargaBarang_list.setText(item.getHarga_barang()+"");
