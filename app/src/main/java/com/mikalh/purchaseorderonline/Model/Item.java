@@ -1,28 +1,23 @@
 package com.mikalh.purchaseorderonline.Model;
 
 
+import java.util.ArrayList;
+
 /**
  * Created by mika.frentzen on 02/02/2018.
  */
 
 public class Item  {
-    private String nama_barang, userId, unit, deskripsi_barang, imageItemUrl;
+    private String nama_barang, userId, unit, deskripsi_barang;
     private int harga_barang;
+    private ArrayList<String> imageItemUrl;
 
-    public Item(String nama_barang, String userId, String unit, String deskripsi_barang, String imageItemUrl, int harga_barang) {
+    public Item(String nama_barang, String userId, String unit, String deskripsi_barang, int harga_barang, ArrayList<String> imageItemUrl) {
         this.nama_barang = nama_barang;
         this.userId = userId;
         this.unit = unit;
         this.deskripsi_barang = deskripsi_barang;
-        this.imageItemUrl = imageItemUrl;
         this.harga_barang = harga_barang;
-    }
-
-    public String getImageItemUrl() {
-        return imageItemUrl;
-    }
-
-    public void setImageItemUrl(String imageItemUrl) {
         this.imageItemUrl = imageItemUrl;
     }
 

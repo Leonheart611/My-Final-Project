@@ -166,6 +166,8 @@ public class userUI extends AppCompatActivity implements ItemAdapter.OnItemSelec
                 signOut();
                 return true;
             case R.id.profile:
+                return true;
+            case R.id.cart:
 
                 return true;
             default:
