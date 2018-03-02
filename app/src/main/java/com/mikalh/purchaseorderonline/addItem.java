@@ -58,9 +58,9 @@ public class addItem extends AppCompatActivity {
     private static final int CAMERA_IMAGE_REQUEST=1;
     Uri outputFile;
     private static final int MY_CAMERA_REQUEST_CODE = 100;
-
     private FirebaseStorage storage;
     StorageReference ItemImage;
+    StorageReference storagePath;
     byte[] dataImage;
     Uri urlImage;
 
@@ -73,8 +73,8 @@ public class addItem extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         storage = FirebaseStorage.getInstance();
-        StorageReference storagePath = storage.getReference();
-        ItemImage = storagePath.child("ItemImages/");
+        storagePath = storage.getReference();
+
 
 
         //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -146,7 +146,7 @@ public class addItem extends AppCompatActivity {
                             } catch (IOException e) {
                                 Log.e("Image Error path",e.getMessage());
                             }
-                            Bitmap bitmap;
+                            final Bitmap bitmap;
                             bitmap = decodeSampledBitmapFromUri(outputFile,imageItem_add.getWidth(),imageItem_add.getHeight());
                         /*if (databasePicture.Checker() != 0){
                             databasePicture.clearTable();
@@ -155,14 +155,20 @@ public class addItem extends AppCompatActivity {
                             if (bitmap == null){
                                 Toast.makeText(getApplicationContext(),"The Image Data Currop",Toast.LENGTH_LONG).show();
                             }else {
+                                final CustomDialog customDialog = new CustomDialog(addItem.this);
+                                customDialog.show();
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                                 bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
                                 dataImage = baos.toByteArray();
+                                Long tsLong = System.currentTimeMillis()/1000;
+                                String ts = tsLong.toString();
+                                ItemImage = storagePath.child(user.getUid()+"/"+ts+".jpg");
 
                                 UploadTask uploadTask = ItemImage.putBytes(dataImage);
                                 uploadTask.addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
+                                        customDialog.dismiss();
                                         Log.e("Error Upload Gambar",e.getMessage());
                                         Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
                                     }
@@ -170,6 +176,8 @@ public class addItem extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                         urlImage = taskSnapshot.getDownloadUrl();
+                                        imageItem_add.setImageBitmap(bitmap);
+                                        customDialog.dismiss();
                                     }
                                 });
                             }
@@ -226,6 +234,8 @@ public class addItem extends AppCompatActivity {
 
 
     void saveItem(){
+        final CustomDialog customDialog = new CustomDialog(addItem.this);
+        customDialog.show();
         String namaBarang = namaItem_add.getText().toString();
         String Deskrpsi = deskripsiItem_add.getText().toString();
         int HargaBarang = Integer.parseInt(hargaItem_add.getText().toString());
@@ -241,12 +251,14 @@ public class addItem extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
                     Toast.makeText(addItem.this,"item added Success",Toast.LENGTH_LONG).show();
+                    customDialog.dismiss();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(addItem.this,e.getMessage(),Toast.LENGTH_LONG).show();
+                customDialog.dismiss();
             }
         });
 

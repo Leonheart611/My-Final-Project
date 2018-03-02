@@ -48,12 +48,14 @@ public class ItemAdapter extends FirestoreAdapter<ItemAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView namaBarang_list, jenisBarang_list, hargaBarang_list;
+        ImageView barangImage_list;
 
         public ViewHolder(View itemView) {
             super(itemView);
             namaBarang_list = itemView.findViewById(R.id.namaBarang_list);
             jenisBarang_list = itemView.findViewById(R.id.jenisBarang_list);
             hargaBarang_list = itemView.findViewById(R.id.hargaBarang_list);
+            barangImage_list = itemView.findViewById(R.id.barangImage_list);
 
         }
 
