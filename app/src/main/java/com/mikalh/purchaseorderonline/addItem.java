@@ -7,12 +7,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -24,12 +27,17 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.mikalh.purchaseorderonline.Model.Item;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -48,16 +56,26 @@ public class addItem extends AppCompatActivity {
     private String imageName = null;
     private static Uri fileUri = null;
     private static final int CAMERA_IMAGE_REQUEST=1;
-
+    Uri outputFile;
     private static final int MY_CAMERA_REQUEST_CODE = 100;
+
+    private FirebaseStorage storage;
+    StorageReference ItemImage;
+    byte[] dataImage;
+    Uri urlImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_item);
+        // Firebase Setting all
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
+        storage = FirebaseStorage.getInstance();
+        StorageReference storagePath = storage.getReference();
+        ItemImage = storagePath.child("ItemImages/");
+
 
         //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         namaItem_add = findViewById(R.id.namaItem_add);
@@ -68,16 +86,6 @@ public class addItem extends AppCompatActivity {
         addItemDo = findViewById(R.id.addItemDo);
         imageItem_add = findViewById(R.id.itemImage_add);
         //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        root = Environment.getExternalStorageDirectory().toString()
-                + "/Your_Folder";
-
-        // Creating folders for Image
-        imageFolderPath = root + "/saved_images";
-        File imagesFolder = new File(imageFolderPath);
-        imagesFolder.mkdirs();
-
-        // Generating file name
-        imageName = "test.png";
 
 
         addItemDo.setOnClickListener(new View.OnClickListener() {
@@ -93,16 +101,15 @@ public class addItem extends AppCompatActivity {
                         != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{android.Manifest.permission.CAMERA},
                             MY_CAMERA_REQUEST_CODE);
+                }else {
+                    Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    File file = new File(Environment.getExternalStorageDirectory()+File.separator+"DCIM/Camera","IMG_lwlwlwlwlwwl.jpg");
+                    outputFile = Uri.fromFile(file);
+                    i.putExtra(MediaStore.EXTRA_OUTPUT, outputFile);
+                    startActivityForResult(i,0);
+
                 }
-                File image = new File(imageFolderPath, imageName);
 
-                fileUri = Uri.fromFile(image);
-
-                imageItem_add.setTag(imageFolderPath + File.separator + imageName);
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(takePictureIntent,
-                        CAMERA_IMAGE_REQUEST);
             }
         });
 
@@ -117,23 +124,57 @@ public class addItem extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case CAMERA_IMAGE_REQUEST:
-                    Bitmap bitmap = null;
-                    try {
-                        GetImageThumbnail getImageThumbnail = new GetImageThumbnail();
-                        bitmap = getImageThumbnail.getThumbnail(fileUri, this);
-                    } catch (FileNotFoundException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    } catch (IOException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
+                case 0:
+                    if (resultCode == RESULT_OK){
+                        Log.d("Tag","outputFileUri Result_ok"+outputFile);
+                        if (outputFile != null){
+                            Matrix mat = new Matrix();
+                            try {
+                                ExifInterface exif = new ExifInterface(outputFile.getPath());
+                                String orientstring = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+                                int orientation = orientstring != null ? Integer.parseInt(orientstring) : ExifInterface.ORIENTATION_NORMAL;
+                                int rotateangle = 0;
+                                if (orientation == ExifInterface.ORIENTATION_ROTATE_90)
+                                    rotateangle = 90;
+                                if(orientation == ExifInterface.ORIENTATION_ROTATE_180)
+                                    rotateangle = 180;
+                                if(orientation == ExifInterface.ORIENTATION_ROTATE_270)
+                                    rotateangle = 270;
+                                mat.setRotate(rotateangle, (float) imageItem_add.getWidth() / 2, (float) imageItem_add.getHeight() / 2);
 
-                    // Setting image image icon on the imageview
-                    imageItem_add.setImageBitmap(bitmap);
+                            } catch (IOException e) {
+                                Log.e("Image Error path",e.getMessage());
+                            }
+                            Bitmap bitmap;
+                            bitmap = decodeSampledBitmapFromUri(outputFile,imageItem_add.getWidth(),imageItem_add.getHeight());
+                        /*if (databasePicture.Checker() != 0){
+                            databasePicture.clearTable();
+                        }*/
+
+                            if (bitmap == null){
+                                Toast.makeText(getApplicationContext(),"The Image Data Currop",Toast.LENGTH_LONG).show();
+                            }else {
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
+                                dataImage = baos.toByteArray();
+
+                                UploadTask uploadTask = ItemImage.putBytes(dataImage);
+                                uploadTask.addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.e("Error Upload Gambar",e.getMessage());
+                                        Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                                    }
+                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        urlImage = taskSnapshot.getDownloadUrl();
+                                    }
+                                });
+                            }
+                        }
+                    }
                     break;
                 default:
                     Toast.makeText(this, "Something went wrong...",
@@ -142,7 +183,6 @@ public class addItem extends AppCompatActivity {
             }
 
         }
-    }
     public static class GetImageThumbnail {
 
         private static int getPowerOfTwoForSampleRatio(double ratio) {
@@ -182,20 +222,8 @@ public class addItem extends AppCompatActivity {
             return bitmap;
         }
     }
-    public void showFullImage(View view) {
-        String path = (String) view.getTag();
 
-        if (path != null) {
 
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_VIEW);
-            Uri imgUri = Uri.parse("file://" + path);
-            intent.setDataAndType(imgUri, "image/*");
-            startActivity(intent);
-
-        }
-
-    }
 
     void saveItem(){
         String namaBarang = namaItem_add.getText().toString();
@@ -203,8 +231,9 @@ public class addItem extends AppCompatActivity {
         int HargaBarang = Integer.parseInt(hargaItem_add.getText().toString());
         String userId = user.getUid();
         String unitItem = unitItem_add.getText().toString();
+        String imageItemUrl = urlImage.toString();
 
-        Item item = new Item(namaBarang,userId,unitItem,Deskrpsi,"",HargaBarang);
+        Item item = new Item(namaBarang,userId,unitItem,Deskrpsi,imageItemUrl,HargaBarang);
 
         firestore.collection("Items").document()
                 .set(item).addOnCompleteListener(new OnCompleteListener<Void>() {
