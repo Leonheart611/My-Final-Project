@@ -1,13 +1,18 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.Dialog;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -17,6 +22,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.Item;
 
 public class detailItem extends AppCompatActivity {
@@ -28,6 +34,7 @@ public class detailItem extends AppCompatActivity {
     DocumentReference documentReference;
     CustomDialog customDialog;
     Item item;
+    Button beliButton_do;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +44,7 @@ public class detailItem extends AppCompatActivity {
         hargaBarang_detail = findViewById(R.id.hargaBarang_detail);
         diskripsiBarang_detail = findViewById(R.id.diskripsiBarang_detail);
         imageBarang_detail = findViewById(R.id.imageBarang_detail);
+        beliButton_do = findViewById(R.id.beliButton_do);
         firestore = FirebaseFirestore.getInstance();
         KEY_ITEM_ID = getIntent().getExtras().getString(userUI.KEY_ITEM_ID);
         customDialog.show();
@@ -71,5 +79,50 @@ public class detailItem extends AppCompatActivity {
             }
         });
 
+        beliButton_do.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popupBuyCart();
+            }
+        });
+
+
+    }
+    void popupBuyCart(){
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.pop_up_buy_cart);
+
+        final Button saveToCart = dialog.findViewById(R.id.saveToCart);
+        final EditText banyakPCS_popCart = dialog.findViewById(R.id.banyakPCS_popCart);
+
+        saveToCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                    int pcs = Integer.parseInt(banyakPCS_popCart.getText().toString());
+                Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit(),item.getDeskripsi_barang(),
+                        item.getHarga_barang(),item.getImageItemUrl(),pcs);
+                // add database firestore
+                firestore.collection("Users").document("Cart").set(cart).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Gagal Save To DB",e.getMessage());
+                        Toast.makeText(detailItem.this,e.getMessage(),Toast.LENGTH_LONG).show();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Toast.makeText(detailItem.this,"Barang sudah masuk di Cart",Toast.LENGTH_LONG).show();
+                            dialog.show();
+                        }
+                    }
+                });
+                // add database firestore
+
+
+            }
+        });
+        dialog.show();
     }
 }

@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class addItem extends AppCompatActivity {
     EditText namaItem_add, hargaItem_add, deskripsiItem_add,unitItem_add;
@@ -63,6 +64,7 @@ public class addItem extends AppCompatActivity {
     StorageReference storagePath;
     byte[] dataImage;
     Uri urlImage;
+    ArrayList<String> imageList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,15 +111,12 @@ public class addItem extends AppCompatActivity {
                     startActivityForResult(i,0);
 
                 }
-
             }
         });
 
         // Camera
 
         // Creating image here
-
-
 
     }
 
@@ -241,9 +240,9 @@ public class addItem extends AppCompatActivity {
         int HargaBarang = Integer.parseInt(hargaItem_add.getText().toString());
         String userId = user.getUid();
         String unitItem = unitItem_add.getText().toString();
-        String imageItemUrl = urlImage.toString();
+        String urlItemBarang = urlImage.toString();
 
-        Item item = new Item(namaBarang,userId,unitItem,Deskrpsi,imageItemUrl,HargaBarang);
+        Item item = new Item(namaBarang,userId,unitItem,Deskrpsi,HargaBarang,urlItemBarang);
 
         firestore.collection("Items").document()
                 .set(item).addOnCompleteListener(new OnCompleteListener<Void>() {

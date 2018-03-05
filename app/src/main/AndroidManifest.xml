@@ -24,7 +24,8 @@
         <activity android:name=".userUI" />
         <activity android:name=".addItem" />
         <activity android:name=".detailItem" />
-        <activity android:name=".myProfile"></activity>
+        <activity android:name=".myProfile" />
+        <activity android:name=".cartUI"></activity>
     </application>
 
 </manifest>
