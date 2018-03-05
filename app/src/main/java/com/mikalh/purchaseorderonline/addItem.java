@@ -64,7 +64,7 @@ public class addItem extends AppCompatActivity {
     StorageReference storagePath;
     byte[] dataImage;
     Uri urlImage;
-    ArrayList<String> imageUrls;
+    ArrayList<String> imageList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,15 +111,12 @@ public class addItem extends AppCompatActivity {
                     startActivityForResult(i,0);
 
                 }
-
             }
         });
 
         // Camera
 
         // Creating image here
-
-
 
     }
 
@@ -178,7 +175,6 @@ public class addItem extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                         urlImage = taskSnapshot.getDownloadUrl();
-                                        imageUrls.add(urlImage.toString());
                                         imageItem_add.setImageBitmap(bitmap);
                                         customDialog.dismiss();
                                     }
@@ -244,8 +240,9 @@ public class addItem extends AppCompatActivity {
         int HargaBarang = Integer.parseInt(hargaItem_add.getText().toString());
         String userId = user.getUid();
         String unitItem = unitItem_add.getText().toString();
+        String urlItemBarang = urlImage.toString();
 
-        Item item = new Item(namaBarang,userId,unitItem,Deskrpsi,HargaBarang,imageUrls);
+        Item item = new Item(namaBarang,userId,unitItem,Deskrpsi,HargaBarang,urlItemBarang);
 
         firestore.collection("Items").document()
                 .set(item).addOnCompleteListener(new OnCompleteListener<Void>() {
