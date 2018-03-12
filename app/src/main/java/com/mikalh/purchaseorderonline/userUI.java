@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -175,6 +176,7 @@ public class userUI extends AppCompatActivity implements ItemAdapter.OnItemSelec
     void signOut(){
         FirebaseAuth.getInstance().signOut();
         Intent i = new Intent(userUI.this, MainActivity.class);
+        Toast.makeText(userUI.this,"Success Sign Out",Toast.LENGTH_LONG).show();
         startActivity(i);
     }
 
