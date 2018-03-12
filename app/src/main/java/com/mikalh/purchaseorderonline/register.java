@@ -2,6 +2,7 @@ package com.mikalh.purchaseorderonline;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mikalh.purchaseorderonline.Model.User;
+import com.mikalh.purchaseorderonline.Pager.RegisterPager;
+import com.pixelcan.inkpageindicator.InkPageIndicator;
+
+import github.chenupt.springindicator.SpringIndicator;
+import github.chenupt.springindicator.viewpager.ScrollerViewPager;
 
 public class register extends AppCompatActivity {
     EditText nama_register, nohp_register,email_register, password_register;
@@ -32,38 +38,27 @@ public class register extends AppCompatActivity {
     FirebaseUser user;
     FirebaseFirestore firestore;
     ProgressBar loadingBar_register;
+    ViewPager myViewPager;
+    RegisterPager registerPager;
+    InkPageIndicator inkPageIndicator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        myViewPager = findViewById(R.id.myViewPagger);
 
-        nama_register = findViewById(R.id.nama_register);
-        nohp_register = findViewById(R.id.nohp_register);
-        email_register = findViewById(R.id.email_register);
-        password_register = findViewById(R.id.password_register);
-        registerDo = findViewById(R.id.registerDo);
-        loadingBar_register = findViewById(R.id.loadingBar_register);
-        registerDo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Register();
-            }
-        });
+        inkPageIndicator = findViewById(R.id.indicator);
+        registerPager = new RegisterPager(getSupportFragmentManager(),2);
+        myViewPager.setAdapter(registerPager);
 
-        password_register.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if (i == EditorInfo.IME_ACTION_DONE || i == EditorInfo.IME_NULL){
-                    Register();
-                    return true;
-                }
-                return false;
-            }
-        });
+        inkPageIndicator.setViewPager(myViewPager);
+
 
     }
+
+
     void Register(){
         final String Email = email_register.getText().toString();
         final String Password = password_register.getText().toString();
