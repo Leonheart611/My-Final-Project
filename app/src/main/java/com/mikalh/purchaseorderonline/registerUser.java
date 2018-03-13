@@ -1,6 +1,7 @@
 package com.mikalh.purchaseorderonline;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -51,7 +52,7 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
     FirebaseFirestore firestore;
     registerCompanyProfile previous;
     private OnFragmentInteractionListener mListener;
-
+    CustomDialog cd;
     public registerUser() {
         // Required empty public constructor
     }
@@ -137,6 +138,8 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
     }
 
     void RegisterDo(){
+        cd = new CustomDialog(getActivity());
+        cd.show();
         Company mcompany = CachePot.getInstance().pop(Company.class);
 
         final String CompanyName = mcompany.getNama_perusahaan();
@@ -169,7 +172,10 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){
+                                cd.dismiss();
                                 Toast.makeText(getActivity(),"Please Check Your email for verification",Toast.LENGTH_LONG).show();
+                                Intent i = new Intent(getActivity(), newUserUI.class);
+                                startActivity(i);
                             }
                             else {
 

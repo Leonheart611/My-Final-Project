@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mikalh.purchaseorderonline.newMainActivity">
+    tools:context="com.mikalh.purchaseorderonline.newUserUI">
 
     <android.support.design.widget.TabLayout
         android:id="@+id/mainTab"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="8dp">
@@ -17,16 +17,19 @@
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:icon="@mipmap/home"
             android:text="HOME" />
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:icon="@mipmap/transaction"
             android:text="TRANSACTION" />
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:icon="@mipmap/chat"
             android:text="CHAT" />
     </android.support.design.widget.TabLayout>
 
