@@ -1,10 +1,12 @@
 package com.mikalh.purchaseorderonline.Model;
 
+import java.io.Serializable;
+
 /**
  * Created by mika.frentzen on 12/03/2018.
  */
 
-public class Company {
+public class Company implements Serializable {
     private String
             alamat_perusahaan,
             nama_perusahaan,nomorTelphone, no_fax, kota, Provinsi

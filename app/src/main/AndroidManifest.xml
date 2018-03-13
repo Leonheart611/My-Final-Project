@@ -25,7 +25,11 @@
         <activity android:name=".addItem" />
         <activity android:name=".detailItem" />
         <activity android:name=".myProfile" />
-        <activity android:name=".cartUI"></activity>
+        <activity android:name=".cartUI" />
+        <activity
+            android:name=".newUserUI"
+            android:theme="@style/generalnotitle" />
+        <activity android:name=".myCatalogue"></activity>
     </application>
 
 </manifest>
