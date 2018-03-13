@@ -10,9 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import com.github.kimkevin.cachepot.CachePot;
+import com.mikalh.purchaseorderonline.Model.Company;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 
@@ -24,12 +27,13 @@ import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
  * Use the {@link registerCompanyProfile#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class registerCompanyProfile extends android.support.v4.app.Fragment {
+public class registerCompanyProfile extends android.support.v4.app.Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    public static final String COMPANY_KEY = "company";
+    registerUser next = new registerUser();
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -71,7 +75,8 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment {
 
     };
     private OnFragmentInteractionListener mListener;
-
+    Button nextDo;
+    ViewPager myViewPagger;
     TextInputEditText companyName_register, adress_register
             ,city_register,telephone_register,fax_register;
     SearchableSpinner province_register;
@@ -117,15 +122,19 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment {
         adress_register = view.findViewById(R.id.adress_register);
         telephone_register = view.findViewById(R.id.telephone_register);
         fax_register = view.findViewById(R.id.fax_register);
+        nextDo = view.findViewById(R.id.nextDo);
+        nextDo.setOnClickListener(this);
         province_register = view.findViewById(R.id.province_register);
         ArrayAdapter adapter = new ArrayAdapter(getActivity(),android.R.layout.simple_spinner_dropdown_item,listProvince);
-
         province_register.setAdapter(adapter);
         province_register.setTitle("Select Province");
+        myViewPagger = getActivity().findViewById(R.id.myViewPagger);
 
 
         return view;
     }
+
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -134,7 +143,7 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment {
         }
     }
 
-   /* @Override
+  /*  @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -143,34 +152,37 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-    }
-*/
+    }*/
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
     }
 
-    public String getCompanyName(){
-        String CompanyName = companyName_register.getText().toString();
-        return CompanyName;
+    @Override
+    public void onClick(View view) {
+        if (view == nextDo){
+
+            Company company = new Company();
+            company.setNama_perusahaan(companyName_register.getText().toString());
+            company.setAlamat_perusahaan(adress_register.getText().toString());
+            company.setKota(city_register.getText().toString());
+            company.setNo_fax(fax_register.getText().toString());
+            company.setProvinsi(province_register.getSelectedItem().toString());
+            company.setNomorTelphone(telephone_register.getText().toString());
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(COMPANY_KEY,company);
+            next.setArguments(bundle);
+            CachePot.getInstance().push(company);
+
+
+            myViewPagger.setCurrentItem(1,true);
+
+        }
     }
-    public String getAddress(){
-        String Address = adress_register.getText().toString();
-        return Address;
-    }
-    public String getProvince(){
-        return province_register.getSelectedItem().toString();
-    }
-    public String getCity(){
-        return city_register.getText().toString();
-    }
-    public String getTelphone(){
-        return telephone_register.getText().toString();
-    }
-    public String getFax(){
-        return fax_register.getText().toString();
-    }
+
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

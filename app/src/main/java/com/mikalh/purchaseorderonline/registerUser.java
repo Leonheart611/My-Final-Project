@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.github.kimkevin.cachepot.CachePot;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -22,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.mikalh.purchaseorderonline.Model.Company;
 import com.mikalh.purchaseorderonline.Model.User;
 
 
@@ -48,7 +50,6 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
     FirebaseUser user;
     FirebaseFirestore firestore;
     registerCompanyProfile previous;
-
     private OnFragmentInteractionListener mListener;
 
     public registerUser() {
@@ -83,6 +84,8 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         previous = new registerCompanyProfile();
+
+
 
     }
 
@@ -134,12 +137,14 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
     }
 
     void RegisterDo(){
-        final String CompanyName = previous.getCompanyName();
-        final String Address = previous.getAddress();
-        final String Province = previous.getProvince();
-        final String City = previous.getCity();
-        final String Telephone = previous.getTelphone();
-        final String FAX = previous.getFax();
+        Company mcompany = CachePot.getInstance().pop(Company.class);
+
+        final String CompanyName = mcompany.getNama_perusahaan();
+        final String Address = mcompany.getAlamat_perusahaan();
+        final String Province = mcompany.getProvinsi();
+        final String City = mcompany.getKota();
+        final String Telephone = mcompany.getNomorTelphone();
+        final String FAX = mcompany.getNo_fax();
         final String Email = email_register.getText().toString();
         final String PICName = name_register.getText().toString();
         final String PICPossition = position_register.getText().toString();
