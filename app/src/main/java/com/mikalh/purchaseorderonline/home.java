@@ -128,6 +128,10 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
             Toast.makeText(getActivity(),"Success Sign Out",Toast.LENGTH_LONG).show();
             startActivity(i);
         }
+        if (view == catalogImage || view == catalogTxt){
+            Intent i = new Intent(getActivity(),myCatalogue.class);
+            startActivity(i);
+        }
     }
 
     /**

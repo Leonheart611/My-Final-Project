@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -36,6 +37,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.mikalh.purchaseorderonline.Model.Item;
+import com.mikalh.purchaseorderonline.TextWatcher.CurcurencyFormater;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,7 +47,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 public class addItem extends AppCompatActivity {
-    EditText namaItem_add, hargaItem_add, deskripsiItem_add,unitItem_add;
+    EditText namaItem_add, hargaItem_add,unitItem_add;
     ImageView imageItem_add;
     Button addItemDo;
     FirebaseFirestore firestore;
@@ -69,6 +71,10 @@ public class addItem extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setTitle("Add Item");
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         setContentView(R.layout.activity_add_item);
         // Firebase Setting all
         firestore = FirebaseFirestore.getInstance();
@@ -84,7 +90,7 @@ public class addItem extends AppCompatActivity {
         //jenisItem_add = findViewById(R.id.jenisItem_add);
         unitItem_add = findViewById(R.id.unitItem_add);
         hargaItem_add = findViewById(R.id.hargaItem_add);
-        deskripsiItem_add = findViewById(R.id.deskripsiItem_add);
+        hargaItem_add.addTextChangedListener(new CurcurencyFormater(hargaItem_add));
         addItemDo = findViewById(R.id.addItemDo);
         imageItem_add = findViewById(R.id.itemImage_add);
         //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -236,13 +242,15 @@ public class addItem extends AppCompatActivity {
         final CustomDialog customDialog = new CustomDialog(addItem.this);
         customDialog.show();
         String namaBarang = namaItem_add.getText().toString();
-        String Deskrpsi = deskripsiItem_add.getText().toString();
         int HargaBarang = Integer.parseInt(hargaItem_add.getText().toString());
         String userId = user.getUid();
         String unitItem = unitItem_add.getText().toString();
-        String urlItemBarang = urlImage.toString();
+        String urlItemBarang="";
+        if (urlImage!=null) {
+            urlItemBarang = urlImage.toString();
+        }
 
-        Item item = new Item(namaBarang,userId,unitItem,Deskrpsi,HargaBarang,urlItemBarang);
+        Item item = new Item(namaBarang,userId,unitItem,HargaBarang,urlItemBarang);
 
         firestore.collection("Items").document()
                 .set(item).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -296,5 +304,17 @@ public class addItem extends AppCompatActivity {
             }
         }
         return inSampleSize;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.home:
+                super.onBackPressed();
+                return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+        }
+
     }
 }

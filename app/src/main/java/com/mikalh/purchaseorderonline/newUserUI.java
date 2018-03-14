@@ -38,4 +38,5 @@ public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelec
     public void onTabReselected(TabLayout.Tab tab) {
 
     }
+
 }

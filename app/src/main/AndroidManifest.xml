@@ -29,7 +29,8 @@
         <activity
             android:name=".newUserUI"
             android:theme="@style/generalnotitle" />
-        <activity android:name=".myCatalogue"></activity>
+        <activity android:name=".myCatalogue" />
+        <activity android:name=".detailEdit"></activity>
     </application>
 
 </manifest>

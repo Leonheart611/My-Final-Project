@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         email_login = findViewById(R.id.email_login);
         password_login = findViewById(R.id.password_login);
         loginDo = findViewById(R.id.loginDo);
+        tilPassword = findViewById(R.id.tilPassword);
         loginDo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     void login(){
-        tilPassword.setError("");
+        tilPassword.setError(null);
         customDialog = new CustomDialog(MainActivity.this);
         customDialog.show();
         String email = email_login.getText().toString();
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }else {
             tilPassword.setError("Please input Email and Password");
+            customDialog.dismiss();
             //Toast.makeText(MainActivity.this,"Please input Email and Password",Toast.LENGTH_LONG).show();
         }
     }

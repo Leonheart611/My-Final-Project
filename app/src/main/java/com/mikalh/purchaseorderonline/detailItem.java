@@ -64,7 +64,6 @@ public class detailItem extends AppCompatActivity {
                     namaBarang_detail.setVisibility(View.VISIBLE);
                     hargaBarang_detail.setText(item.getHarga_barang()+"");
                     hargaBarang_detail.setVisibility(View.VISIBLE);
-                    diskripsiBarang_detail.setText(item.getDeskripsi_barang());
                     diskripsiBarang_detail.setVisibility(View.VISIBLE);
                     Glide.with(imageBarang_detail.getContext())
                             .load(item.getImageItemUrl())
@@ -100,7 +99,7 @@ public class detailItem extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                     int pcs = Integer.parseInt(banyakPCS_popCart.getText().toString());
-                Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit(),item.getDeskripsi_barang(),
+                Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit(),
                         item.getHarga_barang(),item.getImageItemUrl(),pcs);
                 // add database firestore
                 firestore.collection("Users").document("Cart").set(cart).addOnFailureListener(new OnFailureListener() {
