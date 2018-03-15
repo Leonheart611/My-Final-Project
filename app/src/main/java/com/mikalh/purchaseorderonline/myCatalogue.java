@@ -45,7 +45,7 @@ public class myCatalogue extends AppCompatActivity implements CatalogueAdapter.O
 
         firestore = FirebaseFirestore.getInstance();
         String id = user.getUid();
-        query = FirebaseFirestore.getInstance().collection("Items").limit(50);
+        query = FirebaseFirestore.getInstance().collection("Items").whereEqualTo("userId",user.getUid());
         adapter = new CatalogueAdapter(query,this){
             @Override
             protected void onDataChanged() {

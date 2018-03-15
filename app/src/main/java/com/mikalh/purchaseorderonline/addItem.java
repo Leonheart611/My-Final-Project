@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,11 +55,12 @@ public class addItem extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseUser user;
     //Image
-    private static String root = null;
-    private static String imageFolderPath = null;
-    private String imageName = null;
-    private static Uri fileUri = null;
-    private static final int CAMERA_IMAGE_REQUEST=1;
+    String[] permissionsRequired = new String[]{Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+
+
+
     Uri outputFile;
     private static final int MY_CAMERA_REQUEST_CODE = 100;
     private FirebaseStorage storage;
@@ -105,10 +107,9 @@ public class addItem extends AppCompatActivity {
         imageItem_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkSelfPermission(Manifest.permission.CAMERA)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{android.Manifest.permission.CAMERA},
-                            MY_CAMERA_REQUEST_CODE);
+                if (!hasPermissions(addItem.this,permissionsRequired)) {
+
+                    requestPermissions(permissionsRequired,1);
                 }else {
                     Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     File file = new File(Environment.getExternalStorageDirectory()+File.separator+"DCIM/Camera","IMG_lwlwlwlwlwwl.jpg");
@@ -242,7 +243,7 @@ public class addItem extends AppCompatActivity {
         final CustomDialog customDialog = new CustomDialog(addItem.this);
         customDialog.show();
         String namaBarang = namaItem_add.getText().toString();
-        int HargaBarang = Integer.parseInt(hargaItem_add.getText().toString());
+        String HargaBarang = hargaItem_add.getText().toString();
         String userId = user.getUid();
         String unitItem = unitItem_add.getText().toString();
         String urlItemBarang="";
@@ -316,5 +317,15 @@ public class addItem extends AppCompatActivity {
                     return super.onOptionsItemSelected(item);
         }
 
+    }
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

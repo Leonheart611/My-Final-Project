@@ -9,10 +9,10 @@ import java.util.ArrayList;
 
 public class Item  {
     private String nama_barang, userId, unit;
-    private int harga_barang;
+    private String harga_barang;
     private String imageItemUrl;
 
-    public Item(String nama_barang, String userId, String unit, int harga_barang, String imageItemUrl) {
+    public Item(String nama_barang, String userId, String unit, String harga_barang, String imageItemUrl) {
         this.nama_barang = nama_barang;
         this.userId = userId;
         this.unit = unit;
@@ -55,12 +55,11 @@ public class Item  {
         this.userId = userId;
     }
 
-    public int getHarga_barang() {
+    public String getHarga_barang() {
         return harga_barang;
     }
 
-    public void setHarga_barang(int harga_barang) {
+    public void setHarga_barang(String harga_barang) {
         this.harga_barang = harga_barang;
     }
-
 }

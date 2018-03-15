@@ -30,7 +30,8 @@
             android:name=".newUserUI"
             android:theme="@style/generalnotitle" />
         <activity android:name=".myCatalogue" />
-        <activity android:name=".detailEdit"></activity>
+        <activity android:name=".detailEdit" />
+        <activity android:name=".Profile"></activity>
     </application>
 
 </manifest>

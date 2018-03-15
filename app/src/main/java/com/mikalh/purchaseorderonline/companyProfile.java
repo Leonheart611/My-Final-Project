@@ -1,43 +1,59 @@
 package com.mikalh.purchaseorderonline;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.mikalh.purchaseorderonline.Model.User;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link home.OnFragmentInteractionListener} interface
+ * {@link companyProfile.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link home#newInstance} factory method to
+ * Use the {@link companyProfile#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class home extends android.support.v4.app.Fragment implements View.OnClickListener {
+public class companyProfile extends android.support.v4.app.Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    ImageView profileImage,catalogImage,searchImage,logoutImage;
-    TextView profileTxt, catalogTxt,searchTxt,logoutTxt;
+    FirebaseAuth auth;
+    FirebaseUser user;
+    FirebaseFirestore firestore;
+    CollectionReference users;
+    TextInputEditText companyName_profile, address_profile,
+            province_profile,city_profile,fax_profile;
+    Button btnSave;
+    User profileUser;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
-    public home() {
+    public companyProfile() {
         // Required empty public constructor
     }
 
@@ -47,11 +63,11 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment home.
+     * @return A new instance of fragment companyProfile.
      */
     // TODO: Rename and change types and number of parameters
-    public static home newInstance(String param1, String param2) {
-        home fragment = new home();
+    public static companyProfile newInstance(String param1, String param2) {
+        companyProfile fragment = new companyProfile();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -66,34 +82,52 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+        firestore = FirebaseFirestore.getInstance();
+        users = firestore.collection("Users");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        profileImage = view.findViewById(R.id.profileImage);
-        profileImage.setOnClickListener(this);
-        profileTxt = view.findViewById(R.id.ProfileTxt);
-        profileTxt.setOnClickListener(this);
+        DocumentReference docRef = users.document(user.getUid());
 
-        catalogImage = view.findViewById(R.id.catalogImage);
-        catalogImage.setOnClickListener(this);
-        catalogTxt = view.findViewById(R.id.catalogTxt);
-        catalogTxt.setOnClickListener(this);
+        View v = inflater.inflate(R.layout.fragment_company_profile, container, false);
+        companyName_profile = v.findViewById(R.id.companyName_profile);
 
-        searchImage = view.findViewById(R.id.searchImage);
-        searchImage.setOnClickListener(this);
-        searchTxt = view.findViewById(R.id.searchTxt);
-        searchTxt.setOnClickListener(this);
+        address_profile = v.findViewById(R.id.address_profile);
 
-        logoutImage = view.findViewById(R.id.logoutImage);
-        logoutImage.setOnClickListener(this);
-        logoutTxt = view.findViewById(R.id.logoutTxt);
-        logoutTxt.setOnClickListener(this);
+        province_profile = v.findViewById(R.id.province_profile);
 
-        return view;
+        city_profile = v.findViewById(R.id.city_profile);
+
+        fax_profile = v.findViewById(R.id.fax_profile);
+
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot documentSnapshot = task.getResult();
+                    profileUser = documentSnapshot.toObject(User.class);
+                    companyName_profile.setText(profileUser.getNama_perusahaan(), TextView.BufferType.EDITABLE);
+                    address_profile.setText(profileUser.getAlamat_perusahaan(), TextView.BufferType.EDITABLE);
+                    province_profile.setText(profileUser.getProvinsi(), TextView.BufferType.EDITABLE);
+                    city_profile.setText(profileUser.getKota(), TextView.BufferType.EDITABLE);
+                    fax_profile.setText(profileUser.getNo_fax(), TextView.BufferType.EDITABLE);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Error get Data",e.getMessage());
+                Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -103,7 +137,7 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
         }
     }
 
-    /*@Override
+   /* @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -118,24 +152,6 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (view == logoutImage || view == logoutTxt){
-            FirebaseAuth.getInstance().signOut();
-            Intent i = new Intent(getActivity(),MainActivity.class);
-            Toast.makeText(getActivity(),"Success Sign Out",Toast.LENGTH_LONG).show();
-            startActivity(i);
-        }
-        if (view == catalogImage || view == catalogTxt){
-            Intent i = new Intent(getActivity(),myCatalogue.class);
-            startActivity(i);
-        }
-        if (view == profileImage || view == profileTxt){
-            Intent i = new Intent(getActivity(),Profile.class);
-            startActivity(i);
-        }
     }
 
     /**

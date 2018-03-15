@@ -62,7 +62,7 @@ public class detailItem extends AppCompatActivity {
                     item = documentSnapshot.toObject(Item.class);
                     namaBarang_detail.setText(item.getNama_barang());
                     namaBarang_detail.setVisibility(View.VISIBLE);
-                    hargaBarang_detail.setText(item.getHarga_barang()+"");
+                    hargaBarang_detail.setText(item.getHarga_barang());
                     hargaBarang_detail.setVisibility(View.VISIBLE);
                     diskripsiBarang_detail.setVisibility(View.VISIBLE);
                     Glide.with(imageBarang_detail.getContext())

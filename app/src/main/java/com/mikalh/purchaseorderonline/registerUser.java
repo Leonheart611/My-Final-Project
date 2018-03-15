@@ -151,7 +151,7 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
         final String Email = email_register.getText().toString();
         final String PICName = name_register.getText().toString();
         final String PICPossition = position_register.getText().toString();
-        String Username = username_register.getText().toString();
+        final String Username = username_register.getText().toString();
         String Password = password_register.getText().toString();
 
         auth.createUserWithEmailAndPassword(Email,Password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -182,7 +182,7 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
                             }
                         }
                     });
-                    User userAdd = new User(PICName,Email,user.getUid(),PICPossition,Address,CompanyName,Telephone,FAX,City,Province,"");
+                    User userAdd = new User(Address,CompanyName,Telephone,FAX,City,Province,"",PICName,Email,user.getUid(),PICPossition,Username);
                     firestore.collection("Users").document(user.getUid()).set(userAdd).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {

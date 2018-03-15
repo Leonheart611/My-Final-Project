@@ -39,4 +39,8 @@ public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelec
 
     }
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 }
