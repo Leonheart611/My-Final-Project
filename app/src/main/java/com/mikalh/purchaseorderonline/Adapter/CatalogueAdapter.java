@@ -33,7 +33,7 @@ public class CatalogueAdapter extends FirestoreAdapter<CatalogueAdapter.Catalogu
     @Override
     public CatalogueHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.activity_list_items,parent,false);
+                .inflate(R.layout.list_my_catalogue,parent,false);
         return new CatalogueHolder(view);
     }
 

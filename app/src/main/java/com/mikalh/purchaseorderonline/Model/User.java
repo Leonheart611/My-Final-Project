@@ -6,15 +6,24 @@ package com.mikalh.purchaseorderonline.Model;
 
 public class User extends Company{
     private String nama_PIC,
-            email,userID,jabatan_PIC;
+            email,userID,jabatan_PIC,username;
 
     public User(String alamat_perusahaan, String nama_perusahaan, String nomorTelphone, String no_fax, String kota
-            , String provinsi, String url_pictLogo, String nama_PIC, String email, String userID, String jabatan_PIC) {
+            , String provinsi, String url_pictLogo, String nama_PIC, String email, String userID, String jabatan_PIC,String username) {
         super(alamat_perusahaan, nama_perusahaan, nomorTelphone, no_fax, kota, provinsi, url_pictLogo);
         this.nama_PIC = nama_PIC;
         this.email = email;
         this.userID = userID;
         this.jabatan_PIC = jabatan_PIC;
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public User() {

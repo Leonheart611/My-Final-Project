@@ -90,7 +90,7 @@ public class register extends AppCompatActivity {
                                     }
                                 }
                             });
-                            User user1 = new User(nama,Nohp,Email,"","",user.getUid(),"","","","","");
+                            User user1 = new User(nama,Nohp,Email,"","",user.getUid(),"","","","","","");
                             firestore.collection("Users").document(user.getUid())
                                     .set(user1).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override

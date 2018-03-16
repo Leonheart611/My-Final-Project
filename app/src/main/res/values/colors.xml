@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="redBlack">#d60000</color>
+    <color name="tabColor">#8c9eff</color>
+    <color name="homeColor">#e3f2fd</color>
 </resources>

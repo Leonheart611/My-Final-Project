@@ -13,9 +13,11 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -36,6 +38,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.mikalh.purchaseorderonline.Model.Item;
+import com.mikalh.purchaseorderonline.TextWatcher.CurcurencyFormater;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,18 +48,19 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 public class addItem extends AppCompatActivity {
-    EditText namaItem_add, hargaItem_add, deskripsiItem_add,unitItem_add;
+    EditText namaItem_add, hargaItem_add,unitItem_add;
     ImageView imageItem_add;
     Button addItemDo;
     FirebaseFirestore firestore;
     FirebaseAuth auth;
     FirebaseUser user;
     //Image
-    private static String root = null;
-    private static String imageFolderPath = null;
-    private String imageName = null;
-    private static Uri fileUri = null;
-    private static final int CAMERA_IMAGE_REQUEST=1;
+    String[] permissionsRequired = new String[]{Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+
+
+
     Uri outputFile;
     private static final int MY_CAMERA_REQUEST_CODE = 100;
     private FirebaseStorage storage;
@@ -69,6 +73,10 @@ public class addItem extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setTitle("Add Item");
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         setContentView(R.layout.activity_add_item);
         // Firebase Setting all
         firestore = FirebaseFirestore.getInstance();
@@ -84,7 +92,7 @@ public class addItem extends AppCompatActivity {
         //jenisItem_add = findViewById(R.id.jenisItem_add);
         unitItem_add = findViewById(R.id.unitItem_add);
         hargaItem_add = findViewById(R.id.hargaItem_add);
-        deskripsiItem_add = findViewById(R.id.deskripsiItem_add);
+        hargaItem_add.addTextChangedListener(new CurcurencyFormater(hargaItem_add));
         addItemDo = findViewById(R.id.addItemDo);
         imageItem_add = findViewById(R.id.itemImage_add);
         //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
@@ -99,10 +107,9 @@ public class addItem extends AppCompatActivity {
         imageItem_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkSelfPermission(Manifest.permission.CAMERA)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{android.Manifest.permission.CAMERA},
-                            MY_CAMERA_REQUEST_CODE);
+                if (!hasPermissions(addItem.this,permissionsRequired)) {
+
+                    requestPermissions(permissionsRequired,1);
                 }else {
                     Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     File file = new File(Environment.getExternalStorageDirectory()+File.separator+"DCIM/Camera","IMG_lwlwlwlwlwwl.jpg");
@@ -236,13 +243,15 @@ public class addItem extends AppCompatActivity {
         final CustomDialog customDialog = new CustomDialog(addItem.this);
         customDialog.show();
         String namaBarang = namaItem_add.getText().toString();
-        String Deskrpsi = deskripsiItem_add.getText().toString();
-        int HargaBarang = Integer.parseInt(hargaItem_add.getText().toString());
+        String HargaBarang = hargaItem_add.getText().toString();
         String userId = user.getUid();
         String unitItem = unitItem_add.getText().toString();
-        String urlItemBarang = urlImage.toString();
+        String urlItemBarang="";
+        if (urlImage!=null) {
+            urlItemBarang = urlImage.toString();
+        }
 
-        Item item = new Item(namaBarang,userId,unitItem,Deskrpsi,HargaBarang,urlItemBarang);
+        Item item = new Item(namaBarang,userId,unitItem,HargaBarang,urlItemBarang);
 
         firestore.collection("Items").document()
                 .set(item).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -296,5 +305,27 @@ public class addItem extends AppCompatActivity {
             }
         }
         return inSampleSize;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.home:
+                super.onBackPressed();
+                return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+        }
+
+    }
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
