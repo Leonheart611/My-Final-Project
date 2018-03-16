@@ -136,6 +136,10 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
             Intent i = new Intent(getActivity(),Profile.class);
             startActivity(i);
         }
+        if(view == searchImage || view == searchTxt){
+            Intent i = new Intent(getActivity(),search.class);
+            startActivity(i);
+        }
     }
 
     /**
