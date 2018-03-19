@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
 /**
@@ -29,12 +30,14 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    ImageView profileImage,catalogImage,searchImage,logoutImage;
+    ImageView profileImage,catalogImage,searchImage,logoutImage,cartImage;
     TextView profileTxt, catalogTxt,searchTxt,logoutTxt;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    public static final String USER_ID = "userID";
+    FirebaseAuth auth;
+    FirebaseUser user;
     private OnFragmentInteractionListener mListener;
 
     public home() {
@@ -66,6 +69,8 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
     }
 
     @Override
@@ -77,6 +82,9 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
         profileImage.setOnClickListener(this);
         profileTxt = view.findViewById(R.id.ProfileTxt);
         profileTxt.setOnClickListener(this);
+
+        cartImage = view.findViewById(R.id.cartImage);
+        cartImage.setOnClickListener(this);
 
         catalogImage = view.findViewById(R.id.catalogImage);
         catalogImage.setOnClickListener(this);
@@ -134,10 +142,15 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
         }
         if (view == profileImage || view == profileTxt){
             Intent i = new Intent(getActivity(),Profile.class);
+            i.putExtra(USER_ID,user.getUid());
             startActivity(i);
         }
         if(view == searchImage || view == searchTxt){
             Intent i = new Intent(getActivity(),search.class);
+            startActivity(i);
+        }
+        if (view == cartImage){
+            Intent i = new Intent(getActivity(),cartUI.class);
             startActivity(i);
         }
     }

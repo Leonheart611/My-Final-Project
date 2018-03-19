@@ -1,6 +1,7 @@
 package com.mikalh.purchaseorderonline.Adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,7 +22,7 @@ import com.mikalh.purchaseorderonline.R;
 
 public class CartAdapter extends FirestoreAdapter<CartAdapter.CartHolder>{
     public interface OnCartSelectedListener{
-        void onItemSelected(DocumentSnapshot cart);
+        void onCartSelected(DocumentSnapshot cart);
     }
 
     private OnCartSelectedListener mListener;
@@ -33,20 +34,21 @@ public class CartAdapter extends FirestoreAdapter<CartAdapter.CartHolder>{
 
     @Override
     public CartHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view;
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.cart_list,parent,false);;
 
-        return null;
+        return new CartHolder(view);
     }
 
     @Override
     public void onBindViewHolder(CartHolder holder, int position) {
-
+        holder.bind(getSnapshot(position),mListener);
     }
 
 
     public static class CartHolder extends RecyclerView.ViewHolder{
         ImageView imageItem_cart;
-        TextView nameItem_cart,hargaItem_cart,quantitasItem_cart;
+        TextView nameItem_cart,hargaItem_cart,quantitasItem_cart,totalHarga;
 
         public CartHolder(View itemView) {
             super(itemView);
@@ -54,9 +56,13 @@ public class CartAdapter extends FirestoreAdapter<CartAdapter.CartHolder>{
             hargaItem_cart = itemView.findViewById(R.id.hargaItem_cart);
             quantitasItem_cart = itemView.findViewById(R.id.quantitasItem_cart);
             imageItem_cart = itemView.findViewById(R.id.imageItem_cart);
+            totalHarga = itemView.findViewById(R.id.totalHarga);
         }
         public void bind(final DocumentSnapshot snapshot, final OnCartSelectedListener listener){
             Cart cart = snapshot.toObject(Cart.class);
+            int harga = Integer.parseInt(cart.getHarga_barang());
+            int quantitas = cart.getQuantitas_banyakBarang();
+            int hargaTotal = harga * quantitas;
             if (!cart.getImageItemUrl().isEmpty()) {
                 Glide.with(imageItem_cart.getContext())
                         .load(cart.getImageItemUrl())
@@ -66,7 +72,17 @@ public class CartAdapter extends FirestoreAdapter<CartAdapter.CartHolder>{
             }
             nameItem_cart.setText(cart.getNama_barang());
             hargaItem_cart.setText(cart.getHarga_barang());
+            quantitasItem_cart.setText(cart.getQuantitas_banyakBarang());
+            totalHarga.setText(hargaTotal+"");
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null){
+                        listener.onCartSelected(snapshot);
+                    }
+                }
+            });
         }
     }
 

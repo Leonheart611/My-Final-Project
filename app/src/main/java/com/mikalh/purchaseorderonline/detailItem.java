@@ -2,6 +2,7 @@ package com.mikalh.purchaseorderonline;
 
 import android.app.Dialog;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -27,10 +30,11 @@ import com.mikalh.purchaseorderonline.Model.Item;
 
 public class detailItem extends AppCompatActivity {
     private String KEY_ITEM_ID;
-    TextView namaBarang_detail,hargaBarang_detail
-            ,quantitasBarang_detail,diskripsiBarang_detail;
+    TextInputEditText namaBarang_detail,hargaBarang_detail,unit_detail;
     ImageView imageBarang_detail;
     FirebaseFirestore firestore;
+    FirebaseAuth auth;
+    FirebaseUser user;
     DocumentReference documentReference;
     CustomDialog customDialog;
     Item item;
@@ -39,10 +43,12 @@ public class detailItem extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_item);
-        namaBarang_detail = findViewById(R.id.namaBarang_detail);
         customDialog = new CustomDialog(detailItem.this);
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+        namaBarang_detail = findViewById(R.id.namaBarang_detail);
         hargaBarang_detail = findViewById(R.id.hargaBarang_detail);
-        diskripsiBarang_detail = findViewById(R.id.diskripsiBarang_detail);
+        unit_detail = findViewById(R.id.unit_detail);
         imageBarang_detail = findViewById(R.id.imageBarang_detail);
         beliButton_do = findViewById(R.id.beliButton_do);
         firestore = FirebaseFirestore.getInstance();
@@ -60,11 +66,9 @@ public class detailItem extends AppCompatActivity {
                 if (task.isSuccessful()){
                     DocumentSnapshot documentSnapshot = task.getResult();
                     item = documentSnapshot.toObject(Item.class);
-                    namaBarang_detail.setText(item.getNama_barang());
-                    namaBarang_detail.setVisibility(View.VISIBLE);
-                    hargaBarang_detail.setText(item.getHarga_barang());
-                    hargaBarang_detail.setVisibility(View.VISIBLE);
-                    diskripsiBarang_detail.setVisibility(View.VISIBLE);
+                    namaBarang_detail.setText(item.getNama_barang());;
+                    hargaBarang_detail.setText(item.getHarga_barang()+"");
+                    unit_detail.setText(item.getUnit()+"");
                     Glide.with(imageBarang_detail.getContext())
                             .load(item.getImageItemUrl())
                             .into(imageBarang_detail);
@@ -98,11 +102,10 @@ public class detailItem extends AppCompatActivity {
         saveToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    int pcs = Integer.parseInt(banyakPCS_popCart.getText().toString());
-                Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit(),
-                        item.getHarga_barang(),item.getImageItemUrl(),pcs);
+                int pcs = Integer.parseInt(banyakPCS_popCart.getText().toString());
+                Cart cart = new Cart(item.getNama_barang(),user.getUid(),item.getUnit(),item.getHarga_barang(),item.getImageItemUrl(),pcs);
                 // add database firestore
-                firestore.collection("Users").document("Cart").set(cart).addOnFailureListener(new OnFailureListener() {
+                firestore.collection("Users").document(user.getUid()).collection("Cart").document().set(cart).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.e("Gagal Save To DB",e.getMessage());

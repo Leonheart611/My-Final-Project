@@ -23,7 +23,8 @@
             android:id="@+id/picName_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="PIC Name" />
+            android:hint="PIC Name"
+            android:textColor="@android:color/black" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -40,7 +41,8 @@
             android:id="@+id/picPosition_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="PIC Position" />
+            android:hint="PIC Position"
+            android:textColor="@android:color/black" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -57,7 +59,8 @@
             android:id="@+id/telephone_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Telephone" />
+            android:hint="Telephone"
+            android:textColor="@android:color/black" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -74,7 +77,8 @@
             android:id="@+id/email_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email" />
+            android:hint="Email"
+            android:textColor="@android:color/black" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -91,7 +95,8 @@
             android:id="@+id/username_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username" />
+            android:hint="Username"
+            android:textColor="@android:color/black" />
     </android.support.design.widget.TextInputLayout>
 
     <Button
