@@ -15,6 +15,14 @@ import com.google.firebase.firestore.Query;
 import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.R;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.Format;
+import java.text.NumberFormat;
+import java.util.Currency;
+import java.util.Locale;
+
 
 /**
  * Created by mika.frentzen on 05/03/2018.
@@ -60,9 +68,10 @@ public class CartAdapter extends FirestoreAdapter<CartAdapter.CartHolder>{
         }
         public void bind(final DocumentSnapshot snapshot, final OnCartSelectedListener listener){
             Cart cart = snapshot.toObject(Cart.class);
-            int harga = Integer.parseInt(cart.getHarga_barang());
+            BigDecimal harga = new BigDecimal(cart.getHarga_barang().replace(".",""));
             int quantitas = cart.getQuantitas_banyakBarang();
-            int hargaTotal = harga * quantitas;
+            BigDecimal total = totalCost(quantitas,harga);
+            String TotalCur = formatRP(total);
             if (!cart.getImageItemUrl().isEmpty()) {
                 Glide.with(imageItem_cart.getContext())
                         .load(cart.getImageItemUrl())
@@ -72,8 +81,8 @@ public class CartAdapter extends FirestoreAdapter<CartAdapter.CartHolder>{
             }
             nameItem_cart.setText(cart.getNama_barang());
             hargaItem_cart.setText(cart.getHarga_barang());
-            quantitasItem_cart.setText(cart.getQuantitas_banyakBarang());
-            totalHarga.setText(hargaTotal+"");
+            quantitasItem_cart.setText(cart.getQuantitas_banyakBarang()+"");
+            totalHarga.setText(TotalCur);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -84,6 +93,25 @@ public class CartAdapter extends FirestoreAdapter<CartAdapter.CartHolder>{
                 }
             });
         }
+
+        public BigDecimal totalCost(int itemQuantity, BigDecimal itemPrice){
+            BigDecimal itemCost,totalCost = null;
+            itemCost = itemPrice.multiply(new BigDecimal(itemQuantity));
+            totalCost = itemCost;
+            return totalCost;
+        }
+        public String formatRP (BigDecimal n){
+            DecimalFormat kursIndonesia = (DecimalFormat) DecimalFormat.getCurrencyInstance();
+            DecimalFormatSymbols formatRp = new DecimalFormatSymbols();
+
+            formatRp.setCurrencySymbol("Rp. ");
+            formatRp.setMonetaryDecimalSeparator(',');
+            formatRp.setGroupingSeparator('.');
+            kursIndonesia.setDecimalFormatSymbols(formatRp);
+
+            return kursIndonesia.format(n);
+        }
     }
+
 
 }
