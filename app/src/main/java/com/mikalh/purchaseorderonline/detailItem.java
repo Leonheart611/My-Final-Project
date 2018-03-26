@@ -42,6 +42,7 @@ public class detailItem extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setTitle("Detail Item");
         setContentView(R.layout.activity_detail_item);
         customDialog = new CustomDialog(detailItem.this);
         auth = FirebaseAuth.getInstance();

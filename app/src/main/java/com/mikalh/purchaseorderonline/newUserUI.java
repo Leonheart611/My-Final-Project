@@ -1,6 +1,14 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +30,7 @@ public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelec
         mainPagger.setAdapter(adapter);
         mainPagger.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mainTab));
         mainTab.setOnTabSelectedListener(this);
+        CreateNotification();
     }
 
     @Override
@@ -38,6 +47,18 @@ public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelec
     public void onTabReselected(TabLayout.Tab tab) {
 
     }
+    public void CreateNotification(){
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher_round)
+                        .setContentTitle("Purchase Order Online")
+                        .setContentText("Hello World!");
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(001, mBuilder.build());
+
+    }
+
 
     @Override
     public void onBackPressed() {

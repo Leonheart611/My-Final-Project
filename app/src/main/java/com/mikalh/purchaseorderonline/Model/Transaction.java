@@ -5,24 +5,22 @@ package com.mikalh.purchaseorderonline.Model;
  */
 
 public class Transaction {
-    private String item_id,pengirim_id,penerima_id,status,tanggal;
+    private String pengirim_id,penerima_id,status,tanggal;
+    private String[] item_id;
 
-    public Transaction(String item_id, String pengirim_id, String penerima_id, String status, String tanggal) {
-        this.item_id = item_id;
+    public Transaction(String pengirim_id, String penerima_id, String status, String tanggal, String[] item_id) {
         this.pengirim_id = pengirim_id;
         this.penerima_id = penerima_id;
         this.status = status;
         this.tanggal = tanggal;
+        this.item_id = item_id;
     }
 
-    public Transaction() {
-    }
-
-    public String getItem_id() {
+    public String[] getItem_id() {
         return item_id;
     }
 
-    public void setItem_id(String item_id) {
+    public void setItem_id(String[] item_id) {
         this.item_id = item_id;
     }
 
