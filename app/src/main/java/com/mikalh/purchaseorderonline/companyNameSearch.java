@@ -34,6 +34,7 @@ public class companyNameSearch extends android.support.v4.app.Fragment implement
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    public static final String USER_ID = "userID";
     String queryBack="";
     FirebaseFirestore firestore;
     RecyclerView companyName_rv;
@@ -74,6 +75,16 @@ public class companyNameSearch extends android.support.v4.app.Fragment implement
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        Intent intent = getActivity().getIntent();
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())){
+            queryBack = intent.getStringExtra(SearchManager.QUERY);
+        }
+        firestore = FirebaseFirestore.getInstance();
+        if (!queryBack.isEmpty()){
+            query = firestore.collection("Users").whereGreaterThanOrEqualTo("nama_perusahaan",queryBack);
+        }else {
+            query = firestore.collection("Users");
+        }
 
     }
 
@@ -81,16 +92,7 @@ public class companyNameSearch extends android.support.v4.app.Fragment implement
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Intent intent = getActivity().getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())){
-            queryBack = intent.getStringExtra(SearchManager.QUERY);
-        }
-        firestore = FirebaseFirestore.getInstance();
-        if (!queryBack.isEmpty()){
-            query = firestore.collection("Users").whereLessThanOrEqualTo("nama_perusahaan",queryBack);
-        }else {
-            query = firestore.collection("Users");
-        }
+
         View v = inflater.inflate(R.layout.fragment_company_name, container, false);
         companyName_rv = v.findViewById(R.id.companyName_rv);
         adapter = new CompanyAdapter(query,this){
@@ -169,7 +171,9 @@ public class companyNameSearch extends android.support.v4.app.Fragment implement
 
     @Override
     public void onCompanySelected(DocumentSnapshot user) {
-
+        Intent i = new Intent(getActivity(),Profile.class);
+        i.putExtra(USER_ID,user.getId());
+        startActivity(i);
     }
 
 

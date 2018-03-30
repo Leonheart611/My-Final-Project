@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +45,7 @@ public class PICContact extends android.support.v4.app.Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
+    String userID;
     FirebaseAuth auth;
     FirebaseUser user;
     FirebaseFirestore firestore;
@@ -52,6 +53,7 @@ public class PICContact extends android.support.v4.app.Fragment {
     TextInputEditText picName_profile,picPosition_profile
             ,telephone_profile,username_profile,email_profile;
     User userProfile;
+    Button saveButton_profile,changePassword_profile;
     public PICContact() {
         // Required empty public constructor
     }
@@ -84,7 +86,9 @@ public class PICContact extends android.support.v4.app.Fragment {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
+        userID = getActivity().getIntent().getExtras().getString(companyNameSearch.USER_ID);
         users = firestore.collection("Users");
+
     }
 
     @Override
@@ -95,10 +99,29 @@ public class PICContact extends android.support.v4.app.Fragment {
         picName_profile = v.findViewById(R.id.picName_profile);
         picPosition_profile = v.findViewById(R.id.picPosition_profile);
         telephone_profile = v.findViewById(R.id.telephone_profile);
+        saveButton_profile = v.findViewById(R.id.saveButton_profile);
+        changePassword_profile = v.findViewById(R.id.changePassword_profile);
         email_profile = v.findViewById(R.id.email_profile);
         username_profile = v.findViewById(R.id.username_profile);
 
-        DocumentReference docRef = users.document(user.getUid());
+        if (!userID.equals(user.getUid())){
+            picName_profile.setEnabled(false);
+            picName_profile.setFocusable(false);
+            picPosition_profile.setEnabled(false);
+            picPosition_profile.setFocusable(false);
+            telephone_profile.setEnabled(false);
+            telephone_profile.setFocusable(false);
+            email_profile.setEnabled(false);
+            email_profile.setFocusable(false);
+            username_profile.setEnabled(false);
+            username_profile.setFocusable(false);
+
+            saveButton_profile.setVisibility(View.INVISIBLE);
+            changePassword_profile.setVisibility(View.INVISIBLE);
+
+        }
+
+        DocumentReference docRef = users.document(userID);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {

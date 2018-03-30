@@ -36,6 +36,7 @@ public class catalogueItemSearch extends android.support.v4.app.Fragment  implem
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
+    public static final String KEY_ITEM_ID = "keyItemID";
     private String mParam1;
     private String mParam2;
     String queryBack="";
@@ -74,21 +75,22 @@ public class catalogueItemSearch extends android.support.v4.app.Fragment  implem
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+        firestore = FirebaseFirestore.getInstance();
         Intent intent = getActivity().getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())){
             queryBack = intent.getStringExtra(SearchManager.QUERY);
         }
         if (!queryBack.isEmpty()){
-            query = firestore.collection("Items").whereEqualTo("nama_barang",queryBack);
+            query = firestore.collection("Items").whereGreaterThanOrEqualTo("nama_barang",queryBack);
         }else {
             query = firestore.collection("Items");
         }
-        firestore = FirebaseFirestore.getInstance();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_catalogue_item_search, container, false);
         catalogueSearch_rv = view.findViewById(R.id.catalogueSearch_rv);
@@ -152,7 +154,9 @@ public class catalogueItemSearch extends android.support.v4.app.Fragment  implem
 
     @Override
     public void onClickCatalogueListener(DocumentSnapshot item) {
-
+        Intent i = new Intent(getActivity(),detailItem.class);
+        i.putExtra(KEY_ITEM_ID,item.getId());
+        startActivity(i);
     }
 
     @Override

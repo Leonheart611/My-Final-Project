@@ -34,7 +34,7 @@ import com.mikalh.purchaseorderonline.Model.User;
  * Use the {@link companyProfile#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class companyProfile extends android.support.v4.app.Fragment {
+public class companyProfile extends android.support.v4.app.Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -50,6 +50,7 @@ public class companyProfile extends android.support.v4.app.Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    String userID;
 
     private OnFragmentInteractionListener mListener;
 
@@ -85,6 +86,7 @@ public class companyProfile extends android.support.v4.app.Fragment {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
+        userID = getActivity().getIntent().getExtras().getString(companyNameSearch.USER_ID);
         users = firestore.collection("Users");
     }
 
@@ -92,18 +94,31 @@ public class companyProfile extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        DocumentReference docRef = users.document(user.getUid());
+        DocumentReference docRef = users.document(userID);
 
         View v = inflater.inflate(R.layout.fragment_company_profile, container, false);
         companyName_profile = v.findViewById(R.id.companyName_profile);
-
         address_profile = v.findViewById(R.id.address_profile);
-
         province_profile = v.findViewById(R.id.province_profile);
-
         city_profile = v.findViewById(R.id.city_profile);
-
         fax_profile = v.findViewById(R.id.fax_profile);
+        btnSave = v.findViewById(R.id.btnSave);
+        btnSave.setOnClickListener(this);
+
+        if (!userID.equals(user.getUid())){
+            companyName_profile.setEnabled(false);
+            companyName_profile.setFocusable(false);
+            address_profile.setEnabled(false);
+            address_profile.setFocusable(false);
+            province_profile.setEnabled(false);
+            province_profile.setFocusable(false);
+            city_profile.setEnabled(false);
+            city_profile.setFocusable(false);
+            fax_profile.setEnabled(false);
+            fax_profile.setEnabled(false);
+
+            btnSave.setVisibility(View.INVISIBLE);
+        }
 
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -152,6 +167,11 @@ public class companyProfile extends android.support.v4.app.Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 
     /**

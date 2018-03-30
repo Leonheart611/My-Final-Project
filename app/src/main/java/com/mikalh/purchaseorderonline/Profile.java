@@ -23,6 +23,7 @@ public class Profile extends AppCompatActivity implements TabLayout.OnTabSelecte
     FirebaseUser user;
     FirebaseFirestore firestore;
     ProfilePagger adapter;
+    String userID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,11 +31,14 @@ public class Profile extends AppCompatActivity implements TabLayout.OnTabSelecte
         setContentView(R.layout.activity_profile);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-        //
+        userID = getIntent().getExtras().getString(home.USER_ID);
         profile_image = findViewById(R.id.imageProfile);
         profile_tab = findViewById(R.id.profile_tab);
         profile_pagger = findViewById(R.id.profile_pagger);
         changImage_profile = findViewById(R.id.changeImage_profile);
+        if (!user.getUid().equals(userID)){
+            changImage_profile.hide();
+        }
         adapter = new ProfilePagger(getSupportFragmentManager(),2);
         profile_pagger.setAdapter(adapter);
         profile_tab.setOnTabSelectedListener(this);
