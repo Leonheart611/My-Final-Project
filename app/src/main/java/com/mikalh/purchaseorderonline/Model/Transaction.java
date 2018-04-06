@@ -4,7 +4,7 @@ package com.mikalh.purchaseorderonline.Model;
  * Created by mika.frentzen on 19/03/2018.
  */
 
-public class Transaction {
+public class Transaction extends Cart{
     private String pengirim_id,penerima_id,status,tanggal;
     private String[] item_id;
 

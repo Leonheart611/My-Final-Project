@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -9,14 +10,23 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.mikalh.purchaseorderonline.Adapter.CartAdapter;
+import com.mikalh.purchaseorderonline.Model.Cart;
 
 public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelectedListener {
     RecyclerView cart_recylerView;
@@ -66,7 +76,42 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
         MakePO_do.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                CollectionReference collectionReference = firestore.collection("Users").document(user.getUid()).collection("Cart");
+                collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()){
+                            for (DocumentSnapshot data : task.getResult()){
+                                Cart cart =  data.toObject(Cart.class);
+                                firestore.collection("Transaction").add(cart).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                                        if (task.isSuccessful()){
+                                            Toast.makeText(getApplicationContext(),"Susccess add to Transaction",Toast.LENGTH_LONG).show();
+                                            firestore.collection("Users").document(user.getUid()).
+                                                    collection("Cart").document().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d("Susccess Delte Data","Done");
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e("Error Delte",e.getMessage());
+                                                }
+                                            });
+                                        }
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.e("Error Pindah To Cart",e.getMessage());
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
             }
         });
         DividerItemDecoration itemDecoration = new DividerItemDecoration(cart_recylerView.getContext(),llm.getOrientation());
