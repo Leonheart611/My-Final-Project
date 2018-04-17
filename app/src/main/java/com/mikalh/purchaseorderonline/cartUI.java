@@ -18,17 +18,26 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mikalh.purchaseorderonline.Adapter.CartAdapter;
 import com.mikalh.purchaseorderonline.Model.Cart;
+import com.mikalh.purchaseorderonline.Model.Transaction;
 
-public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelectedListener {
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelectedListener,View.OnClickListener {
     RecyclerView cart_recylerView;
     CartAdapter adapter;
     FirebaseFirestore firestore;
@@ -36,18 +45,23 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
     FirebaseUser user;
     Query query;
     Button MakePO_do;
+    ArrayList<Cart> carts;
+    Cart cart = new Cart();
+    Transaction transactionModel;
+    private DatabaseReference mDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setTitle("Cart");
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         setContentView(R.layout.activity_cart_ui);
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-        query = firestore.collection("Users").document(user.getUid()).collection("Cart");
+        query = firestore.collection("Users").document(user.getUid()).collection("Cart").whereEqualTo("toTransaction",false);
         cart_recylerView = findViewById(R.id.cart_RV);
         MakePO_do = findViewById(R.id.MakePO_do);
-        adapter = new CartAdapter(query,this){
+        adapter = new CartAdapter(query, this) {
             @Override
             protected void onDataChanged() {
                 super.onDataChanged();
@@ -66,55 +80,15 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
             @Override
             protected void onError(FirebaseFirestoreException e) {
                 super.onError(e);
-                Log.e("Error Adapater",e.getMessage());
+                Log.e("Error Adapater", e.getMessage());
             }
         };
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         cart_recylerView.setLayoutManager(llm);
-        MakePO_do.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CollectionReference collectionReference = firestore.collection("Users").document(user.getUid()).collection("Cart");
-                collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()){
-                            for (DocumentSnapshot data : task.getResult()){
-                                Cart cart =  data.toObject(Cart.class);
-                                firestore.collection("Transaction").add(cart).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                                        if (task.isSuccessful()){
-                                            Toast.makeText(getApplicationContext(),"Susccess add to Transaction",Toast.LENGTH_LONG).show();
-                                            firestore.collection("Users").document(user.getUid()).
-                                                    collection("Cart").document().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d("Susccess Delte Data","Done");
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.e("Error Delte",e.getMessage());
-                                                }
-                                            });
-                                        }
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.e("Error Pindah To Cart",e.getMessage());
-                                    }
-                                });
-                            }
-                        }
-                    }
-                });
-            }
-        });
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(cart_recylerView.getContext(),llm.getOrientation());
+        MakePO_do.setOnClickListener(this);
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(cart_recylerView.getContext(), llm.getOrientation());
         cart_recylerView.addItemDecoration(itemDecoration);
         cart_recylerView.setAdapter(adapter);
 
@@ -123,7 +97,7 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
     @Override
     protected void onStart() {
         super.onStart();
-        if (adapter != null){
+        if (adapter != null) {
             adapter.startListening();
         }
     }
@@ -131,7 +105,7 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
     @Override
     protected void onStop() {
         super.onStop();
-        if (adapter!=null){
+        if (adapter != null) {
             adapter.stopListening();
         }
     }
@@ -140,4 +114,75 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
     public void onCartSelected(DocumentSnapshot cart) {
 
     }
+
+
+    @Override
+    public void onClick(View view) {
+        if (view == MakePO_do){
+            Calendar calendar = Calendar.getInstance();
+            final String date = calendar.toString();
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()){
+                        for (DocumentSnapshot documentSnapshot : task.getResult()){
+                            cart = documentSnapshot.toObject(Cart.class);
+                            cart.setToTransaction(true);
+                            transactionModel = new Transaction(cart.getNama_barang(),cart.getUserId()
+                                    ,cart.getUnit(),cart.getHarga_barang(),cart.getImageItemUrl(),cart.getQuantitas_banyakBarang(),cart.isToTransaction(),user.getUid(),cart.getUserId(),"Masih Dalam Proeses",date);
+                            firestore.collection("Transaction").document().set(transactionModel).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        Log.d("Data has been Added",task.toString());
+                                    }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e("Error add data",e.getMessage());
+                                }
+                            });
+                        }
+                    }
+                    if (task.isComplete()){
+                        firestore.collection("Users").document(user.getUid()).collection("Cart")
+                                .document().delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    Log.d("Susscess Delete Data",task.toString());
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("Error delete data",e.getMessage());
+                            }
+                        });
+                    }
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+        }
+    }
+    public ArrayList<String> checkMultipleBuyer(ArrayList<Cart> carts){
+        ArrayList<String> userSellerId = new ArrayList<>();
+        for (int i = 0; i<carts.size(); i++){
+            cart = carts.get(i);
+            Cart cartNext = carts.get(i+1);
+            if (cartNext != null){
+                if (!cart.getUserId().equals(cartNext.getUserId())){
+                    userSellerId.add(cart.getUserId());
+                }
+            }
+        }
+        return userSellerId;
+    }
 }
+

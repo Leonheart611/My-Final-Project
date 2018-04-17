@@ -6,22 +6,13 @@ package com.mikalh.purchaseorderonline.Model;
 
 public class Transaction extends Cart{
     private String pengirim_id,penerima_id,status,tanggal;
-    private String[] item_id;
 
-    public Transaction(String pengirim_id, String penerima_id, String status, String tanggal, String[] item_id) {
+    public Transaction(String nama_barang, String userId, String unit, String harga_barang, String imageItemUrl, int quantitas_banyakBarang, boolean toTransaction, String pengirim_id, String penerima_id, String status, String tanggal) {
+        super(nama_barang, userId, unit, harga_barang, imageItemUrl, quantitas_banyakBarang, toTransaction);
         this.pengirim_id = pengirim_id;
         this.penerima_id = penerima_id;
         this.status = status;
         this.tanggal = tanggal;
-        this.item_id = item_id;
-    }
-
-    public String[] getItem_id() {
-        return item_id;
-    }
-
-    public void setItem_id(String[] item_id) {
-        this.item_id = item_id;
     }
 
     public String getPengirim_id() {
