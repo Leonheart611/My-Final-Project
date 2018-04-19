@@ -30,6 +30,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mikalh.purchaseorderonline.Adapter.CartAdapter;
 import com.mikalh.purchaseorderonline.Model.Cart;
+import com.mikalh.purchaseorderonline.Model.Company;
 import com.mikalh.purchaseorderonline.Model.Transaction;
 
 import java.lang.reflect.Array;
@@ -58,7 +59,7 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-        query = firestore.collection("Users").document(user.getUid()).collection("Cart").whereEqualTo("toTransaction",false);
+        query = firestore.collection("Users").document(user.getUid()).collection("Cart");
         cart_recylerView = findViewById(R.id.cart_RV);
         MakePO_do = findViewById(R.id.MakePO_do);
         adapter = new CartAdapter(query, this) {
@@ -119,22 +120,39 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
     @Override
     public void onClick(View view) {
         if (view == MakePO_do){
-            Calendar calendar = Calendar.getInstance();
+            Date calendar = Calendar.getInstance().getTime();
             final String date = calendar.toString();
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()){
-                        for (DocumentSnapshot documentSnapshot : task.getResult()){
+
+                        for (final DocumentSnapshot documentSnapshot : task.getResult()){
                             cart = documentSnapshot.toObject(Cart.class);
-                            cart.setToTransaction(true);
+
                             transactionModel = new Transaction(cart.getNama_barang(),cart.getUserId()
-                                    ,cart.getUnit(),cart.getHarga_barang(),cart.getImageItemUrl(),cart.getQuantitas_banyakBarang(),cart.isToTransaction(),user.getUid(),cart.getUserId(),"Masih Dalam Proeses",date);
+                                    ,cart.getUnit(),cart.getNamaPerusahaan(),cart.getHarga_barang(),cart.getImageItemUrl(),cart.getQuantitas_banyakBarang(),user.getUid(),cart.getUserId(),"Masih Dalam Proses",date);
                             firestore.collection("Transaction").document().set(transactionModel).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()){
                                         Log.d("Data has been Added",task.toString());
+                                    }
+                                    if (task.isComplete()){
+                                        firestore.collection("Users").document(user.getUid()).collection("Cart")
+                                                .document(documentSnapshot.getId()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()){
+                                                    Log.d("Susscess Delete Data",task.toString());
+                                                }
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.e("Error delete data",e.getMessage());
+                                            }
+                                        });
                                     }
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
@@ -146,20 +164,7 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
                         }
                     }
                     if (task.isComplete()){
-                        firestore.collection("Users").document(user.getUid()).collection("Cart")
-                                .document().delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    Log.d("Susscess Delete Data",task.toString());
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e("Error delete data",e.getMessage());
-                            }
-                        });
+
                     }
 
                 }

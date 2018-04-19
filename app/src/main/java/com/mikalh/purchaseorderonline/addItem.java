@@ -33,10 +33,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.mikalh.purchaseorderonline.Model.Company;
 import com.mikalh.purchaseorderonline.Model.Item;
 import com.mikalh.purchaseorderonline.TextWatcher.CurcurencyFormater;
 
@@ -57,10 +59,6 @@ public class addItem extends AppCompatActivity {
     //Image
     String[] permissionsRequired = new String[]{Manifest.permission.CAMERA,
             Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
-
-
-
-
     Uri outputFile;
     private static final int MY_CAMERA_REQUEST_CODE = 100;
     private FirebaseStorage storage;
@@ -69,7 +67,7 @@ public class addItem extends AppCompatActivity {
     byte[] dataImage;
     Uri urlImage;
     ArrayList<String> imageList = new ArrayList<>();
-
+    Company company = new Company();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +83,20 @@ public class addItem extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storagePath = storage.getReference();
 
-
+        firestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot snapshot = task.getResult();
+                    company = snapshot.toObject(Company.class);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("Error get data",e.getMessage());
+            }
+        });
 
         //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         namaItem_add = findViewById(R.id.namaItem_add);
@@ -251,7 +262,7 @@ public class addItem extends AppCompatActivity {
             urlItemBarang = urlImage.toString();
         }
 
-        Item item = new Item(namaBarang,userId,unitItem,HargaBarang,urlItemBarang);
+        Item item = new Item(namaBarang,userId,unitItem,company.getNama_perusahaan(),HargaBarang,urlItemBarang);
 
         firestore.collection("Items").document()
                 .set(item).addOnCompleteListener(new OnCompleteListener<Void>() {

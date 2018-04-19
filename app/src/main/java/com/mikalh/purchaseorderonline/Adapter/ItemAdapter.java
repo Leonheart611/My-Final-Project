@@ -85,7 +85,6 @@ public class ItemAdapter extends FirestoreAdapter<ItemAdapter.ViewHolder> {
                 }
             });
         }
-
     }
 }
 

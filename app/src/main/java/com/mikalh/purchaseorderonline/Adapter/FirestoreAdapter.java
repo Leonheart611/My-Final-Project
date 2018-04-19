@@ -39,7 +39,6 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
             onError(e);
             return;
         }
-
         // Dispatch the event
         Log.d(TAG, "onEvent:numChanges:" + documentSnapshots.getDocumentChanges().size());
         for (DocumentChange change : documentSnapshots.getDocumentChanges()) {
@@ -55,7 +54,6 @@ public abstract class FirestoreAdapter<VH extends RecyclerView.ViewHolder>
                     break;
             }
         }
-
         onDataChanged();
     }
 

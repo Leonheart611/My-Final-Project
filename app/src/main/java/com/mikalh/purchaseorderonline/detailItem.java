@@ -104,7 +104,7 @@ public class detailItem extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 int pcs = Integer.parseInt(banyakPCS_popCart.getText().toString());
-                Cart cart = new Cart(item.getNama_barang(),user.getUid(),item.getUnit(),item.getHarga_barang(),item.getImageItemUrl(),pcs,false);
+                Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit(),item.getNamaPerusahaan(),item.getHarga_barang(),item.getImageItemUrl(),pcs);
                 // add database firestore
                 firestore.collection("Users").document(user.getUid()).collection("Cart").document().set(cart).addOnFailureListener(new OnFailureListener() {
                     @Override
