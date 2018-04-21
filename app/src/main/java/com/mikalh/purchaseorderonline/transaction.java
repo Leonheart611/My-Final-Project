@@ -1,12 +1,29 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.mikalh.purchaseorderonline.Adapter.TransactionAdapter;
+import com.mikalh.purchaseorderonline.Model.User;
 
 
 /**
@@ -17,15 +34,21 @@ import android.view.ViewGroup;
  * Use the {@link transaction#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class transaction extends android.support.v4.app.Fragment {
+public class transaction extends android.support.v4.app.Fragment implements TransactionAdapter.OnTransactionSelectedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    RecyclerView transactionRV;
+    Query query;
+    FirebaseFirestore firebaseFirestore;
+    FirebaseAuth auth;
+    FirebaseUser user;
+    TransactionAdapter adapter;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -58,13 +81,60 @@ public class transaction extends android.support.v4.app.Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+        query = FirebaseFirestore.getInstance().collection("Transaction").whereEqualTo("pengirim_id",user.getUid());
+
+
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_transaction, container, false);
+        View view = inflater.inflate(R.layout.fragment_transaction, container, false);
+        transactionRV = view.findViewById(R.id.transactionRV);
+        adapter = new TransactionAdapter(query,this){
+            @Override
+            protected void onDataChanged() {
+                CreateNotification();
+            }
+
+            @Override
+            public TransactionHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return super.onCreateViewHolder(parent, viewType);
+            }
+
+            @Override
+            public void onBindViewHolder(TransactionHolder holder, int position) {
+                super.onBindViewHolder(holder, position);
+            }
+
+            @Override
+            protected void onError(FirebaseFirestoreException e) {
+                super.onError(e);
+                Log.e("Error Transaction",e.getLocalizedMessage());
+                Toast.makeText(getActivity(),e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
+            }
+        };
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        transactionRV.setLayoutManager(llm);
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(transactionRV.getContext(), llm.getOrientation());
+        transactionRV.addItemDecoration(itemDecoration);
+        transactionRV.setAdapter(adapter);
+
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (adapter != null) {
+            adapter.startListening();
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -91,6 +161,11 @@ public class transaction extends android.support.v4.app.Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onTransactionSelectedListener(DocumentSnapshot transaction) {
+
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -104,5 +179,16 @@ public class transaction extends android.support.v4.app.Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+    public void CreateNotification(){
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(getActivity())
+                        .setSmallIcon(R.mipmap.ic_launcher_round)
+                        .setContentTitle("Purchase Order Online")
+                        .setContentText("You Have New Order");
+        NotificationManager mNotificationManager =
+                (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(001, mBuilder.build());
+
     }
 }

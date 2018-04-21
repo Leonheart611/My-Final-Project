@@ -30,7 +30,7 @@ public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelec
         mainPagger.setAdapter(adapter);
         mainPagger.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mainTab));
         mainTab.setOnTabSelectedListener(this);
-        CreateNotification();
+        /*CreateNotification();*/
     }
 
     @Override
@@ -58,8 +58,6 @@ public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelec
         mNotificationManager.notify(001, mBuilder.build());
 
     }
-
-
     @Override
     public void onBackPressed() {
         moveTaskToBack(true);
