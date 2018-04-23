@@ -28,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.functions.FirebaseFunctions;
 import com.mikalh.purchaseorderonline.Adapter.CartAdapter;
 import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.Company;
@@ -153,6 +154,7 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
                                                 Log.e("Error delete data",e.getMessage());
                                             }
                                         });
+
                                     }
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
