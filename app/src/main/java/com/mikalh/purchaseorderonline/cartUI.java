@@ -1,11 +1,16 @@
 package com.mikalh.purchaseorderonline;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,15 +34,28 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.mikalh.purchaseorderonline.Adapter.CartAdapter;
 import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.Company;
 import com.mikalh.purchaseorderonline.Model.Transaction;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Array;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelectedListener,View.OnClickListener {
     RecyclerView cart_recylerView;
@@ -51,6 +69,8 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
     Cart cart = new Cart();
     Transaction transactionModel;
     private DatabaseReference mDatabase;
+    String Key = "key=AAAAx1NMbj0:APA91bHv2Yky3eenD79mwmY1unL3bLEI57VLpDkFoxQ2rfowQXju2DkeRV4_SvOF-LCaO9IsZfAhFIliTTeo5RPs5EwBxlImuoeDlfBzKsTDEiHsGBqtJlp8fCNgHEjlOAx9UqU_mWaT";
+    String instanceId = FirebaseInstanceId.getInstance().getToken();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +152,7 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
                             cart = documentSnapshot.toObject(Cart.class);
 
                             transactionModel = new Transaction(cart.getNama_barang(),cart.getUserId()
-                                    ,cart.getUnit(),cart.getNamaPerusahaan(),cart.getHarga_barang(),cart.getImageItemUrl(),cart.getQuantitas_banyakBarang(),user.getUid(),cart.getUserId(),"Masih Dalam Proses",date);
+                                    ,cart.getUnit(),cart.getNamaPerusahaan(),cart.getHarga_barang(),cart.getImageItemUrl(),cart.getNotificationId(),cart.getQuantitas_banyakBarang(),user.getUid(),cart.getUserId(),"Masih Dalam Proses",date,instanceId);
                             firestore.collection("Transaction").document().set(transactionModel).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
@@ -146,6 +166,7 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()){
                                                     Log.d("Susscess Delete Data",task.toString());
+                                                    new Sendnotif().execute();
                                                 }
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
@@ -191,5 +212,68 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
         }
         return userSellerId;
     }
+    public class Sendnotif extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... arg0) {
+            try {
+                URL url = new URL("https://fcm.googleapis.com/fcm/send"); //http://api.simasjiwa.com/rest/json/epolicylogin http://192.168.22.54/RestApp/rest/json/epolicylogin
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(30000);
+                conn.setConnectTimeout(30000);
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Authorization", Key);
+                conn.setRequestProperty("Content-Type", "application/json");
+
+
+                JSONObject notification = new JSONObject();
+                notification.put("body", "You Have New Purchase Order");
+                /*JSONArray notificationArr = new JSONArray();
+                notification.put("notification", notification);*/
+
+                JSONObject postDataParam = new JSONObject();
+                postDataParam.put("to", cart.getNotificationId());
+                postDataParam.put("notification", notification);
+                Log.e("param", postDataParam.toString());
+
+                OutputStream os = conn.getOutputStream();
+                OutputStreamWriter writer = new OutputStreamWriter(os, "UTF-8");
+                writer.write(postDataParam.toString());
+                writer.flush();
+                writer.close();
+                os.close();
+
+
+                int responseCode = conn.getResponseCode();
+
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream()));
+                    StringBuffer sb = new StringBuffer();
+                    String line = "";
+                    while ((line = in.readLine()) != null) {
+                        sb.append(line);
+                        break;
+                    }
+                    in.close();
+                    return sb.toString();
+                } else {
+                    return new String("False: " + responseCode);
+
+                }
+
+            } catch (Exception e) {
+                return new String("Exception: " + e.getMessage());
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+        }
+    }
+
 }
 

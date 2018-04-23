@@ -57,11 +57,11 @@ public class CompanyAdapter extends FirestoreAdapter<CompanyAdapter.CompanyHolde
         public void bind(final DocumentSnapshot snapshot,
                          final OnCompanySelectedListener listener){
             Company company = snapshot.toObject(Company.class);
-            if (!company.getUrl_pictLogo().isEmpty()){
+           /* if (!company.getUrl_pictLogo().isEmpty()){
                 Glide.with(imageCompany.getContext())
                         .load(company.getUrl_pictLogo())
                         .into(imageCompany);
-            }
+            }*/
             companyName.setText(company.getNama_perusahaan());
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

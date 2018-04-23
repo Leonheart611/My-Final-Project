@@ -23,15 +23,15 @@ public class InstanceIdService extends FirebaseInstanceIdService {
         Log.d("@@@@", "onTokenRefresh: " + instanceId);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null) {
-            FirebaseDatabase.getInstance().getReference()
+            /*FirebaseDatabase.getInstance().getReference()
                     .child("users")
                     .child(firebaseUser.getUid())
                     .child("instanceId")
-                    .setValue(instanceId);
-            /*HashMap<String,Object> instance = new HashMap<>();
+                    .setValue(instanceId);*/
+            HashMap<String,Object> instance = new HashMap<>();
             instance.put("notificationId",instanceId);
             FirebaseFirestore.getInstance().collection("Users")
-                    .document(firebaseUser.getUid()).set(instance)
+                    .document(firebaseUser.getUid()).update(instance)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -44,7 +44,7 @@ public class InstanceIdService extends FirebaseInstanceIdService {
                 public void onFailure(@NonNull Exception e) {
                     Log.e("Error add Instanse ID",e.getLocalizedMessage());
                 }
-            });*/
+            });
         }
     }
 }

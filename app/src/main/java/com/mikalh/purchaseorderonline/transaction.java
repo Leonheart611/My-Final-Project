@@ -99,7 +99,7 @@ public class transaction extends android.support.v4.app.Fragment implements Tran
         adapter = new TransactionAdapter(query,this){
             @Override
             protected void onDataChanged() {
-                CreateNotification();
+                //CreateNotification();
             }
 
             @Override

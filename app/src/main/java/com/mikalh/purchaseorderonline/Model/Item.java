@@ -11,14 +11,24 @@ public class Item  {
     private String nama_barang, userId, unit,namaPerusahaan;
     private String harga_barang;
     private String imageItemUrl;
+    private String notificationId;
 
-    public Item(String nama_barang, String userId, String unit, String namaPerusahaan, String harga_barang, String imageItemUrl) {
+    public Item(String nama_barang, String userId, String unit, String namaPerusahaan, String harga_barang, String imageItemUrl, String notificationId) {
         this.nama_barang = nama_barang;
         this.userId = userId;
         this.unit = unit;
         this.namaPerusahaan = namaPerusahaan;
         this.harga_barang = harga_barang;
         this.imageItemUrl = imageItemUrl;
+        this.notificationId = notificationId;
+    }
+
+    public String getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
     }
 
     public String getNamaPerusahaan() {

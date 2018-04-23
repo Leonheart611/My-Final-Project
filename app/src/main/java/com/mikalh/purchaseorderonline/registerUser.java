@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.mikalh.purchaseorderonline.Model.Company;
 import com.mikalh.purchaseorderonline.Model.User;
 
@@ -53,6 +54,7 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
     registerCompanyProfile previous;
     private OnFragmentInteractionListener mListener;
     CustomDialog cd;
+    String instanceId;
     public registerUser() {
         // Required empty public constructor
     }
@@ -85,7 +87,7 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         previous = new registerCompanyProfile();
-
+        instanceId = FirebaseInstanceId.getInstance().getToken();
 
 
     }
@@ -182,7 +184,7 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
                             }
                         }
                     });
-                    User userAdd = new User(Address,CompanyName,Telephone,FAX,City,Province,"",PICName,Email,user.getUid(),PICPossition,Username);
+                    User userAdd = new User(Address,CompanyName,Telephone,FAX,City,Province,"",PICName,Email,user.getUid(),PICPossition,Username,instanceId);
                     firestore.collection("Users").document(user.getUid()).set(userAdd).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {

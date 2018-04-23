@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.mikalh.purchaseorderonline.FCM.InstanceIdService;
 import com.mikalh.purchaseorderonline.Pager.MainPager;
 
 public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
@@ -25,6 +26,7 @@ public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelec
         getSupportActionBar().hide();
         setContentView(R.layout.activity_new_main);
         mainPagger = findViewById(R.id.mainPagger);
+        new InstanceIdService().onTokenRefresh();
         mainTab = findViewById(R.id.mainTab);
         adapter = new MainPager(getSupportFragmentManager(),3);
         mainPagger.setAdapter(adapter);

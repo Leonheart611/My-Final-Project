@@ -9,8 +9,8 @@ import java.util.ArrayList;
 public class Cart extends Item {
     private int quantitas_banyakBarang;
 
-    public Cart(String nama_barang, String userId, String unit, String namaPerusahaan, String harga_barang, String imageItemUrl, int quantitas_banyakBarang) {
-        super(nama_barang, userId, unit, namaPerusahaan, harga_barang, imageItemUrl);
+    public Cart(String nama_barang, String userId, String unit, String namaPerusahaan, String harga_barang, String imageItemUrl, String notificationId, int quantitas_banyakBarang) {
+        super(nama_barang, userId, unit, namaPerusahaan, harga_barang, imageItemUrl, notificationId);
         this.quantitas_banyakBarang = quantitas_banyakBarang;
     }
 
