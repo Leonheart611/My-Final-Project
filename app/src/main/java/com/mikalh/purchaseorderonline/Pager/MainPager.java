@@ -4,9 +4,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.mikalh.purchaseorderonline.Transaction_fragment;
 import com.mikalh.purchaseorderonline.chat;
 import com.mikalh.purchaseorderonline.home;
-import com.mikalh.purchaseorderonline.transaction;
 
 /**
  * Created by mika.frentzen on 13/03/2018.
@@ -27,8 +27,8 @@ public class MainPager extends FragmentStatePagerAdapter {
                 home home = new home();
                 return home;
             case 1:
-                transaction transaction = new transaction();
-                return transaction;
+                Transaction_fragment Transaction_fragment = new Transaction_fragment();
+                return Transaction_fragment;
             case 2:
                 chat chat = new chat();
                 return chat;

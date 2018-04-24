@@ -1,15 +1,32 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout2"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.mikalh.purchaseorderonline.registerUser">
-
-    <!-- TODO: Update blank fragment layout -->
+    android:layout_height="match_parent">
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout6"
+        android:id="@+id/textInputLayout28"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView3">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/namaBarang_detailOrder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nama Barang" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputLayout27"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -17,101 +34,85 @@
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout28">
 
         <android.support.design.widget.TextInputEditText
-            android:id="@+id/email_register"
+            android:id="@+id/banyakBarang_detailOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:singleLine="true" />
+            android:hint="Banyak Barang" />
     </android.support.design.widget.TextInputLayout>
 
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="170dp"
+        android:layout_height="139dp"
+        android:layout_marginEnd="163dp"
+        android:layout_marginStart="149dp"
+        android:layout_marginTop="16dp"
+        android:adjustViewBounds="true"
+        android:cropToPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_launcher" />
+
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout7"
+        android:id="@+id/textInputLayout29"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout6">
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout27">
 
         <android.support.design.widget.TextInputEditText
-            android:id="@+id/name_register"
+            android:id="@+id/totalHarga_detailOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="PIC Name"
-            android:singleLine="true" />
+            android:hint="Total Harga" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout8"
+        android:id="@+id/textInputLayout30"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout7">
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout29">
 
         <android.support.design.widget.TextInputEditText
-            android:id="@+id/position_register"
+            android:id="@+id/status_detailOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="PIC Posision"
-            android:singleLine="true" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout9"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout8">
-
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/username_register"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Username"
-            android:singleLine="true" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout10"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout9">
-
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/password_register"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:singleLine="true" />
+            android:hint="Status" />
     </android.support.design.widget.TextInputLayout>
 
     <Button
-        android:id="@+id/registerBtn"
+        android:id="@+id/update_statusDo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Register"
+        android:text="update status"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout10" />
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout30" />
+
+    <ImageView
+        android:id="@+id/exit_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/imageView3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/x_button" />
 </android.support.constraint.ConstraintLayout>

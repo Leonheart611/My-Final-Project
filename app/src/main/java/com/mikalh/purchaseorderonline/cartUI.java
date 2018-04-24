@@ -49,6 +49,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -151,8 +152,12 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
                         for (final DocumentSnapshot documentSnapshot : task.getResult()){
                             cart = documentSnapshot.toObject(Cart.class);
 
+                            BigDecimal harga = new BigDecimal(cart.getHarga_barang().replace(".",""));
+                            int quantitas = cart.getQuantitas_banyakBarang();
+                            BigDecimal total = totalCost(quantitas,harga);
+
                             transactionModel = new Transaction(cart.getNama_barang(),cart.getUserId()
-                                    ,cart.getUnit(),cart.getNamaPerusahaan(),cart.getHarga_barang(),cart.getImageItemUrl(),cart.getNotificationId(),cart.getQuantitas_banyakBarang(),user.getUid(),cart.getUserId(),"Masih Dalam Proses",date,instanceId);
+                                    ,cart.getUnit(),cart.getNamaPerusahaan(),cart.getHarga_barang(),cart.getImageItemUrl(),cart.getNotificationId(),cart.getQuantitas_banyakBarang(),user.getUid(),cart.getUserId(),"Masih Dalam Proses",date,instanceId,total);
                             firestore.collection("Transaction").document().set(transactionModel).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
@@ -273,6 +278,12 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
         protected void onPostExecute(String result) {
 
         }
+    }
+    public BigDecimal totalCost(int itemQuantity, BigDecimal itemPrice){
+        BigDecimal itemCost,totalCost = null;
+        itemCost = itemPrice.multiply(new BigDecimal(itemQuantity));
+        totalCost = itemCost;
+        return totalCost;
     }
 
 }

@@ -1,12 +1,8 @@
 package com.mikalh.purchaseorderonline;
 
-import android.app.NotificationManager;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,18 +19,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.mikalh.purchaseorderonline.Adapter.TransactionAdapter;
-import com.mikalh.purchaseorderonline.Model.User;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link transaction.OnFragmentInteractionListener} interface
+ * {@link Transaction_fragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link transaction#newInstance} factory method to
+ * Use the {@link Transaction_fragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class transaction extends android.support.v4.app.Fragment implements TransactionAdapter.OnTransactionSelectedListener {
+public class Transaction_fragment extends android.support.v4.app.Fragment implements TransactionAdapter.OnTransactionSelectedListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -52,7 +47,7 @@ public class transaction extends android.support.v4.app.Fragment implements Tran
 
     private OnFragmentInteractionListener mListener;
 
-    public transaction() {
+    public Transaction_fragment() {
         // Required empty public constructor
     }
 
@@ -62,11 +57,11 @@ public class transaction extends android.support.v4.app.Fragment implements Tran
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment transaction.
+     * @return A new instance of fragment Transaction_fragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static transaction newInstance(String param1, String param2) {
-        transaction fragment = new transaction();
+    public static Transaction_fragment newInstance(String param1, String param2) {
+        Transaction_fragment fragment = new Transaction_fragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -100,6 +95,7 @@ public class transaction extends android.support.v4.app.Fragment implements Tran
             @Override
             protected void onDataChanged() {
                 //CreateNotification();
+                super.onDataChanged();
             }
 
             @Override
@@ -179,16 +175,5 @@ public class transaction extends android.support.v4.app.Fragment implements Tran
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-    public void CreateNotification(){
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(getActivity())
-                        .setSmallIcon(R.mipmap.ic_launcher_round)
-                        .setContentTitle("Purchase Order Online")
-                        .setContentText("You Have New Order");
-        NotificationManager mNotificationManager =
-                (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(001, mBuilder.build());
-
     }
 }

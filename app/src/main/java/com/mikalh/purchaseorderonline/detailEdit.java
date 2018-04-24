@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.Dialog;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
@@ -7,7 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,9 +22,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.Item;
 import com.mikalh.purchaseorderonline.TextWatcher.CurcurencyFormater;
 
@@ -39,6 +44,7 @@ public class detailEdit extends AppCompatActivity implements View.OnClickListene
     Item item;
     DocumentReference documentReference;
     ImageView itemImage_detailEdit;
+    TextView deleteDetailEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +64,8 @@ public class detailEdit extends AppCompatActivity implements View.OnClickListene
         unit_edit = findViewById(R.id.unit_edit);
         updateDo = findViewById(R.id.updateDo);
         updateDo.setOnClickListener(this);
-
+        deleteDetailEdit = findViewById(R.id.deleteDetailEdit);
+        deleteDetailEdit.setOnClickListener(this);
         documentReference = firestore.collection("Items").document(KEY_ITEM);
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -91,7 +98,6 @@ public class detailEdit extends AppCompatActivity implements View.OnClickListene
         if (view == updateDo){
             String namaBarang = itemName_edit.getText().toString();
             String HargaBarang = price_edit.getText().toString();
-            String userId = user.getUid();
             String unitItem = unit_edit.getText().toString();
             String urlItemBarang="";
 
@@ -99,7 +105,6 @@ public class detailEdit extends AppCompatActivity implements View.OnClickListene
             updates.put("harga_barang",HargaBarang);
             updates.put("nama_barang",namaBarang);
             updates.put("unit",unitItem);
-
 
             firestore.collection("Items").document(KEY_ITEM).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
@@ -118,6 +123,47 @@ public class detailEdit extends AppCompatActivity implements View.OnClickListene
                 }
             });
         }
+        if (view == deleteDetailEdit){
+            warningPopUp();
+        }
+    }
+
+    void warningPopUp(){
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.warning_delete_item);
+
+        final Button yes_warning = dialog.findViewById(R.id.yes_warning);
+        final Button no_warning = dialog.findViewById(R.id.no_warning);
+
+        yes_warning.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firestore.collection("Items").document(KEY_ITEM).delete()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    dialog.dismiss();
+                                    onBackPressed();
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        FirebaseCrash.logcat(Log.ERROR, "Delete Item Failed", "NPE caught");
+                        FirebaseCrash.report(e);
+                    }
+                });
+            }
+        });
+        no_warning.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     @Override

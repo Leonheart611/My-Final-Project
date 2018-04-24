@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -44,6 +46,8 @@ public class catalogueItemSearch extends android.support.v4.app.Fragment  implem
     CatalogueAdapter adapter;
     FirebaseFirestore firestore;
     Query query;
+    FirebaseAuth auth;
+    FirebaseUser user;
     private OnFragmentInteractionListener mListener;
 
     public catalogueItemSearch() {
@@ -76,12 +80,14 @@ public class catalogueItemSearch extends android.support.v4.app.Fragment  implem
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         firestore = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
         Intent intent = getActivity().getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())){
             queryBack = intent.getStringExtra(SearchManager.QUERY);
         }
         if (!queryBack.isEmpty()){
-            query = firestore.collection("Items").whereGreaterThanOrEqualTo("nama_barang",queryBack);
+            query = firestore.collection("Items").whereGreaterThanOrEqualTo("nama_barang",queryBack).whereLessThan("userId",user.getUid());
         }else {
             query = firestore.collection("Items");
         }

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -19,6 +20,9 @@ import com.mikalh.purchaseorderonline.R;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.TransactionHolder> {
 
@@ -67,6 +71,7 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
                 int quantitas = transaction.getQuantitas_banyakBarang();
                 BigDecimal total = totalCost(quantitas,harga);
                 TotalCur = formatRP(total);
+
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -74,10 +79,10 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
             }
 
 
-
-            date_transaction.setText(transaction.getTanggal());
+            String date = formatDate(transaction.getTanggal());
+            date_transaction.setText(date);
             namaBarang_transaction.setText(transaction.getNama_barang());
-            quantitas_transaction.setText(transaction.getQuantitas_banyakBarang()+"");
+            quantitas_transaction.setText(transaction.getQuantitas_banyakBarang()+""+transaction.getUnit());
             status_transaction.setText(transaction.getStatus());
             total_transaction.setText(TotalCur);
             companyName_transaction.setText(transaction.getNamaPerusahaan());
@@ -109,6 +114,20 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
             kursIndonesia.setDecimalFormatSymbols(formatRp);
 
             return kursIndonesia.format(n);
+        }
+
+        public String formatDate(String date) {
+            try {
+                SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss Z");
+                Date newDate = format.parse(date);
+
+                format = new SimpleDateFormat("dd-MMM-yyyy");
+                return new String(format.format(newDate));
+            }catch (Exception e){
+                FirebaseCrash.logcat(Log.ERROR, "Error Parse", "NPE caught");
+                FirebaseCrash.report(e);
+            }
+            return null;
         }
     }
 }

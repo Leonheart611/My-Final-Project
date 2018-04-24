@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.mikalh.purchaseorderonline.Model.Company;
@@ -196,7 +197,8 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_LONG).show();
-                            Log.e("Error save to firestore",e.getMessage());
+                            FirebaseCrash.logcat(Log.ERROR,"Error at Add user", "NPE caught");
+                            FirebaseCrash.report(e);
                         }
                     });
 

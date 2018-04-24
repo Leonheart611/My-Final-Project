@@ -30,8 +30,8 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    ImageView profileImage,catalogImage,searchImage,logoutImage,cartImage;
-    TextView profileTxt, catalogTxt,searchTxt,logoutTxt;
+    ImageView profileImage,catalogImage,searchImage,logoutImage,cartImage,myOrderImage;
+    TextView profileTxt, catalogTxt,searchTxt,logoutTxt,myOrderTxt;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -152,6 +152,9 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
         if (view == cartImage){
             Intent i = new Intent(getActivity(),cartUI.class);
             startActivity(i);
+        }
+        if(view == myOrderImage || view == myOrderTxt){
+
         }
     }
 
