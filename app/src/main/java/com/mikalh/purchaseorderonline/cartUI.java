@@ -33,7 +33,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.mikalh.purchaseorderonline.Adapter.CartAdapter;
 import com.mikalh.purchaseorderonline.Model.Cart;
@@ -155,9 +154,9 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
                             BigDecimal harga = new BigDecimal(cart.getHarga_barang().replace(".",""));
                             int quantitas = cart.getQuantitas_banyakBarang();
                             BigDecimal total = totalCost(quantitas,harga);
-
+                            String TotalCost = total.toString();
                             transactionModel = new Transaction(cart.getNama_barang(),cart.getUserId()
-                                    ,cart.getUnit(),cart.getNamaPerusahaan(),cart.getHarga_barang(),cart.getImageItemUrl(),cart.getNotificationId(),cart.getQuantitas_banyakBarang(),user.getUid(),cart.getUserId(),"Masih Dalam Proses",date,instanceId,total);
+                                    ,cart.getUnit(),cart.getNamaPerusahaan(),cart.getHarga_barang(),cart.getImageItemUrl(),cart.getNotificationId(),cart.getQuantitas_banyakBarang(),user.getUid(),cart.getUserId(),"Masih Dalam Proses",date,instanceId,TotalCost);
                             firestore.collection("Transaction").document().set(transactionModel).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {

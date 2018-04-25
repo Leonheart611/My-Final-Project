@@ -72,13 +72,13 @@ public class CartAdapter extends FirestoreAdapter<CartAdapter.CartHolder>{
             int quantitas = cart.getQuantitas_banyakBarang();
             BigDecimal total = totalCost(quantitas,harga);
             String TotalCur = formatRP(total);
-            if (!cart.getImageItemUrl().isEmpty()) {
+            /*if (!cart.getImageItemUrl().isEmpty()) {
                 Glide.with(imageItem_cart.getContext())
                         .load(cart.getImageItemUrl())
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
                         .into(imageItem_cart);
-            }
+            }*/
             nameItem_cart.setText(cart.getNama_barang());
             hargaItem_cart.setText(cart.getHarga_barang());
             quantitasItem_cart.setText(cart.getQuantitas_banyakBarang()+"");

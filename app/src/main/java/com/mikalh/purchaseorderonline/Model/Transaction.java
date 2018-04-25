@@ -9,9 +9,9 @@ import java.math.BigDecimal;
 public class Transaction extends Cart{
     private String pengirim_id,penerima_id,status,tanggal;
     private String notificationIdPengirim;
-    private BigDecimal totalHarga;
+    private String totalHarga;
 
-    public Transaction(String nama_barang, String userId, String unit, String namaPerusahaan, String harga_barang, String imageItemUrl, String notificationId, int quantitas_banyakBarang, String pengirim_id, String penerima_id, String status, String tanggal, String notificationIdPengirim, BigDecimal totalHarga) {
+    public Transaction(String nama_barang, String userId, String unit, String namaPerusahaan, String harga_barang, String imageItemUrl, String notificationId, int quantitas_banyakBarang, String pengirim_id, String penerima_id, String status, String tanggal, String notificationIdPengirim, String totalHarga) {
         super(nama_barang, userId, unit, namaPerusahaan, harga_barang, imageItemUrl, notificationId, quantitas_banyakBarang);
         this.pengirim_id = pengirim_id;
         this.penerima_id = penerima_id;
@@ -21,18 +21,16 @@ public class Transaction extends Cart{
         this.totalHarga = totalHarga;
     }
 
-    public BigDecimal getTotalHarga() {
+    public Transaction() {
+    }
+
+    public String getTotalHarga() {
         return totalHarga;
     }
 
-    public void setTotalHarga(BigDecimal totalHarga) {
+    public void setTotalHarga(String totalHarga) {
         this.totalHarga = totalHarga;
     }
-
-    public Transaction() {
-
-    }
-
 
     public String getPengirim_id() {
         return pengirim_id;

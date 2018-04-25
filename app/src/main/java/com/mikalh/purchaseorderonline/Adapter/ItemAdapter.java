@@ -65,13 +65,13 @@ public class ItemAdapter extends FirestoreAdapter<ItemAdapter.ViewHolder> {
                          final OnItemSelectedListener listener) {
             Item item = snapshot.toObject(Item.class);
             //Resources resources = itemView.getResources();
-            if (!item.getImageItemUrl().isEmpty()) {
+            /*if (!item.getImageItemUrl().isEmpty()) {
                 Glide.with(barangImage_list.getContext())
                         .load(item.getImageItemUrl())
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
                         .into(barangImage_list);
-            }
+            }*/
             namaBarang_list.setText(item.getNama_barang());
             jenisBarang_list.setText(item.getUnit());
             hargaBarang_list.setText(item.getHarga_barang()+"");

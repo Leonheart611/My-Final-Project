@@ -52,13 +52,13 @@ public class CatalogueAdapter extends FirestoreAdapter<CatalogueAdapter.Catalogu
         }
         public void bind(final DocumentSnapshot snapshot, final OnClickCatalogueListener listener){
             Item item = snapshot.toObject(Item.class);
-            if (!item.getImageItemUrl().isEmpty()) {
+            /*if (!item.getImageItemUrl().isEmpty()) {
                 Glide.with(img_catalogue.getContext())
                         .load(item.getImageItemUrl())
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .skipMemoryCache(true)
                         .into(img_catalogue);
-            }
+            }*/
             namaBarang_catalogue.setText(item.getNama_barang());
 
             itemView.setOnClickListener(new View.OnClickListener() {
