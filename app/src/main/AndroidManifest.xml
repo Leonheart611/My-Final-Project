@@ -53,7 +53,8 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".MyOrder"></activity>
+        <activity android:name=".MyOrder" />
+        <activity android:name=".buyerActivity"></activity>
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -7,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -68,8 +70,7 @@ public class MainActivity extends AppCompatActivity {
                     if (task.isSuccessful()){
                         customDialog.show();
                         FirebaseUser user = auth.getCurrentUser();
-                        Intent i = new Intent(MainActivity.this, newUserUI.class);
-                        startActivity(i);
+                        popRole();
                     }else {
                         FirebaseAuthException e = (FirebaseAuthException) task.getException();
                         Log.e("Error Login",e.getMessage());
@@ -83,6 +84,31 @@ public class MainActivity extends AppCompatActivity {
             customDialog.dismiss();
             //Toast.makeText(MainActivity.this,"Please input Email and Password",Toast.LENGTH_LONG).show();
         }
+    }
+    public void popRole(){
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.choose_role);
+        dialog.setCanceledOnTouchOutside(false);
+
+        final Button buttonSeller = dialog.findViewById(R.id.buttonSeller);
+        final Button buttonBuyer = dialog.findViewById(R.id.buttonBuyer);
+
+        buttonBuyer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this,buyerActivity.class);
+                startActivity(i);
+            }
+        });
+        buttonSeller.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this,newUserUI.class);
+                startActivity(i);
+            }
+        });
+
     }
 
     @Override
