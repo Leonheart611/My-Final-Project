@@ -12,6 +12,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +35,7 @@ import java.util.Map;
 
 public class detailEdit extends AppCompatActivity implements View.OnClickListener {
     private String KEY_ITEM;
-    TextInputEditText itemName_edit, price_edit, unit_edit;
+    TextInputEditText itemName_edit, price_edit, unit_edit,kategori_edit;
     Button updateDo;
     FirebaseFirestore firestore;
     FirebaseAuth auth;
@@ -64,6 +65,7 @@ public class detailEdit extends AppCompatActivity implements View.OnClickListene
         updateDo.setOnClickListener(this);
         deleteDetailEdit = findViewById(R.id.deleteDetailEdit);
         deleteDetailEdit.setOnClickListener(this);
+        kategori_edit = findViewById(R.id.Kategori_edit);
         documentReference = firestore.collection("Items").document(KEY_ITEM);
         documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -79,6 +81,7 @@ public class detailEdit extends AppCompatActivity implements View.OnClickListene
                         Glide.with(itemImage_detailEdit.getContext()).load(item.getImageItemUrl())
                                 .into(itemImage_detailEdit);
                     }
+                    kategori_edit.setText(item.getKategori());
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -98,11 +101,12 @@ public class detailEdit extends AppCompatActivity implements View.OnClickListene
             String HargaBarang = price_edit.getText().toString();
             String unitItem = unit_edit.getText().toString();
             String urlItemBarang="";
-
+            String kategori = kategori_edit.getText().toString();
             Map<String, Object> updates = new HashMap<>();
             updates.put("harga_barang",HargaBarang);
             updates.put("nama_barang",namaBarang);
             updates.put("unit",unitItem);
+            updates.put("kategori",kategori);
 
             firestore.collection("Items").document(KEY_ITEM).update(updates).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override

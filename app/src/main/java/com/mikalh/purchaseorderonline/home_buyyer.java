@@ -1,46 +1,51 @@
 package com.mikalh.purchaseorderonline;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.AbsListView;
+import android.widget.SearchView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.mikalh.purchaseorderonline.Adapter.ItemAdapter;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link home.OnFragmentInteractionListener} interface
+ * {@link home_buyyer.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link home#newInstance} factory method to
+ * Use the {@link home_buyyer#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class home extends android.support.v4.app.Fragment implements View.OnClickListener {
+public class home_buyyer extends Fragment implements ItemAdapter.OnItemSelectedListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    ImageView profileImage,catalogImage,logoutImage,myOrderImage;
-    TextView profileTxt, catalogTxt,logoutTxt,myOrderTxt;
+    SearchView buyyerSearch;
+    RecyclerView itemListRV_buyyer;
+    ItemAdapter adapter;
+    FirebaseFirestore firestore;
+    Query query;
+    FirebaseAuth auth;
+    FirebaseUser user;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    public static final String USER_ID = "userID";
-    FirebaseAuth auth;
-    FirebaseUser user;
+
     private OnFragmentInteractionListener mListener;
 
-    public home() {
+    public home_buyyer() {
         // Required empty public constructor
     }
 
@@ -50,11 +55,11 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment home.
+     * @return A new instance of fragment home_buyyer.
      */
     // TODO: Rename and change types and number of parameters
-    public static home newInstance(String param1, String param2) {
-        home fragment = new home();
+    public static home_buyyer newInstance(String param1, String param2) {
+        home_buyyer fragment = new home_buyyer();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -69,37 +74,20 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        profileImage = view.findViewById(R.id.profileImage);
-        profileImage.setOnClickListener(this);
-        profileTxt = view.findViewById(R.id.ProfileTxt);
-        profileTxt.setOnClickListener(this);
+        View v = inflater.inflate(R.layout.fragment_home_buyyer, container, false);
+        buyyerSearch = v.findViewById(R.id.buyyerSearch);
+        itemListRV_buyyer = v.findViewById(R.id.itemListRV_buyyer);
+        adapter = new ItemAdapter(query,this);
 
-        catalogImage = view.findViewById(R.id.catalogImage);
-        catalogImage.setOnClickListener(this);
-        catalogTxt = view.findViewById(R.id.catalogTxt);
-        catalogTxt.setOnClickListener(this);
-
-        myOrderImage = view.findViewById(R.id.myOrderImage);
-        myOrderImage.setOnClickListener(this);
-        myOrderTxt = view.findViewById(R.id.myOrderTxt);
-        myOrderTxt.setOnClickListener(this);
-
-
-        logoutImage = view.findViewById(R.id.logoutImage);
-        logoutImage.setOnClickListener(this);
-        logoutTxt = view.findViewById(R.id.logoutTxt);
-        logoutTxt.setOnClickListener(this);
-
-        return view;
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -109,7 +97,7 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
         }
     }
 
-    /*@Override
+   /* @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -127,26 +115,8 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
     }
 
     @Override
-    public void onClick(View view) {
-        if (view == logoutImage || view == logoutTxt){
-            FirebaseAuth.getInstance().signOut();
-            Intent i = new Intent(getActivity(),MainActivity.class);
-            Toast.makeText(getActivity(),"Success Sign Out",Toast.LENGTH_LONG).show();
-            startActivity(i);
-        }
-        if (view == catalogImage || view == catalogTxt){
-            Intent i = new Intent(getActivity(),myCatalogue.class);
-            startActivity(i);
-        }
-        if (view == profileImage || view == profileTxt){
-            Intent i = new Intent(getActivity(),Profile.class);
-            i.putExtra(USER_ID,user.getUid());
-            startActivity(i);
-        }
-        if(view == myOrderImage || view == myOrderTxt){
-            Intent i = new Intent(getActivity(),MyOrder.class);
-            startActivity(i);
-        }
+    public void onItemSelected(DocumentSnapshot item) {
+
     }
 
     /**

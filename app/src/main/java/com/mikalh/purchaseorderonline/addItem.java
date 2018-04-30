@@ -51,7 +51,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 public class addItem extends AppCompatActivity {
-    EditText namaItem_add, hargaItem_add,unitItem_add;
+    EditText namaItem_add, hargaItem_add,unitItem_add,estimasiWaktu;
+    Spinner pilihanWaktu,Kategori;
     ImageView imageItem_add;
     Button addItemDo;
     FirebaseFirestore firestore;
@@ -70,6 +71,8 @@ public class addItem extends AppCompatActivity {
     ArrayList<String> imageList = new ArrayList<>();
     Company company = new Company();
     String instanceId = FirebaseInstanceId.getInstance().getToken();
+    String[] pilihanTime = {"Hari","Bulan"};
+    String[] kategori = {"Barang Baku","Barang Mentah","Barang Dasar","Dll"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +111,13 @@ public class addItem extends AppCompatActivity {
         hargaItem_add.addTextChangedListener(new CurcurencyFormater(hargaItem_add));
         addItemDo = findViewById(R.id.addItemDo);
         imageItem_add = findViewById(R.id.itemImage_add);
+        Kategori = findViewById(R.id.Kategori);
         //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        ArrayAdapter waktu = new ArrayAdapter(this,android.R.layout.simple_spinner_item,pilihanTime);
+        pilihanWaktu.setAdapter(waktu);
+        ArrayAdapter kategoriAdapter = new ArrayAdapter(this,android.R.layout.simple_spinner_item,kategori);
+        Kategori.setAdapter(kategoriAdapter);
+
 
 
         addItemDo.setOnClickListener(new View.OnClickListener() {
@@ -260,11 +269,12 @@ public class addItem extends AppCompatActivity {
         String userId = user.getUid();
         String unitItem = unitItem_add.getText().toString();
         String urlItemBarang="";
+        String kategori = Kategori.getSelectedItem().toString();
         if (urlImage!=null) {
             urlItemBarang = urlImage.toString();
         }
 
-        Item item = new Item(namaBarang,userId,unitItem,company.getNama_perusahaan(),HargaBarang,urlItemBarang,instanceId);
+        Item item = new Item(namaBarang,userId,unitItem,company.getNama_perusahaan(),HargaBarang,urlItemBarang,instanceId,kategori);
 
         firestore.collection("Items").document()
                 .set(item).addOnCompleteListener(new OnCompleteListener<Void>() {

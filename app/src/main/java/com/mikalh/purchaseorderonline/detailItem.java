@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -28,6 +30,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.Item;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class detailItem extends AppCompatActivity {
     private String KEY_ITEM_ID;
     TextInputEditText namaBarang_detail,hargaBarang_detail,unit_detail;
@@ -39,6 +44,7 @@ public class detailItem extends AppCompatActivity {
     CustomDialog customDialog;
     Item item;
     Button beliButton_do;
+    Calendar myCalendar = Calendar.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,14 +103,37 @@ public class detailItem extends AppCompatActivity {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.pop_up_buy_cart);
 
+
+
+        final EditText tanggalEstimasi = dialog.findViewById(R.id.tanggalEstimasi);
+        final EditText alamatPengiriman_PopUP = dialog.findViewById(R.id.alamatPengiriman_popUP);
         final Button saveToCart = dialog.findViewById(R.id.saveToCart);
         final EditText banyakPCS_popCart = dialog.findViewById(R.id.banyakPCS_popCart);
+
+        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, month);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                updateLabel(tanggalEstimasi);
+            }
+        };
+
+        tanggalEstimasi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(detailItem.this,date,myCalendar.get(Calendar.YEAR),
+                        myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
 
         saveToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int pcs = Integer.parseInt(banyakPCS_popCart.getText().toString());
-                Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit(),item.getNamaPerusahaan(),item.getHarga_barang(),item.getImageItemUrl(),item.getNotificationId(),pcs);
+                Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit()
+                        ,item.getNamaPerusahaan(),item.getHarga_barang(),item.getImageItemUrl(),item.getNotificationId(),item.getKategori(),pcs,alamatPengiriman_PopUP.getText().toString(),tanggalEstimasi.getText().toString());
                 // add database firestore
                 firestore.collection("Users").document(user.getUid()).collection("Cart").document().set(cart).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -127,5 +156,10 @@ public class detailItem extends AppCompatActivity {
             }
         });
         dialog.show();
+    }
+    private void updateLabel(EditText textInputEditText){
+        String myFormat = "dd-MMM-yyyy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
+        textInputEditText.setText(sdf.format(myCalendar.getTime()));
     }
 }

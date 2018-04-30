@@ -41,6 +41,7 @@ public class Profile extends AppCompatActivity implements TabLayout.OnTabSelecte
         }
         adapter = new ProfilePagger(getSupportFragmentManager(),2);
         profile_pagger.setAdapter(adapter);
+        profile_pagger.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(profile_tab));
         profile_tab.setOnTabSelectedListener(this);
     }
 

@@ -12,8 +12,10 @@ public class Item  {
     private String harga_barang;
     private String imageItemUrl;
     private String notificationId;
+    private String kategori;
 
-    public Item(String nama_barang, String userId, String unit, String namaPerusahaan, String harga_barang, String imageItemUrl, String notificationId) {
+    public Item(String nama_barang, String userId, String unit, String namaPerusahaan
+            , String harga_barang, String imageItemUrl, String notificationId, String kategori) {
         this.nama_barang = nama_barang;
         this.userId = userId;
         this.unit = unit;
@@ -21,6 +23,15 @@ public class Item  {
         this.harga_barang = harga_barang;
         this.imageItemUrl = imageItemUrl;
         this.notificationId = notificationId;
+        this.kategori = kategori;
+    }
+
+    public String getKategori() {
+        return kategori;
+    }
+
+    public void setKategori(String kategori) {
+        this.kategori = kategori;
     }
 
     public String getNotificationId() {
