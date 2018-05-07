@@ -14,10 +14,11 @@ public class buyerActivity extends AppCompatActivity implements TabLayout.OnTabS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_buyer);
         buyyerTab = findViewById(R.id.buyyerTab);
         buyyerView = findViewById(R.id.buyyerView);
-        adapter = new BuyyerPagger(getSupportFragmentManager());
+        adapter = new BuyyerPagger(getSupportFragmentManager(),3);
         buyyerView.setAdapter(adapter);
         buyyerView.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(buyyerTab));
         buyyerTab.setOnTabSelectedListener(this);
@@ -39,4 +40,8 @@ public class buyerActivity extends AppCompatActivity implements TabLayout.OnTabS
 
     }
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 }

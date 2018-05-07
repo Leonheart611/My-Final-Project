@@ -9,23 +9,33 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.mikalh.purchaseorderonline.Model.User;
 import com.mikalh.purchaseorderonline.Pager.MainPager;
+
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity {
     Button register_login, loginDo;
     EditText email_login, password_login;
     FirebaseAuth auth;
     FirebaseUser user;
+    FirebaseFirestore firebaseFirestore;
     CustomDialog customDialog;
     TextInputLayout tilPassword;
     @Override
@@ -34,9 +44,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
+        firebaseFirestore = FirebaseFirestore.getInstance();
         if (user != null){
-            Intent i = new Intent(MainActivity.this, newUserUI.class);
-            startActivity(i);
+            firebaseFirestore.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot snapshot) {
+                    User user1ogin = snapshot.toObject(User.class);
+                    if (user1ogin.getRoleActive().equals("Penjual")) {
+                        Intent i = new Intent(MainActivity.this, newUserUI.class);
+                        startActivity(i);
+                    }else if (user1ogin.getRoleActive().equals("Pembeli")){
+                        Intent i = new Intent(MainActivity.this,buyerActivity.class);
+                        startActivity(i);
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Crashlytics.logException(e);
+                }
+            });
         }
         email_login = findViewById(R.id.email_login);
         password_login = findViewById(R.id.password_login);
@@ -68,9 +95,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()){
-                        customDialog.show();
+                        customDialog.dismiss();
                         FirebaseUser user = auth.getCurrentUser();
-                        popRole();
+                        popRole(user);
                     }else {
                         FirebaseAuthException e = (FirebaseAuthException) task.getException();
                         Log.e("Error Login",e.getMessage());
@@ -85,11 +112,18 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(MainActivity.this,"Please input Email and Password",Toast.LENGTH_LONG).show();
         }
     }
-    public void popRole(){
+    public void popRole(final FirebaseUser user){
         final Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+       /* dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);*/
         dialog.setContentView(R.layout.choose_role);
         dialog.setCanceledOnTouchOutside(false);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+//This makes the dialog take up the full width
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(lp);
 
         final Button buttonSeller = dialog.findViewById(R.id.buttonSeller);
         final Button buttonBuyer = dialog.findViewById(R.id.buttonBuyer);
@@ -97,17 +131,49 @@ public class MainActivity extends AppCompatActivity {
         buttonBuyer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this,buyerActivity.class);
-                startActivity(i);
+                firebaseFirestore.collection("Users").document(user.getUid()).update("roleActive","Pembeli").addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Intent i = new Intent(MainActivity.this,buyerActivity.class);
+                            startActivity(i);
+                            dialog.dismiss();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Crashlytics.logException(e);
+                        dialog.dismiss();
+                        Toast.makeText(MainActivity.this,"Terjadi Kesalahan harap Login Ulang",Toast.LENGTH_LONG).show();
+                    }
+                });
+
             }
         });
         buttonSeller.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this,newUserUI.class);
-                startActivity(i);
+                firebaseFirestore.collection("Users").document(user.getUid()).update("roleActive","Penjual").addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Intent i = new Intent(MainActivity.this,newUserUI.class);
+                            startActivity(i);
+                            dialog.dismiss();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Crashlytics.logException(e);
+                        dialog.dismiss();
+                    }
+                });
+
             }
         });
+        dialog.show();
 
     }
 

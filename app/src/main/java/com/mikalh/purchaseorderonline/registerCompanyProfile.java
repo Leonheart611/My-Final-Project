@@ -1,6 +1,5 @@
 package com.mikalh.purchaseorderonline;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -12,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
+
 
 import com.github.kimkevin.cachepot.CachePot;
 import com.mikalh.purchaseorderonline.Model.Company;

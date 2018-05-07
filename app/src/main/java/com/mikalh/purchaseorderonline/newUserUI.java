@@ -32,7 +32,7 @@ public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelec
         mainPagger.setAdapter(adapter);
         mainPagger.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mainTab));
         mainTab.setOnTabSelectedListener(this);
-        /*CreateNotification();*/
+
     }
 
     @Override
@@ -47,17 +47,6 @@ public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelec
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-
-    }
-    public void CreateNotification(){
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher_round)
-                        .setContentTitle("Purchase Order Online")
-                        .setContentText("Hello World!");
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(001, mBuilder.build());
 
     }
     @Override

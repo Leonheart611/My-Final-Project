@@ -6,9 +6,11 @@ package com.mikalh.purchaseorderonline.Model;
 
 public class User extends Company{
     private String nama_PIC,
-            email,userID,jabatan_PIC,username,notificationId;
+            email,userID,jabatan_PIC,username,notificationId,roleActive;
 
-    public User(String alamat_perusahaan, String nama_perusahaan, String nomorTelphone, String no_fax, String kota, String provinsi, String url_pictLogo, String nama_PIC, String email, String userID, String jabatan_PIC, String username, String notificationId) {
+    public User(String alamat_perusahaan, String nama_perusahaan, String nomorTelphone, String no_fax, String kota
+            , String provinsi, String url_pictLogo, String nama_PIC, String email
+            , String userID, String jabatan_PIC, String username, String notificationId, String roleActive) {
         super(alamat_perusahaan, nama_perusahaan, nomorTelphone, no_fax, kota, provinsi, url_pictLogo);
         this.nama_PIC = nama_PIC;
         this.email = email;
@@ -16,6 +18,23 @@ public class User extends Company{
         this.jabatan_PIC = jabatan_PIC;
         this.username = username;
         this.notificationId = notificationId;
+        this.roleActive = roleActive;
+    }
+
+    public String getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
+    }
+
+    public String getRoleActive() {
+        return roleActive;
+    }
+
+    public void setRoleActive(String roleActive) {
+        this.roleActive = roleActive;
     }
 
     public String getUsername() {

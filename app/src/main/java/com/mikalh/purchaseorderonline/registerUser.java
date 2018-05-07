@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,9 +12,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.github.kimkevin.cachepot.CachePot;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -171,34 +174,35 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
                             }
                         }
                     });
-                    user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                cd.dismiss();
-                                Toast.makeText(getActivity(),"Please Check Your email for verification",Toast.LENGTH_LONG).show();
-                                Intent i = new Intent(getActivity(), newUserUI.class);
-                                startActivity(i);
-                            }
-                            else {
-
-                            }
-                        }
-                    });
-                    User userAdd = new User(Address,CompanyName,Telephone,FAX,City,Province,"",PICName,Email,user.getUid(),PICPossition,Username,instanceId);
+                    User userAdd = new User(Address,CompanyName,Telephone,FAX,City,Province,"",PICName,Email,user.getUid(),PICPossition,Username,instanceId,"");
                     firestore.collection("Users").document(user.getUid()).set(userAdd).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){
-                                Toast.makeText(getActivity(),"Successfuly Create User",Toast.LENGTH_LONG).show();
+                                //Toast.makeText(getActivity(),"Successfuly Create User",Toast.LENGTH_LONG).show();
+                                user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()){
+                                            cd.dismiss();
+                                            popRole(user);
+                                        }
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Crashlytics.logException(e);
+                                        cd.dismiss();
+                                        Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_LONG).show();
+                                    }
+                                });
                             }
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_LONG).show();
-                            FirebaseCrash.logcat(Log.ERROR,"Error at Add user", "NPE caught");
-                            FirebaseCrash.report(e);
+                            Crashlytics.logException(e);
                         }
                     });
 
@@ -215,6 +219,62 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
                 Log.e("Error Create User",e.getMessage());
             }
         });
+
+    }
+    public void popRole(final FirebaseUser user){
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.choose_role);
+        dialog.setCanceledOnTouchOutside(false);
+
+        final Button buttonSeller = dialog.findViewById(R.id.buttonSeller);
+        final Button buttonBuyer = dialog.findViewById(R.id.buttonBuyer);
+
+        buttonBuyer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firestore.collection("Users").document(user.getUid()).update("roleActive","Pembeli").addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Intent i = new Intent(getActivity(),buyerActivity.class);
+                            startActivity(i);
+                            dialog.dismiss();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Crashlytics.logException(e);
+                        dialog.dismiss();
+                        Toast.makeText(getActivity(),"Terjadi Kesalahan harap Login Ulang",Toast.LENGTH_LONG).show();
+                    }
+                });
+
+            }
+        });
+        buttonSeller.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firestore.collection("Users").document(user.getUid()).update("roleActive","Penjual").addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Intent i = new Intent(getActivity(), newUserUI.class);
+                            startActivity(i);
+                            dialog.dismiss();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Crashlytics.logException(e);
+                    }
+                });
+
+            }
+        });
+        dialog.show();
 
     }
 

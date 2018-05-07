@@ -4,7 +4,7 @@
     android:id="@+id/frameLayout4"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mikalh.purchaseorderonline.companyProfile">
+    tools:context="com.mikalh.purchaseorderonline.company_Profile">
 
     <!-- TODO: Update blank fragment layout -->
 

@@ -1,6 +1,5 @@
 package com.mikalh.purchaseorderonline;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -14,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -22,19 +22,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mikalh.purchaseorderonline.Model.User;
 
+import java.util.HashMap;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link companyProfile.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link companyProfile#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class companyProfile extends android.support.v4.app.Fragment implements View.OnClickListener {
+
+public class company_Profile extends android.support.v4.app.Fragment implements View.OnClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -51,10 +46,10 @@ public class companyProfile extends android.support.v4.app.Fragment implements V
     private String mParam1;
     private String mParam2;
     String userID;
-
+    CustomDialog customDialog;
     private OnFragmentInteractionListener mListener;
 
-    public companyProfile() {
+    public company_Profile() {
         // Required empty public constructor
     }
 
@@ -64,11 +59,11 @@ public class companyProfile extends android.support.v4.app.Fragment implements V
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment companyProfile.
+     * @return A new instance of fragment company_Profile.
      */
     // TODO: Rename and change types and number of parameters
-    public static companyProfile newInstance(String param1, String param2) {
-        companyProfile fragment = new companyProfile();
+    public static company_Profile newInstance(String param1, String param2) {
+        company_Profile fragment = new company_Profile();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -88,6 +83,7 @@ public class companyProfile extends android.support.v4.app.Fragment implements V
         firestore = FirebaseFirestore.getInstance();
         userID = getActivity().getIntent().getExtras().getString(companyNameSearch.USER_ID);
         users = firestore.collection("Users");
+        customDialog = new CustomDialog(getActivity());
     }
 
     @Override
@@ -171,7 +167,33 @@ public class companyProfile extends android.support.v4.app.Fragment implements V
 
     @Override
     public void onClick(View view) {
+        if (view == btnSave){
 
+        }
+    }
+    public void updateCompany(){
+        customDialog.show();
+        HashMap<String,Object> update = new HashMap<>();
+        update.put("alamat_perusahaan",address_profile.getText().toString());
+        update.put("nama_perusahaan",companyName_profile.getText().toString());
+        update.put("no_fax",fax_profile.getText().toString());
+        update.put("Provinsi",province_profile.getText().toString());
+        update.put("historyUpdate", FieldValue.serverTimestamp());
+
+        users.document(user.getUid()).update(update).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                    customDialog.dismiss();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Crashlytics.logException(e);
+                customDialog.dismiss();
+            }
+        });
     }
 
     /**

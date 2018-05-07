@@ -9,8 +9,10 @@ import com.mikalh.purchaseorderonline.Transaction_buyyer;
 import com.mikalh.purchaseorderonline.home_buyyer;
 
 public class BuyyerPagger extends FragmentStatePagerAdapter {
-    public BuyyerPagger(FragmentManager fm) {
+    int tabCount;
+    public BuyyerPagger(FragmentManager fm,int tabCount) {
         super(fm);
+        this.tabCount = tabCount;
     }
 
     @Override
@@ -20,15 +22,15 @@ public class BuyyerPagger extends FragmentStatePagerAdapter {
                 return new home_buyyer();
             case 1:
                 return new Cart_buyyer();
-            case 3:
+            case 2:
                 return new Transaction_buyyer();
-
+            default:
+                return null;
         }
-        return null;
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return tabCount;
     }
 }

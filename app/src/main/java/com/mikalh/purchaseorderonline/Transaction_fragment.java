@@ -78,11 +78,8 @@ public class Transaction_fragment extends android.support.v4.app.Fragment implem
         }
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-        query = FirebaseFirestore.getInstance().collection("Transaction").whereEqualTo("pengirim_id",user.getUid());
-
-
-
-
+        query = FirebaseFirestore.getInstance().collection("Transaction").whereEqualTo("penerima_id",user.getUid());
+        
     }
 
     @Override
