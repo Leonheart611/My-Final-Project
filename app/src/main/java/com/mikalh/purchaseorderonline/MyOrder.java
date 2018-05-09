@@ -51,17 +51,19 @@ public class MyOrder extends AppCompatActivity implements TransactionAdapter.OnT
     FirebaseFirestore firestore;
     TransactionAdapter adapter;
     RecyclerView transasction_myOrder;
-    CustomDialog cd = new CustomDialog(this);
+    CustomDialog cd;
     Transaction detailTransaction;
     String Key = "key=AAAAx1NMbj0:APA91bHv2Yky3eenD79mwmY1unL3bLEI57VLpDkFoxQ2rfowQXju2DkeRV4_SvOF-LCaO9IsZfAhFIliTTeo5RPs5EwBxlImuoeDlfBzKsTDEiHsGBqtJlp8fCNgHEjlOAx9UqU_mWaT";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         query = FirebaseFirestore.getInstance().collection("Transaction").whereEqualTo("penerima_id",user.getUid());
         firestore = FirebaseFirestore.getInstance();
         setContentView(R.layout.activity_my_order);
+        cd = new CustomDialog(this);
         transasction_myOrder = findViewById(R.id.transaction_myOrder);
         adapter = new TransactionAdapter(query,this){
             @Override

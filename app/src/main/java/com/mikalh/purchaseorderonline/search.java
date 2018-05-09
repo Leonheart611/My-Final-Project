@@ -7,97 +7,89 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toolbar;
 
+import com.crashlytics.android.Crashlytics;
+import com.firebase.ui.auth.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.mikalh.purchaseorderonline.Adapter.ItemAdapter;
 import com.mikalh.purchaseorderonline.Pager.SearchPagger;
 
-public class search extends AppCompatActivity implements SearchView.OnQueryTextListener, TabLayout.OnTabSelectedListener {
+public class search extends AppCompatActivity implements ItemAdapter.OnItemSelectedListener{
     private Toolbar searchToolBar;
-    ViewPager mySearch_viewPagger;
-    SearchPagger adapter;
     TabLayout searchTab;
+    Query query;
+    FirebaseFirestore firestore;
+    FirebaseUser user;
+    FirebaseAuth auth;
+    CardView searchItem_cardView;
+    ItemAdapter itemAdapter;
+    RecyclerView itemRV_search;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getSupportActionBar().setTitle("Search");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        mySearch_viewPagger = findViewById(R.id.mySearch_viewPagger);
-        searchTab = findViewById(R.id.search_tab);
-        adapter = new SearchPagger(getSupportFragmentManager(),2);
-        mySearch_viewPagger.setAdapter(adapter);
-        mySearch_viewPagger.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(searchTab));
-        searchTab.setOnTabSelectedListener(this);
+        firestore = FirebaseFirestore.getInstance();
+        query = firestore.collection("Items").orderBy("nama_barang");
+        searchItem_cardView = findViewById(R.id.searchItem_cardView);
+        itemRV_search = findViewById(R.id.itemRV_search);
+        itemAdapter = new ItemAdapter(query,this){
+            @Override
+            protected void onDataChanged() {
+                super.onDataChanged();
+            }
+
+            @Override
+            protected void onError(FirebaseFirestoreException e) {
+                super.onError(e);
+                Crashlytics.logException(e);
+            }
+
+            @Override
+            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return super.onCreateViewHolder(parent, viewType);
+            }
+
+            @Override
+            public void onBindViewHolder(ViewHolder holder, int position) {
+                super.onBindViewHolder(holder, position);
+            }
+        };
+        itemRV_search.setAdapter(itemAdapter);
+
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.searchbar,menu);
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnQueryTextListener(this);
-        searchView.setFocusable(true);
-        searchView.setIconified(false);
-        searchView.requestFocusFromTouch();
-
-
-        return true;
-    }
-
-    @Override
-    public boolean onSearchRequested() {
-        Bundle appData = new Bundle();
-        appData.putString("Hello","World");
-        startSearch(null,false,appData,false);
-        return super.onSearchRequested();
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String s) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String s) {
-        return false;
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        handleIntent(intent);
-    }
-    public String handleIntent(Intent intent){
-        String query ="";
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())){
-            query = intent.getStringExtra(SearchManager.QUERY);
-
-            return query;
-        }else {
-            return query;
+    protected void onStart() {
+        super.onStart();
+        if (itemAdapter != null){
+            itemAdapter.startListening();
         }
-
     }
 
     @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        mySearch_viewPagger.setCurrentItem(tab.getPosition());
+    protected void onDestroy() {
+        super.onDestroy();
+        if (itemAdapter!=null){
+            itemAdapter.stopListening();
+        }
     }
 
     @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-
-    }
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {
+    public void onItemSelected(DocumentSnapshot item) {
 
     }
 }

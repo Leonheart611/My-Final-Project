@@ -55,7 +55,6 @@ public class ItemAdapter extends FirestoreAdapter<ItemAdapter.ViewHolder> {
         public ViewHolder(View itemView) {
             super(itemView);
             namaBarang_list = itemView.findViewById(R.id.namaBarang_list);
-            jenisBarang_list = itemView.findViewById(R.id.jenisBarang_list);
             hargaBarang_list = itemView.findViewById(R.id.hargaBarang_list);
             barangImage_list = itemView.findViewById(R.id.barangImage_list);
 
@@ -73,7 +72,6 @@ public class ItemAdapter extends FirestoreAdapter<ItemAdapter.ViewHolder> {
                         .into(barangImage_list);
             }*/
             namaBarang_list.setText(item.getNama_barang());
-            jenisBarang_list.setText(item.getUnit());
             hargaBarang_list.setText(item.getHarga_barang()+"");
 
             itemView.setOnClickListener(new View.OnClickListener() {

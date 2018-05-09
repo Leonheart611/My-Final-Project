@@ -21,6 +21,8 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -104,6 +106,7 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_piccontact, container, false);
+        customDialog.show();
         picName_profile = v.findViewById(R.id.picName_profile);
         picPosition_profile = v.findViewById(R.id.picPosition_profile);
         telephone_profile = v.findViewById(R.id.telephone_profile);
@@ -120,7 +123,7 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
         changePassword_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                UpdatePassword();
             }
         });
 
@@ -153,6 +156,7 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
                     telephone_profile.setText(userProfile.getNomorTelphone(), TextView.BufferType.EDITABLE);
                     email_profile.setText(userProfile.getEmail(), TextView.BufferType.EDITABLE);
                     username_profile.setText(userProfile.getUsername(), TextView.BufferType.EDITABLE);
+                    customDialog.dismiss();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -160,6 +164,7 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
             public void onFailure(@NonNull Exception e) {
                 Crashlytics.logException(e);
                 Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_LONG).show();
+                customDialog.dismiss();
             }
         });
 
@@ -176,13 +181,13 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
     }
     public void updateProfile(){
         customDialog.show();
+        String email = email_profile.getText().toString();
         HashMap<String, Object> update = new HashMap<>();
         update.put("nama_PIC",picName_profile.getText().toString());
         update.put("jabatan_PIC",picPosition_profile.getText().toString());
         update.put("nomorTelphone",telephone_profile.getText().toString());
-        update.put("email",email_profile.getText().toString());
+        update.put("email",email);
         update.put("username",username_profile.getText().toString());
-
         users.document(user.getUid()).update(update).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -198,6 +203,20 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
                 customDialog.dismiss();
             }
         });
+        if (!user.getEmail().equals(email)){
+            user.updateEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful())
+                        Crashlytics.log("Success Change Email");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Crashlytics.logException(e);
+                }
+            });
+        }
     }
 
     public void UpdatePassword(){
@@ -215,35 +234,53 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
 
         final TextInputEditText updatePassword = dialog.findViewById(R.id.updatePassword);
         final Button updateDo = dialog.findViewById(R.id.updatePassword_do);
-        final TextInputLayout TIL_updatePass = dialog.findViewById(R.id.TIL_updatePass);
-        final String password = updatePassword.getText().toString();
+        final TextInputEditText oldPassword = dialog.findViewById(R.id.oldPassword);
+        final TextInputEditText retypeNewPassword = dialog.findViewById(R.id.retypeNewPassword);
+        final TextInputLayout TIL_notifUpdate = dialog.findViewById(R.id.TIL_notifUpdate);
         updateDo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (password.isEmpty()){
-                    TIL_updatePass.setError("Tidak Boleh Kosong");
+                TIL_notifUpdate.setError(null);
+                final String password = updatePassword.getText().toString();
+                if (password.isEmpty() || oldPassword.getText().toString().isEmpty() || retypeNewPassword.getText().toString().isEmpty()){
+                    TIL_notifUpdate.setError("Please Fill All Form");
                 }else {
-                    user.updatePassword(password).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    dialog.dismiss();
+                    customDialog.show();
+                    AuthCredential credential = EmailAuthProvider
+                            .getCredential(user.getEmail(), oldPassword.getText().toString());
+                    user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                Toast.makeText(getActivity(),"Berhasil Ganti Password",Toast.LENGTH_LONG).show();
-                            }
+                            user.updatePassword(password).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        Toast.makeText(getActivity(),"Berhasil Ganti Password",Toast.LENGTH_LONG).show();
+                                        customDialog.dismiss();
+                                    }
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Crashlytics.logException(e);
+                                    Toast.makeText(getActivity(),"Gagal Merubah password,Silahkan coba kembali",Toast.LENGTH_LONG).show();
+                                    customDialog.dismiss();
+                                    dialog.show();
+                                }
+                            });
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Crashlytics.logException(e);
-                            Toast.makeText(getActivity(),"Gagal Merubah password,Silahkan coba kembali",Toast.LENGTH_LONG).show();
                         }
                     });
+
                 }
             }
         });
-
-
-
-
+        dialog.show();
     }
     /*@Override
     public void onAttach(Context context) {

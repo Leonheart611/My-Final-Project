@@ -1,6 +1,7 @@
 package com.mikalh.purchaseorderonline;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,22 +29,19 @@ import com.mikalh.purchaseorderonline.Adapter.ItemAdapter;
  * Use the {@link home_buyyer#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class home_buyyer extends Fragment implements ItemAdapter.OnItemSelectedListener{
+public class home_buyyer extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    SearchView buyyerSearch;
-    RecyclerView itemListRV_buyyer;
-    ItemAdapter adapter;
+    ImageButton myProfile_buyyer, search_buyyer,send_po,logout_buyyer;
     FirebaseFirestore firestore;
-    Query query;
     FirebaseAuth auth;
     FirebaseUser user;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    public static final String USER_ID = "userID";
     private OnFragmentInteractionListener mListener;
 
     public home_buyyer() {
@@ -76,6 +75,7 @@ public class home_buyyer extends Fragment implements ItemAdapter.OnItemSelectedL
         }
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
     }
 
     @Override
@@ -83,9 +83,12 @@ public class home_buyyer extends Fragment implements ItemAdapter.OnItemSelectedL
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_home_buyyer, container, false);
-        buyyerSearch = v.findViewById(R.id.buyyerSearch);
-        itemListRV_buyyer = v.findViewById(R.id.itemListRV_buyyer);
-        adapter = new ItemAdapter(query,this);
+        myProfile_buyyer = v.findViewById(R.id.myProfile_buyyer);
+        myProfile_buyyer.setOnClickListener(this);
+        search_buyyer = v.findViewById(R.id.search_buyyer);
+        send_po = v.findViewById(R.id.send_po);
+        logout_buyyer = v.findViewById(R.id.logout_buyyer);
+        logout_buyyer.setOnClickListener(this);
 
         return v;
     }
@@ -115,20 +118,17 @@ public class home_buyyer extends Fragment implements ItemAdapter.OnItemSelectedL
     }
 
     @Override
-    public void onItemSelected(DocumentSnapshot item) {
-
+    public void onClick(View v) {
+        if (v == logout_buyyer){
+            auth.signOut();
+        }
+        if (v == myProfile_buyyer){
+            Intent i = new Intent(getActivity(),Profile.class);
+            i.putExtra(USER_ID,user.getUid());
+            startActivity(i);
+        }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);

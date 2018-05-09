@@ -193,7 +193,6 @@ public class userUI extends AppCompatActivity implements ItemAdapter.OnItemSelec
         public ItemHolder(View itemView) {
             super(itemView);
             namaBarang_list = itemView.findViewById(R.id.namaBarang_list);
-            jenisBarang_list = itemView.findViewById(R.id.jenisBarang_list);
             hargaBarang_list = itemView.findViewById(R.id.hargaBarang_list);
             myConstrain = itemView.findViewById(R.id.myConstrain);
         }

@@ -6,8 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -23,6 +25,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.TransactionHolder> {
 
@@ -50,6 +53,7 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
 
     public static class TransactionHolder extends RecyclerView.ViewHolder {
         TextView date_transaction, namaBarang_transaction, quantitas_transaction, status_transaction, total_transaction, companyName_transaction;
+        ImageView statusComplete_transaction;
 
         public TransactionHolder(View itemView) {
             super(itemView);
@@ -59,6 +63,7 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
             status_transaction = itemView.findViewById(R.id.status_transaction);
             total_transaction = itemView.findViewById(R.id.total_transaction);
             companyName_transaction = itemView.findViewById(R.id.companyName_transaction);
+            statusComplete_transaction = itemView.findViewById(R.id.statusComplete_transaction);
         }
 
         public void bind(final DocumentSnapshot snapshot
@@ -71,11 +76,12 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
                 int quantitas = transaction.getQuantitas_banyakBarang();
                 BigDecimal total = totalCost(quantitas,harga);
                 TotalCur = formatRP(total);
-
+                if (!transaction.getStatus().equals("Complete")){
+                    statusComplete_transaction.setImageResource(R.mipmap.x_button);
+                }
             }
             catch (Exception e){
-                e.printStackTrace();
-                Log.e("error adapter Transac",e.getMessage());
+                Crashlytics.logException(e);
             }
 
 
@@ -118,14 +124,13 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
 
         public String formatDate(String date) {
             try {
-                SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss Z");
+                SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
                 Date newDate = format.parse(date);
 
                 format = new SimpleDateFormat("dd-MMM-yyyy");
                 return new String(format.format(newDate));
             }catch (Exception e){
-                FirebaseCrash.logcat(Log.ERROR, "Error Parse", "NPE caught");
-                FirebaseCrash.report(e);
+                Crashlytics.logException(e);
             }
             return null;
         }
