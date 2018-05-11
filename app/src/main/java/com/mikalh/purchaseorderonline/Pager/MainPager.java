@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.mikalh.purchaseorderonline.ChatList;
 import com.mikalh.purchaseorderonline.Transaction_fragment;
-import com.mikalh.purchaseorderonline.chat;
 import com.mikalh.purchaseorderonline.home;
 
 /**
@@ -30,8 +30,8 @@ public class MainPager extends FragmentStatePagerAdapter {
                 Transaction_fragment Transaction_fragment = new Transaction_fragment();
                 return Transaction_fragment;
             case 2:
-                chat chat = new chat();
-                return chat;
+                ChatList ChatList = new ChatList();
+                return ChatList;
             default:
                 return null;
         }

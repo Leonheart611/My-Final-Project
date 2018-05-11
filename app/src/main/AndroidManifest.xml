@@ -55,7 +55,8 @@
 
         <activity android:name=".MyOrder" />
         <activity android:name=".buyerActivity" />
-        <activity android:name=".Transaction_detail"></activity>
+        <activity android:name=".Transaction_detail" />
+        <activity android:name=".DetailChat"></activity>
     </application>
 
 </manifest>

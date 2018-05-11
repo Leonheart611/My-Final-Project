@@ -3,12 +3,19 @@ package com.mikalh.purchaseorderonline;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Rect;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -37,14 +44,14 @@ public class search extends AppCompatActivity implements ItemAdapter.OnItemSelec
     CardView searchItem_cardView;
     ItemAdapter itemAdapter;
     RecyclerView itemRV_search;
+    public static final String KEY_ITEM_ID = "keyItemID";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getSupportActionBar().setTitle("Search");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         firestore = FirebaseFirestore.getInstance();
-        query = firestore.collection("Items").orderBy("nama_barang");
-        searchItem_cardView = findViewById(R.id.searchItem_cardView);
+        query = firestore.collection("Items").orderBy("nama_barang", Query.Direction.ASCENDING);
         itemRV_search = findViewById(R.id.itemRV_search);
         itemAdapter = new ItemAdapter(query,this){
             @Override
@@ -67,7 +74,11 @@ public class search extends AppCompatActivity implements ItemAdapter.OnItemSelec
             public void onBindViewHolder(ViewHolder holder, int position) {
                 super.onBindViewHolder(holder, position);
             }
+
         };
+        LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        itemRV_search.setLayoutManager(horizontalLayoutManagaer);
+        itemRV_search.setItemAnimator(new DefaultItemAnimator());
         itemRV_search.setAdapter(itemAdapter);
 
     }
@@ -90,6 +101,9 @@ public class search extends AppCompatActivity implements ItemAdapter.OnItemSelec
 
     @Override
     public void onItemSelected(DocumentSnapshot item) {
-
+        Intent i = new Intent(this,detailItem.class);
+        i.putExtra(KEY_ITEM_ID,item.getId());
+        startActivity(i);
     }
+
 }

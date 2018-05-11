@@ -1,6 +1,5 @@
 package com.mikalh.purchaseorderonline;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -12,12 +11,12 @@ import android.view.ViewGroup;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link chat.OnFragmentInteractionListener} interface
+ * {@link ChatList.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link chat#newInstance} factory method to
+ * Use the {@link ChatList#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class chat extends android.support.v4.app.Fragment {
+public class ChatList extends android.support.v4.app.Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -29,7 +28,7 @@ public class chat extends android.support.v4.app.Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public chat() {
+    public ChatList() {
         // Required empty public constructor
     }
 
@@ -39,11 +38,11 @@ public class chat extends android.support.v4.app.Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment chat.
+     * @return A new instance of fragment ChatList.
      */
     // TODO: Rename and change types and number of parameters
-    public static chat newInstance(String param1, String param2) {
-        chat fragment = new chat();
+    public static ChatList newInstance(String param1, String param2) {
+        ChatList fragment = new ChatList();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);

@@ -86,6 +86,7 @@ public class home_buyyer extends Fragment implements View.OnClickListener{
         myProfile_buyyer = v.findViewById(R.id.myProfile_buyyer);
         myProfile_buyyer.setOnClickListener(this);
         search_buyyer = v.findViewById(R.id.search_buyyer);
+        search_buyyer.setOnClickListener(this);
         send_po = v.findViewById(R.id.send_po);
         logout_buyyer = v.findViewById(R.id.logout_buyyer);
         logout_buyyer.setOnClickListener(this);
@@ -121,10 +122,16 @@ public class home_buyyer extends Fragment implements View.OnClickListener{
     public void onClick(View v) {
         if (v == logout_buyyer){
             auth.signOut();
+            Intent i = new Intent(getActivity(),MainActivity.class);
+            startActivity(i);
         }
         if (v == myProfile_buyyer){
             Intent i = new Intent(getActivity(),Profile.class);
             i.putExtra(USER_ID,user.getUid());
+            startActivity(i);
+        }
+        if(v == search_buyyer){
+            Intent i = new Intent(getActivity(),search.class);
             startActivity(i);
         }
     }
