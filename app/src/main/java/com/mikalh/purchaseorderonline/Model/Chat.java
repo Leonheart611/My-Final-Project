@@ -5,13 +5,72 @@ package com.mikalh.purchaseorderonline.Model;
  */
 
 public class Chat {
-    String sender_UID, message, timeStamp, imageUrl;
+    String sender_UID,sender_name, message, timeStamp, imageUrl, reciever_UID,reciever_name;
 
-    public Chat(String sender_UID, String message, String timeStamp, String imageUrl) {
+    public Chat(String sender_UID, String sender_name, String message, String timeStamp, String imageUrl, String reciever_UID, String reciever_name) {
         this.sender_UID = sender_UID;
+        this.sender_name = sender_name;
         this.message = message;
         this.timeStamp = timeStamp;
         this.imageUrl = imageUrl;
+        this.reciever_UID = reciever_UID;
+        this.reciever_name = reciever_name;
+    }
+
+    public String getSender_name() {
+        return sender_name;
+    }
+
+    public void setSender_name(String sender_name) {
+        this.sender_name = sender_name;
+    }
+
+    public String getReciever_name() {
+        return reciever_name;
+    }
+
+    public void setReciever_name(String reciever_name) {
+        this.reciever_name = reciever_name;
+    }
+
+    public String getSender_UID() {
+        return sender_UID;
+    }
+
+    public void setSender_UID(String sender_UID) {
+        this.sender_UID = sender_UID;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getReciever_UID() {
+        return reciever_UID;
+    }
+
+    public void setReciever_UID(String reciever_UID) {
+        this.reciever_UID = reciever_UID;
     }
 
     public Chat() {

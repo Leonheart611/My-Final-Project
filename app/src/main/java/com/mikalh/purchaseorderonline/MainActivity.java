@@ -99,11 +99,15 @@ public class MainActivity extends AppCompatActivity {
                         FirebaseUser user = auth.getCurrentUser();
                         popRole(user);
                     }else {
-                        FirebaseAuthException e = (FirebaseAuthException) task.getException();
-                        Log.e("Error Login",e.getMessage());
-                        tilPassword.setError(e.getMessage());
-                        customDialog.dismiss();
+
                     }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e("Error Login",e.getMessage());
+                    tilPassword.setError(e.getMessage());
+                    customDialog.dismiss();
                 }
             });
         }else {
@@ -145,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onFailure(@NonNull Exception e) {
                         Crashlytics.logException(e);
                         dialog.dismiss();
-                        Toast.makeText(MainActivity.this,"Terjadi Kesalahan harap Login Ulang",Toast.LENGTH_LONG).show();
                     }
                 });
 

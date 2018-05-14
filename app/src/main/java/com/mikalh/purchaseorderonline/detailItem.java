@@ -2,6 +2,7 @@ package com.mikalh.purchaseorderonline;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
@@ -31,6 +32,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mikalh.purchaseorderonline.Model.Cart;
+import com.mikalh.purchaseorderonline.Model.Chat;
 import com.mikalh.purchaseorderonline.Model.Item;
 
 import java.text.SimpleDateFormat;
@@ -41,6 +43,7 @@ import java.util.Map;
 
 public class detailItem extends AppCompatActivity {
     private String KEY_ITEM_ID;
+    public static String SENDER_ID = "senderId", RECIEVER_ID = "recieverId";
     TextInputEditText namaBarang_detail,hargaBarang_detail,unit_detail;
     TextView namaPerusahaan_detail;
     ImageView imageBarang_detail;
@@ -52,6 +55,7 @@ public class detailItem extends AppCompatActivity {
     Item item;
     Button beliButton_do;
     Calendar myCalendar = Calendar.getInstance();
+    Button chatButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +68,7 @@ public class detailItem extends AppCompatActivity {
         hargaBarang_detail = findViewById(R.id.hargaBarang_detail);
         unit_detail = findViewById(R.id.unit_detail);
         imageBarang_detail = findViewById(R.id.imageBarang_detail);
+        chatButton = findViewById(R.id.chatButton);
         beliButton_do = findViewById(R.id.beliButton_do);
         namaPerusahaan_detail = findViewById(R.id.namaPerusahaan_detail);
         firestore = FirebaseFirestore.getInstance();
@@ -105,6 +110,16 @@ public class detailItem extends AppCompatActivity {
             }
         });
 
+        chatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(detailItem.this,DetailChat.class);
+                i.putExtra(SENDER_ID,user.getUid());
+                i.putExtra(RECIEVER_ID,item.getUserId());
+                startActivity(i);
+
+            }
+        });
 
     }
     void popupBuyCart(){
