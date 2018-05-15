@@ -1,20 +1,34 @@
 package com.mikalh.purchaseorderonline.Model;
 
+import com.google.firebase.firestore.IgnoreExtraProperties;
+
+import java.util.Date;
+import java.util.HashMap;
+
 /**
  * Created by mika.frentzen on 01/03/2018.
  */
-
+@IgnoreExtraProperties
 public class Chat {
-    String sender_UID,sender_name, message, timeStamp, imageUrl, reciever_UID,reciever_name;
+    public String sender_UID,sender_name, message, imageUrl, reciever_UID,reciever_name,timeStamp;
 
-    public Chat(String sender_UID, String sender_name, String message, String timeStamp, String imageUrl, String reciever_UID, String reciever_name) {
+
+    public Chat(String sender_UID, String sender_name, String message, String imageUrl, String reciever_UID, String reciever_name, String timeStamp) {
         this.sender_UID = sender_UID;
         this.sender_name = sender_name;
         this.message = message;
-        this.timeStamp = timeStamp;
         this.imageUrl = imageUrl;
         this.reciever_UID = reciever_UID;
         this.reciever_name = reciever_name;
+        this.timeStamp = timeStamp;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public String getSender_name() {
@@ -49,13 +63,6 @@ public class Chat {
         this.message = message;
     }
 
-    public String getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(String timeStamp) {
-        this.timeStamp = timeStamp;
-    }
 
     public String getImageUrl() {
         return imageUrl;

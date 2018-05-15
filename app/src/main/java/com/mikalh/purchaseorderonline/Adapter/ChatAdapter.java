@@ -7,11 +7,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.mikalh.purchaseorderonline.Model.Chat;
 import com.mikalh.purchaseorderonline.R;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 
 
 public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
@@ -63,23 +69,38 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
         }
         public void bind(final DocumentSnapshot snapshot, final OnChatListenerListener listener,FirebaseUser user){
             Chat chat = snapshot.toObject(Chat.class);
-            if (user.getUid().equals(chat.getSender_UID())){
-                text_message_body.setText(chat.getMessage());
-                text_message_time.setText(chat.getTimeStamp());
-            }else {
-                text_message_time.setText(chat.getTimeStamp());
-                text_message_body.setText(chat.getMessage());
-                text_message_name.setText(chat.getReciever_name());
-            }
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null){
-                        listener.onChatSelected(snapshot);
-                    }
+            if (chat != null){
+                String time = formatDate(chat.getTimeStamp());
+                if (user.getUid().equals(chat.getSender_UID())){
+                    text_message_body.setText(chat.getMessage());
+                    text_message_time.setText(time);
+                }else {
+                    text_message_time.setText(time);
+                    text_message_body.setText(chat.getMessage());
+                    text_message_name.setText(chat.getReciever_name());
                 }
-            });
+
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (listener != null){
+                            listener.onChatSelected(snapshot);
+                        }
+                    }
+                });
+            }
+        }
+        public String formatDate(String date) {
+            try {
+                SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+                Date newDate = format.parse(date);
+
+                format = new SimpleDateFormat("HH:mm");
+                return new String(format.format(newDate));
+            }catch (Exception e){
+                Crashlytics.logException(e);
+            }
+            return null;
         }
 
 

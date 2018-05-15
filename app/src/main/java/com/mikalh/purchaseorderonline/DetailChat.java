@@ -29,11 +29,15 @@ import com.google.firebase.firestore.ServerTimestamp;
 import com.mikalh.purchaseorderonline.Adapter.ChatAdapter;
 import com.mikalh.purchaseorderonline.Model.Chat;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+
 public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatListenerListener {
     RecyclerView reyclerview_message;
     EditText edittext_chatbox;
     Button button_chatbox;
-    String senderId, recieverId;
+    String senderId, recieverId,ItemId;
     FirebaseUser user;
     FirebaseAuth auth;
     Query query;
@@ -49,11 +53,13 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
 
         senderId = getIntent().getExtras().getString(detailItem.SENDER_ID);
         recieverId = getIntent().getExtras().getString(detailItem.RECIEVER_ID);
-        query = firestore.collection("Chats").document(recieverId).collection(senderId);
+
+        query = firestore.collection("Chats").whereEqualTo("sender_UID",senderId).orderBy("timeStamp", Query.Direction.ASCENDING);
         adapter = new ChatAdapter(query,this,user,senderId){
             @Override
             protected void onDataChanged() {
                 super.onDataChanged();
+                reyclerview_message.smoothScrollToPosition(adapter.getItemCount());
             }
 
             @Override
@@ -76,6 +82,8 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
         reyclerview_message = findViewById(R.id.reyclerview_message_list);
         reyclerview_message.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setStackFromEnd(true);
+        llm.setSmoothScrollbarEnabled(true);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         reyclerview_message.setLayoutManager(llm);
         edittext_chatbox = findViewById(R.id.edittext_chatbox);
@@ -84,15 +92,16 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
             @Override
             public void onClick(View view) {
                 String ChatValue = edittext_chatbox.getText().toString();
-
+                Date calendar = Calendar.getInstance().getTime();
+                final String date = calendar.toString();
                 if (!ChatValue.isEmpty()) {
-                    Chat chat = new Chat(user.getUid(), user.getDisplayName(), ChatValue, "", "", recieverId, "");
-                    firestore.collection("Chats").document(recieverId).collection(senderId).add(chat).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    edittext_chatbox.setText("");
+                    final Chat chat = new Chat(user.getUid(), user.getDisplayName(), ChatValue, "",  recieverId,"",date);
+                    firestore.collection("Chats").document().set(chat).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
-                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                        public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()){
 
-                                Toast.makeText(DetailChat.this,"Your Message HasBeen send",Toast.LENGTH_LONG).show();
                             }
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -101,8 +110,6 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                             Crashlytics.logException(e);
                         }
                     });
-                }else {
-
                 }
             }
         });

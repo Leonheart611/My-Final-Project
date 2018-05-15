@@ -45,26 +45,6 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
-        if (user != null){
-            firebaseFirestore.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot snapshot) {
-                    User user1ogin = snapshot.toObject(User.class);
-                    if (user1ogin.getRoleActive().equals("Penjual")) {
-                        Intent i = new Intent(MainActivity.this, newUserUI.class);
-                        startActivity(i);
-                    }else if (user1ogin.getRoleActive().equals("Pembeli")){
-                        Intent i = new Intent(MainActivity.this,buyerActivity.class);
-                        startActivity(i);
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Crashlytics.logException(e);
-                }
-            });
-        }
         email_login = findViewById(R.id.email_login);
         password_login = findViewById(R.id.password_login);
         loginDo = findViewById(R.id.loginDo);

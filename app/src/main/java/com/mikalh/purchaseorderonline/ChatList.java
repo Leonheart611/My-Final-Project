@@ -1,11 +1,23 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.DownloadManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.crashlytics.android.Crashlytics;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.mikalh.purchaseorderonline.Adapter.ChatListAdapter;
 
 
 /**
@@ -16,12 +28,17 @@ import android.view.ViewGroup;
  * Use the {@link ChatList#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatList extends android.support.v4.app.Fragment {
+public class ChatList extends android.support.v4.app.Fragment implements ChatListAdapter.OnChatListListenerListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    Query query;
+    FirebaseFirestore firestore;
+    FirebaseAuth auth;
+    FirebaseUser user;
+    RecyclerView chatList_RV;
+    ChatListAdapter adapter;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -57,13 +74,47 @@ public class ChatList extends android.support.v4.app.Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        auth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
+        user = auth.getCurrentUser();
+        query = firestore.collection("Chats").whereEqualTo("reciever",user.getUid());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat, container, false);
+        View view =  inflater.inflate(R.layout.fragment_chat, container, false);
+        chatList_RV = view.findViewById(R.id.chatList_RV);
+        adapter = new ChatListAdapter(query,this,user){
+            @Override
+            public ChatListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return super.onCreateViewHolder(parent, viewType);
+            }
+
+            @Override
+            protected void onDataChanged() {
+                super.onDataChanged();
+            }
+
+            @Override
+            protected void onError(FirebaseFirestoreException e) {
+                super.onError(e);
+                Crashlytics.logException(e);
+            }
+
+            @Override
+            public void onBindViewHolder(ChatListHolder holder, int position) {
+                super.onBindViewHolder(holder, position);
+            }
+        };
+        chatList_RV.setAdapter(adapter);
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setStackFromEnd(true);
+        llm.setSmoothScrollbarEnabled(true);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        chatList_RV.setLayoutManager(llm);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -73,6 +124,19 @@ public class ChatList extends android.support.v4.app.Fragment {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (adapter!=null){
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
     /*@Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -88,6 +152,11 @@ public class ChatList extends android.support.v4.app.Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onChatListSelected(DocumentSnapshot chat) {
+
     }
 
     /**
