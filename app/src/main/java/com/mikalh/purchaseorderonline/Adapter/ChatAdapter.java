@@ -1,6 +1,7 @@
 package com.mikalh.purchaseorderonline.Adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +27,12 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
         void onChatSelected(DocumentSnapshot chat);
 
     }
+
     private OnChatListenerListener mListener;
     private FirebaseUser user;
     private String senderID;
 
-    public ChatAdapter(Query query, OnChatListenerListener listener,FirebaseUser user,String senderID) {
+    public ChatAdapter(Query query, OnChatListenerListener listener, FirebaseUser user, String senderID) {
         super(query);
         mListener = listener;
         this.user = user;
@@ -39,23 +41,23 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
 
     @Override
     public ChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (senderID.equals(user.getUid())){
+        if (senderID.equals(user.getUid())) {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.recieve_sent_body,parent,false);
+                    .inflate(R.layout.recieve_sent_body, parent, false);
             return new ChatHolder(view);
-        }else {
+        } else {
             View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.recieve_chat_body,parent,false);
+                    .inflate(R.layout.recieve_chat_body, parent, false);
             return new ChatHolder(view);
         }
     }
 
     @Override
     public void onBindViewHolder(ChatHolder holder, int position) {
-        holder.bind(getSnapshot(position),mListener,user);
+        holder.bind(getSnapshot(position), mListener, user);
     }
 
-    public static class ChatHolder extends RecyclerView.ViewHolder{
+    public static class ChatHolder extends RecyclerView.ViewHolder {
         ImageView image_message_profile;
         TextView text_message_name;
         TextView text_message_body;
@@ -67,14 +69,15 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
             text_message_time = itemView.findViewById(R.id.text_message_time);
             text_message_name = itemView.findViewById(R.id.text_message_name);
         }
-        public void bind(final DocumentSnapshot snapshot, final OnChatListenerListener listener,FirebaseUser user){
+
+        public void bind(final DocumentSnapshot snapshot, final OnChatListenerListener listener, FirebaseUser user) {
             Chat chat = snapshot.toObject(Chat.class);
-            if (chat != null){
+            if (chat != null) {
                 String time = formatDate(chat.getTimeStamp());
-                if (user.getUid().equals(chat.getSender_UID())){
+                if (user.getUid().equals(chat.getSender_UID())) {
                     text_message_body.setText(chat.getMessage());
                     text_message_time.setText(time);
-                }else {
+                } else {
                     text_message_time.setText(time);
                     text_message_body.setText(chat.getMessage());
                     text_message_name.setText(chat.getReciever_name());
@@ -83,13 +86,14 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (listener != null){
+                        if (listener != null) {
                             listener.onChatSelected(snapshot);
                         }
                     }
                 });
             }
         }
+
         public String formatDate(String date) {
             try {
                 SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
@@ -97,7 +101,7 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
 
                 format = new SimpleDateFormat("HH:mm");
                 return new String(format.format(newDate));
-            }catch (Exception e){
+            } catch (Exception e) {
                 Crashlytics.logException(e);
             }
             return null;
@@ -106,3 +110,4 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
 
     }
 }
+

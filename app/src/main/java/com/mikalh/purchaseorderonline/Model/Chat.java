@@ -10,10 +10,9 @@ import java.util.HashMap;
  */
 @IgnoreExtraProperties
 public class Chat {
-    public String sender_UID,sender_name, message, imageUrl, reciever_UID,reciever_name,timeStamp;
+    public String sender_UID,sender_name, message, imageUrl, reciever_UID,reciever_name,timeStamp,roomId,itemId;
 
-
-    public Chat(String sender_UID, String sender_name, String message, String imageUrl, String reciever_UID, String reciever_name, String timeStamp) {
+    public Chat(String sender_UID, String sender_name, String message, String imageUrl, String reciever_UID, String reciever_name, String timeStamp, String roomId, String itemId) {
         this.sender_UID = sender_UID;
         this.sender_name = sender_name;
         this.message = message;
@@ -21,7 +20,29 @@ public class Chat {
         this.reciever_UID = reciever_UID;
         this.reciever_name = reciever_name;
         this.timeStamp = timeStamp;
+        this.roomId = roomId;
+        this.itemId = itemId;
     }
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
+
+
+
+
 
     public String getTimeStamp() {
         return timeStamp;

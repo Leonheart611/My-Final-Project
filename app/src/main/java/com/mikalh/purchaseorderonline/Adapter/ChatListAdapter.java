@@ -1,81 +1,68 @@
 package com.mikalh.purchaseorderonline.Adapter;
 
-import android.support.v7.widget.RecyclerView;
+import android.app.Activity;
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.Query;
+import com.mikalh.purchaseorderonline.ChatList;
 import com.mikalh.purchaseorderonline.Model.Chat;
 import com.mikalh.purchaseorderonline.R;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.lang.reflect.Array;
+import java.util.List;
 
-public class ChatListAdapter extends FirestoreAdapter<ChatListAdapter.ChatListHolder>  {
-    public interface OnChatListListenerListener {
-
-        void onChatListSelected(DocumentSnapshot chat);
-
-    }
-    private OnChatListListenerListener mListener;
-    private FirebaseUser user;
-    private String senderID;
-    public ChatListAdapter(Query query, OnChatListListenerListener listener,FirebaseUser user) {
-        super(query);
-        mListener = listener;
-        this.user = user;
+public class ChatListAdapter extends BaseAdapter {
+    List<Chat> chats;
+    private LayoutInflater myInflater;
+    public ChatListAdapter(Context context,List<Chat> chats){
+        myInflater = LayoutInflater.from(context);
+        this.chats = chats;
     }
 
     @Override
-    public ChatListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_list,parent,false);
-        return new ChatListHolder(view);
+    public int getCount() {
+        return chats.size();
     }
 
     @Override
-    public void onBindViewHolder(ChatListHolder holder, int position) {
-        holder.bind(getSnapshot(position),mListener,user);
+    public Object getItem(int position) {
+        return position;
     }
 
-
-    public static class ChatListHolder extends RecyclerView.ViewHolder{
-        TextView name_chatList,lastMessage_chatList,timeStampt_chatList;
-        public ChatListHolder(View itemView) {
-            super(itemView);
-            name_chatList = itemView.findViewById(R.id.name_chatList);
-            lastMessage_chatList = itemView.findViewById(R.id.lastMessage_chatList);
-            timeStampt_chatList = itemView.findViewById(R.id.timeStamp_chatList);
-        }
-        public void bind(final DocumentSnapshot snapshot, final OnChatListListenerListener listener, FirebaseUser user){
-            Chat chat = snapshot.toObject(Chat.class);
-            if (user.getUid().equals(chat.getSender_UID())){
-                name_chatList.setText("You");
-            }else {
-                name_chatList.setText(chat.getSender_name());
-            }
-            String time = formatDate(chat.getTimeStamp());
-            lastMessage_chatList.setText(chat.getMessage());
-            timeStampt_chatList.setText(time);
-        }
-        public String formatDate(String date) {
-            try {
-                SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-                Date newDate = format.parse(date);
-
-                format = new SimpleDateFormat("HH:mm");
-                return new String(format.format(newDate));
-            }catch (Exception e){
-                Crashlytics.logException(e);
-            }
-            return null;
-        }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+    public class ChatListHolder{
+        TextView name_chatList,lastMessage_chatList,timeStamp_chatList;
+        ImageView image_chatList;
     }
 
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ChatListHolder holder;
+        if (convertView == null){
+            convertView = myInflater.inflate(R.layout.chat_list,null);
+            holder = new ChatListHolder();
+            holder.name_chatList = convertView.findViewById(R.id.name_chatList);
+            holder.lastMessage_chatList = convertView.findViewById(R.id.lastMessage_chatList);
+            holder.timeStamp_chatList = convertView.findViewById(R.id.timeStamp_chatList);
+            convertView.setTag(holder);
+        }else {
+            holder = (ChatListHolder) convertView.getTag();
+        }
+        Chat chat = chats.get(position);
+        holder.name_chatList.setText(chat.getTimeStamp());
+
+
+        return convertView;
+    }
 
 }

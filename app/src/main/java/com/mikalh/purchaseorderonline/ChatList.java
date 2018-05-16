@@ -1,6 +1,5 @@
 package com.mikalh.purchaseorderonline;
 
-import android.app.DownloadManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -28,7 +27,7 @@ import com.mikalh.purchaseorderonline.Adapter.ChatListAdapter;
  * Use the {@link ChatList#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatList extends android.support.v4.app.Fragment implements ChatListAdapter.OnChatListListenerListener {
+public class ChatList extends android.support.v4.app.Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -77,7 +76,9 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
         user = auth.getCurrentUser();
-        query = firestore.collection("Chats").whereEqualTo("reciever",user.getUid());
+        query = firestore.collection("RoomChat").
+                whereEqualTo("reciever",user.getUid());
+
     }
 
     @Override
@@ -86,29 +87,8 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_chat, container, false);
         chatList_RV = view.findViewById(R.id.chatList_RV);
-        adapter = new ChatListAdapter(query,this,user){
-            @Override
-            public ChatListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return super.onCreateViewHolder(parent, viewType);
-            }
 
-            @Override
-            protected void onDataChanged() {
-                super.onDataChanged();
-            }
 
-            @Override
-            protected void onError(FirebaseFirestoreException e) {
-                super.onError(e);
-                Crashlytics.logException(e);
-            }
-
-            @Override
-            public void onBindViewHolder(ChatListHolder holder, int position) {
-                super.onBindViewHolder(holder, position);
-            }
-        };
-        chatList_RV.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setStackFromEnd(true);
         llm.setSmoothScrollbarEnabled(true);
@@ -124,19 +104,6 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (adapter!=null){
-            adapter.startListening();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        adapter.stopListening();
-    }
     /*@Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -154,10 +121,6 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
         mListener = null;
     }
 
-    @Override
-    public void onChatListSelected(DocumentSnapshot chat) {
-
-    }
 
     /**
      * This interface must be implemented by activities that contain this

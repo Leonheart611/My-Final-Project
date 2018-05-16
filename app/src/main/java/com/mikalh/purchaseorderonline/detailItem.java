@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.Chat;
 import com.mikalh.purchaseorderonline.Model.Item;
@@ -41,9 +42,11 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.security.auth.login.LoginException;
+
 public class detailItem extends AppCompatActivity {
     private String KEY_ITEM_ID;
-    public static String SENDER_ID = "senderId", RECIEVER_ID = "recieverId";
+    public static String SENDER_ID = "senderId", RECIEVER_ID = "recieverId",KEY_ID = "ItemID",ROOMID = "RoomId";
     TextInputEditText namaBarang_detail,hargaBarang_detail,unit_detail;
     TextView namaPerusahaan_detail;
     ImageView imageBarang_detail;
@@ -94,6 +97,10 @@ public class detailItem extends AppCompatActivity {
                             .load(item.getImageItemUrl())
                             .into(imageBarang_detail);
                     customDialog.dismiss();
+                    if (item.getUserId() == user.getUid()){
+                        beliButton_do.setVisibility(View.GONE);
+                        chatButton.setVisibility(View.GONE);
+                    }
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -113,10 +120,53 @@ public class detailItem extends AppCompatActivity {
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(detailItem.this,DetailChat.class);
-                i.putExtra(SENDER_ID,user.getUid());
-                i.putExtra(RECIEVER_ID,item.getUserId());
-                startActivity(i);
+                firestore.collection("RoomChat").whereEqualTo("sender",user.getUid())
+                        .whereEqualTo("receiver",item.getUserId())
+                        .whereEqualTo("itemID",KEY_ITEM_ID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                     if (task.isSuccessful()){
+                         QuerySnapshot snapshots = task.getResult();
+                         if (snapshots.getDocuments().size() != 0){
+                             String Id = snapshots.getDocuments().get(0).getId();
+                             Log.e("ID data", Id);
+                             Intent i = new Intent(detailItem.this,DetailChat.class);
+                             i.putExtra(SENDER_ID,user.getUid());
+                             i.putExtra(RECIEVER_ID,item.getUserId());
+                             i.putExtra(KEY_ID,KEY_ITEM_ID);
+                             i.putExtra(ROOMID,Id);
+                             startActivity(i);
+                         }else {
+                             DocumentReference ref = firestore.collection("RoomChat").document();
+                             final String myId = ref.getId();
+                             Map<String,Object> roomChat = new HashMap<>();
+                             roomChat.put("sender",user.getUid());
+                             roomChat.put("receiver",item.getUserId());
+                             roomChat.put("itemID",KEY_ITEM_ID);
+                             roomChat.put("senderName",user.getDisplayName());
+                             Log.e("ID Data",myId);
+                             firestore.collection("RoomChat").document(myId).set(roomChat).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                 @Override
+                                 public void onComplete(@NonNull Task<Void> task) {
+                                     if (task.isSuccessful()){
+                                         Intent i = new Intent(detailItem.this,DetailChat.class);
+                                         i.putExtra(SENDER_ID,user.getUid());
+                                         i.putExtra(RECIEVER_ID,item.getUserId());
+                                         i.putExtra(KEY_ID,KEY_ITEM_ID);
+                                         i.putExtra(ROOMID,myId);
+                                         startActivity(i);
+                                     }
+                                 }
+                             }).addOnFailureListener(new OnFailureListener() {
+                                 @Override
+                                 public void onFailure(@NonNull Exception e) {
+                                     Crashlytics.logException(e);
+                                 }
+                             });
+                         }
+                     }
+                    }
+                });
 
             }
         });
