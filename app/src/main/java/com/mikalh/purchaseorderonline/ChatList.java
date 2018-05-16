@@ -3,19 +3,27 @@ package com.mikalh.purchaseorderonline;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.mikalh.purchaseorderonline.Adapter.ChatListAdapter;
 
 
@@ -27,7 +35,7 @@ import com.mikalh.purchaseorderonline.Adapter.ChatListAdapter;
  * Use the {@link ChatList#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatList extends android.support.v4.app.Fragment {
+public class ChatList extends android.support.v4.app.Fragment implements ChatListAdapter.OnChatListListenerListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -38,6 +46,7 @@ public class ChatList extends android.support.v4.app.Fragment {
     FirebaseUser user;
     RecyclerView chatList_RV;
     ChatListAdapter adapter;
+    String Id;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -76,8 +85,10 @@ public class ChatList extends android.support.v4.app.Fragment {
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
         user = auth.getCurrentUser();
-        query = firestore.collection("RoomChat").
-                whereEqualTo("reciever",user.getUid());
+        query = firestore.collection("RoomChat")
+                .whereEqualTo("Users.users2",user.getUid());
+
+
 
     }
 
@@ -87,10 +98,30 @@ public class ChatList extends android.support.v4.app.Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_chat, container, false);
         chatList_RV = view.findViewById(R.id.chatList_RV);
+        adapter = new ChatListAdapter(query,this,user){
+            @Override
+            protected void onDataChanged() {
+                super.onDataChanged();
+            }
 
+            @Override
+            public void onBindViewHolder(ChatListHolder holder, int position) {
+                super.onBindViewHolder(holder, position);
+            }
 
+            @Override
+            public ChatListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return super.onCreateViewHolder(parent, viewType);
+            }
+
+            @Override
+            protected void onError(FirebaseFirestoreException e) {
+                super.onError(e);
+                Crashlytics.logException(e);
+            }
+        };
+        chatList_RV.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setStackFromEnd(true);
         llm.setSmoothScrollbarEnabled(true);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         chatList_RV.setLayoutManager(llm);
@@ -116,9 +147,26 @@ public class ChatList extends android.support.v4.app.Fragment {
     }*/
 
     @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.startListening();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onChatListSelected(DocumentSnapshot chat) {
+
     }
 
 

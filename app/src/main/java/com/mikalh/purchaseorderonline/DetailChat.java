@@ -69,7 +69,7 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
         ItemId = getIntent().getExtras().getString(detailItem.KEY_ID);
         RoomId = getIntent().getExtras().getString(detailItem.ROOMID);
 
-        query = firestore.collection("Conversasion").whereEqualTo("roomId",RoomId).orderBy("timeStamp").limit(20);
+        query = firestore.collection("RoomChat").document(RoomId).collection("ChatList").orderBy("timeStamp").limit(20);
 
 
         adapter = new ChatAdapter(query,this,user,senderId){
@@ -105,8 +105,6 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
         reyclerview_message.setLayoutManager(llm);
 
 
-
-
         edittext_chatbox = findViewById(R.id.edittext_chatbox);
         button_chatbox = findViewById(R.id.button_chatbox_send);
         button_chatbox.setOnClickListener(new View.OnClickListener() {
@@ -124,12 +122,30 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                                 DocumentSnapshot snapshot = task.getResult();
                                 User recevier = snapshot.toObject(User.class);
                                 chat = new Chat(user.getUid(), user.getDisplayName(), ChatValue, "", recieverId, recevier.getNama_PIC(), date, RoomId, ItemId);
+                                final Map<String,Object> lastChat = new HashMap<>();
+                                lastChat.put("message",chat.getMessage());
+                                lastChat.put("name",chat.getSender_name());
+                                lastChat.put("time",chat.getTimeStamp());
+                                final Map<String, Object> detail = new HashMap<>();
+                                detail.put("LastChat",lastChat);
                                 //add to Conversasion session
-                                firestore.collection("Conversasion").add(chat).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                firestore.collection("RoomChat").document(RoomId).collection("ChatList").add(chat).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentReference> task) {
                                         if (task.isSuccessful()){
+                                            firestore.collection("RoomChat").document(RoomId).update(detail).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()){
 
+                                                    }
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Crashlytics.logException(e);
+                                                }
+                                            });
                                         }
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
