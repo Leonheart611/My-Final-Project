@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -166,7 +167,10 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
 
     @Override
     public void onChatListSelected(DocumentSnapshot chat) {
-
+        Intent i = new Intent(getActivity(),DetailChat.class);
+        i.putExtra(detailItem.ROOMID,chat.getId());
+        i.putExtra(detailItem.SENDER_ID,user.getUid());
+        startActivity(i);
     }
 
 

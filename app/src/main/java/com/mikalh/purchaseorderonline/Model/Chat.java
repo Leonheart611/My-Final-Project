@@ -10,46 +10,22 @@ import java.util.HashMap;
  */
 @IgnoreExtraProperties
 public class Chat {
-    public String sender_UID,sender_name, message, imageUrl, reciever_UID,reciever_name,timeStamp,roomId,itemId;
+    public String senderId,sender_name, message, date,time;
 
-    public Chat(String sender_UID, String sender_name, String message, String imageUrl, String reciever_UID, String reciever_name, String timeStamp, String roomId, String itemId) {
-        this.sender_UID = sender_UID;
+    public Chat(String senderId, String sender_name, String message, String date, String time) {
+        this.senderId = senderId;
         this.sender_name = sender_name;
         this.message = message;
-        this.imageUrl = imageUrl;
-        this.reciever_UID = reciever_UID;
-        this.reciever_name = reciever_name;
-        this.timeStamp = timeStamp;
-        this.roomId = roomId;
-        this.itemId = itemId;
+        this.date = date;
+        this.time = time;
     }
 
-    public String getRoomId() {
-        return roomId;
+    public String getSenderId() {
+        return senderId;
     }
 
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
-    }
-
-    public String getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
-    }
-
-
-
-
-
-    public String getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(String timeStamp) {
-        this.timeStamp = timeStamp;
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
     public String getSender_name() {
@@ -60,22 +36,6 @@ public class Chat {
         this.sender_name = sender_name;
     }
 
-    public String getReciever_name() {
-        return reciever_name;
-    }
-
-    public void setReciever_name(String reciever_name) {
-        this.reciever_name = reciever_name;
-    }
-
-    public String getSender_UID() {
-        return sender_UID;
-    }
-
-    public void setSender_UID(String sender_UID) {
-        this.sender_UID = sender_UID;
-    }
-
     public String getMessage() {
         return message;
     }
@@ -84,21 +44,20 @@ public class Chat {
         this.message = message;
     }
 
-
-    public String getImageUrl() {
-        return imageUrl;
+    public String getDate() {
+        return date;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public String getReciever_UID() {
-        return reciever_UID;
+    public String getTime() {
+        return time;
     }
 
-    public void setReciever_UID(String reciever_UID) {
-        this.reciever_UID = reciever_UID;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public Chat() {

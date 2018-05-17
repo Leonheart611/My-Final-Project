@@ -60,22 +60,32 @@ public class ChatListAdapter extends FirestoreAdapter<ChatListAdapter.ChatListHo
             timeStampt_chatList = itemView.findViewById(R.id.timeStamp_chatList);
         }
         public void bind(final DocumentSnapshot snapshot, final OnChatListListenerListener listener, FirebaseUser user){
-            String Time,name,message;
-            Map<String,Object> chatLast = snapshot.getData();
+            LastChat chat = snapshot.toObject(LastChat.class);
+            name_chatList.setText(chat.getName());
+            lastMessage_chatList.setText(chat.getMessage());
+            timeStampt_chatList.setText(chat.getTime());
 
-            }
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener != null) {
+                        listener.onChatListSelected(snapshot);
+                    }
+                }
+            });
+
+
+        }
 
             /*Chat chat = snapshot.toObject(Chat.class);
             if (user.getUid() != chat.sender_UID){
-                name_chatList.setText(chat.getReciever_name());
-                lastMessage_chatList.setText(chat.getMessage());
-                String time = formatDate(chat.getTimeStamp());
+
 
             }else {
                 name_chatList.setText(chat.getSender_name());
                 lastMessage_chatList.setText(chat.getMessage());
                 String time = formatDate(chat.getTimeStamp());
-                timeStampt_chatList.setText(time);
+
             }*/
 
         }

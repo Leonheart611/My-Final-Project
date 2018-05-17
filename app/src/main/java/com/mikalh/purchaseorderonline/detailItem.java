@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -187,12 +188,12 @@ public class detailItem extends AppCompatActivity {
 
 
         final TextView namaBarang_popUP = dialog.findViewById(R.id.namaBarang_popUP);
-        final EditText tanggalEstimasi = dialog.findViewById(R.id.tanggalEstimasi);
-        final EditText alamatPengiriman_PopUP = dialog.findViewById(R.id.alamatPengiriman_popUP);
+       /* final EditText tanggalEstimasi = dialog.findViewById(R.id.tanggalEstimasi);*/
         final Button saveToCart = dialog.findViewById(R.id.saveToCart);
         final EditText banyakPCS_popCart = dialog.findViewById(R.id.banyakPCS_popCart);
         namaBarang_popUP.setText(":"+item.getNama_barang());
-        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+        // data tanggal untuk cart
+        /*final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 myCalendar.set(Calendar.YEAR, year);
@@ -209,32 +210,28 @@ public class detailItem extends AppCompatActivity {
                         myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
-
+*/
         saveToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 int pcs = Integer.parseInt(banyakPCS_popCart.getText().toString());
                 Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit()
-                        ,item.getNamaPerusahaan(),item.getHarga_barang(),item.getImageItemUrl(),item.getNotificationId(),item.getKategori(),pcs,alamatPengiriman_PopUP.getText().toString(),tanggalEstimasi.getText().toString());
+                        ,item.getNamaPerusahaan(),item.getHarga_barang(),item.getImageItemUrl(),item.getNotificationId(),item.getKategori(),pcs);
                 // add database firestore
-                Map<String,Cart> cartStringMap = new HashMap<>();
-                DocumentReference documentReference = firestore.collection("Users").document(user.getUid()).collection("CountBuy").document();
-                documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()){
-                            Log.e("Hasil Task",task.toString());
-                            Crashlytics.log(5,"dataHasil",task.toString());
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Crashlytics.logException(e);
-                    }
-                });
-                cartStringMap.put("DataBeli1",cart);
-                firestore.collection("Users").document(user.getUid()).collection("Cart").document(item.getNamaPerusahaan()).set(cartStringMap).addOnFailureListener(new OnFailureListener() {
+                Map<String,Object> cartStringMap = new HashMap<>();
+                cartStringMap.put("nama_barang",cart.getNama_barang());
+                cartStringMap.put("userId", cart.getUserId());
+                cartStringMap.put("unit",cart.getUnit());
+                cartStringMap.put("namaPerusahaan",cart.getNamaPerusahaan());
+                cartStringMap.put("harga_barang",cart.getHarga_barang());
+                cartStringMap.put("imageItemUrl",cart.getImageItemUrl());
+                cartStringMap.put("notificationId",cart.getNotificationId());
+                cartStringMap.put("kategori",cart.getKategori());
+                cartStringMap.put("quantitas_banyakBarang",cart.getQuantitas_banyakBarang());
+                Map<String,Object> dataBarang = new HashMap<>();
+                dataBarang.put("itemList",cartStringMap);
+                firestore.collection("Users").document(user.getUid()).collection("Cart").document(item.getNamaPerusahaan()).set(dataBarang).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Crashlytics.logException(e);

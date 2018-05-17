@@ -155,8 +155,7 @@ public class cartUI extends AppCompatActivity implements CartAdapter.OnCartSelec
                             int quantitas = cart.getQuantitas_banyakBarang();
                             BigDecimal total = totalCost(quantitas,harga);
                             String TotalCost = total.toString();
-                            transactionModel = new Transaction(cart.getNama_barang(),cart.getUserId()
-                                    ,cart.getUnit(),cart.getNamaPerusahaan(),cart.getHarga_barang(),cart.getImageItemUrl(),cart.getNotificationId(),cart.getKategori(),cart.getQuantitas_banyakBarang(),cart.getAlamatPengiriman(),cart.getTanggalDibutuhkan(),user.getUid(),cart.getUserId(),"Masih Dalam Proses",date,instanceId,TotalCost);
+
                             firestore.collection("Transaction").document().set(transactionModel).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {

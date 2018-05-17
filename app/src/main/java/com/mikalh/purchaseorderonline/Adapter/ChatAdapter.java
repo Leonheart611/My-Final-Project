@@ -1,11 +1,15 @@
 package com.mikalh.purchaseorderonline.Adapter;
 
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
@@ -41,15 +45,15 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
 
     @Override
     public ChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (senderID.equals(user.getUid())) {
+       /* if (senderID.equals(user.getUid())) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.recieve_sent_body, parent, false);
             return new ChatHolder(view);
-        } else {
+        } else {*/
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.recieve_chat_body, parent, false);
             return new ChatHolder(view);
-        }
+
     }
 
     @Override
@@ -60,27 +64,40 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
     public static class ChatHolder extends RecyclerView.ViewHolder {
         ImageView image_message_profile;
         TextView text_message_name;
-        TextView text_message_body;
-        TextView text_message_time;
-
+        TextView text_message_body,textMessage_you;
+        TextView text_message_time_L,text_message_time_R;
+        RelativeLayout detailChat_layout;
         public ChatHolder(View itemView) {
             super(itemView);
             text_message_body = itemView.findViewById(R.id.text_message_body);
-            text_message_time = itemView.findViewById(R.id.text_message_time);
+            text_message_time_L = itemView.findViewById(R.id.text_message_time_L);
+            text_message_time_R = itemView.findViewById(R.id.text_message_time_R);
             text_message_name = itemView.findViewById(R.id.text_message_name);
+            detailChat_layout = itemView.findViewById(R.id.detailChat_layout);
+            textMessage_you = itemView.findViewById(R.id.text_message_you);
+            image_message_profile = itemView.findViewById(R.id.image_message_profile);
         }
 
         public void bind(final DocumentSnapshot snapshot, final OnChatListenerListener listener, FirebaseUser user) {
             Chat chat = snapshot.toObject(Chat.class);
             if (chat != null) {
-                String time = formatDate(chat.getTimeStamp());
-                if (user.getUid().equals(chat.getSender_UID())) {
+                if (user.getUid().equals(chat.getSenderId())) {
+                    text_message_name.setVisibility(View.GONE);
+                    text_message_time_L.setVisibility(View.GONE);
+                    image_message_profile.setVisibility(View.GONE);;
                     text_message_body.setText(chat.getMessage());
-                    text_message_time.setText(time);
+                    text_message_time_R.setText(chat.getTime());
+                    detailChat_layout.setGravity(Gravity.END);
+                    text_message_body.setGravity(Gravity.END);
+                    text_message_time_R.setGravity(Gravity.END);
+
+
                 } else {
-                    text_message_time.setText(time);
+                    textMessage_you.setVisibility(View.GONE);
+                    text_message_time_R.setVisibility(View.GONE);
+                    text_message_time_L.setText(chat.getTime());
                     text_message_body.setText(chat.getMessage());
-                    text_message_name.setText(chat.getReciever_name());
+                    text_message_name.setText(chat.getSender_name());
                 }
 
                 itemView.setOnClickListener(new View.OnClickListener() {
@@ -91,6 +108,9 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
                         }
                     }
                 });
+            }
+            else {
+                Log.e("Error","Gak ada isi chat");
             }
         }
 

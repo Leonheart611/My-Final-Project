@@ -36,10 +36,12 @@ import com.mikalh.purchaseorderonline.Model.Chat;
 import com.mikalh.purchaseorderonline.Model.Item;
 import com.mikalh.purchaseorderonline.Model.User;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import io.fabric.sdk.android.services.common.Crash;
@@ -48,7 +50,7 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
     RecyclerView reyclerview_message;
     EditText edittext_chatbox;
     Button button_chatbox;
-    String senderId, recieverId,ItemId,RoomId;
+    String senderId,RoomId;
     FirebaseUser user;
     FirebaseAuth auth;
     Query query;
@@ -65,11 +67,9 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
         user = auth.getCurrentUser();
 
         senderId = getIntent().getExtras().getString(detailItem.SENDER_ID);
-        recieverId = getIntent().getExtras().getString(detailItem.RECIEVER_ID);
-        ItemId = getIntent().getExtras().getString(detailItem.KEY_ID);
         RoomId = getIntent().getExtras().getString(detailItem.ROOMID);
 
-        query = firestore.collection("RoomChat").document(RoomId).collection("ChatList").orderBy("timeStamp").limit(20);
+        query = firestore.collection("RoomChat").document(RoomId).collection("ChatList").orderBy("time").limit(20);
 
 
         adapter = new ChatAdapter(query,this,user,senderId){
@@ -113,39 +113,25 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                 final String ChatValue = edittext_chatbox.getText().toString();
                 final Date calendar = Calendar.getInstance().getTime();
                 final String date = calendar.toString();
+                final String time = formatTime(date);
+                final String tanggal = formatDate(date);
                 if (!ChatValue.isEmpty()) {
                     edittext_chatbox.setText("");
-                    firestore.collection("Users").document(recieverId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    chat = new Chat(user.getUid(),user.getDisplayName(),ChatValue,tanggal,time);
+                    final Map<String,Object> lastChat = new HashMap<>();
+                    lastChat.put("message",chat.getMessage());
+                    lastChat.put("name",chat.getSender_name());
+                    lastChat.put("time",chat.getTime());
+                    //add to Conversasion session
+                    firestore.collection("RoomChat").document(RoomId).collection("ChatList").add(chat).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                         @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot snapshot = task.getResult();
-                                User recevier = snapshot.toObject(User.class);
-                                chat = new Chat(user.getUid(), user.getDisplayName(), ChatValue, "", recieverId, recevier.getNama_PIC(), date, RoomId, ItemId);
-                                final Map<String,Object> lastChat = new HashMap<>();
-                                lastChat.put("message",chat.getMessage());
-                                lastChat.put("name",chat.getSender_name());
-                                lastChat.put("time",chat.getTimeStamp());
-                                final Map<String, Object> detail = new HashMap<>();
-                                detail.put("LastChat",lastChat);
-                                //add to Conversasion session
-                                firestore.collection("RoomChat").document(RoomId).collection("ChatList").add(chat).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                            if (task.isSuccessful()){
+                                firestore.collection("RoomChat").document(RoomId).update(lastChat).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
-                                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                                    public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()){
-                                            firestore.collection("RoomChat").document(RoomId).update(detail).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()){
 
-                                                    }
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Crashlytics.logException(e);
-                                                }
-                                            });
                                         }
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
@@ -184,5 +170,29 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
     @Override
     public void onChatSelected(DocumentSnapshot chat) {
 
+    }
+    public static String formatTime(String date) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+            Date newDate = format.parse(date);
+
+            format = new SimpleDateFormat("HH:mm");
+            return new String(format.format(newDate));
+        } catch (Exception e) {
+            Crashlytics.logException(e);
+        }
+        return null;
+    }
+    public static String formatDate(String date) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+            Date newDate = format.parse(date);
+
+            format = new SimpleDateFormat("dd MMM yyyy");
+            return new String(format.format(newDate));
+        } catch (Exception e) {
+            Crashlytics.logException(e);
+        }
+        return null;
     }
 }
