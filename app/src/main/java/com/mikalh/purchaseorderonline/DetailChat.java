@@ -57,22 +57,22 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
     FirebaseFirestore firestore;
     ChatAdapter adapter;
     ArrayList<String> userList;
+    final Date calendar = Calendar.getInstance().getTime();
     Chat chat;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_chat);
+        reyclerview_message = findViewById(R.id.reyclerview_message_list);
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-
         senderId = getIntent().getExtras().getString(detailItem.SENDER_ID);
         RoomId = getIntent().getExtras().getString(detailItem.ROOMID);
-
         query = firestore.collection("RoomChat").document(RoomId).collection("ChatList").orderBy("time").limit(20);
 
 
-        adapter = new ChatAdapter(query,this,user,senderId){
+        adapter = new ChatAdapter(query,this,user){
             @Override
             protected void onDataChanged() {
                 super.onDataChanged();
@@ -80,13 +80,13 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
             }
 
             @Override
-            public ChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return super.onCreateViewHolder(parent, viewType);
+            public void onBindViewHolder(ChatHolder holder, int position) {
+                super.onBindViewHolder(holder, position);
             }
 
             @Override
-            public void onBindViewHolder(ChatHolder holder, int position) {
-                super.onBindViewHolder(holder, position);
+            public ChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return super.onCreateViewHolder(parent, viewType);
             }
 
             @Override
@@ -96,7 +96,7 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
             }
 
         };
-        reyclerview_message = findViewById(R.id.reyclerview_message_list);
+
         reyclerview_message.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setStackFromEnd(true);
@@ -176,7 +176,7 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
             SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
             Date newDate = format.parse(date);
 
-            format = new SimpleDateFormat("HH:mm");
+            format = new SimpleDateFormat("HH:mm:ss");
             return new String(format.format(newDate));
         } catch (Exception e) {
             Crashlytics.logException(e);

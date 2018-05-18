@@ -2,6 +2,7 @@ package com.mikalh.purchaseorderonline;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
@@ -121,7 +122,7 @@ public class detailItem extends AppCompatActivity {
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                firestore.collection("RoomChat").whereEqualTo("Users.users1",user.getUid()).whereEqualTo("Users.users2",item.getUserId()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                firestore.collection("RoomChat").whereEqualTo("Users."+user.getUid(),true).whereEqualTo("Users."+item.getUserId(),true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         Log.e("Hasil Query masa kosong",task.toString());
@@ -139,9 +140,9 @@ public class detailItem extends AppCompatActivity {
                          }else {
                              DocumentReference ref = firestore.collection("RoomChat").document();
                              final String myId = ref.getId();
-                             HashMap<String,String> users = new HashMap<>();
-                             users.put("users1",user.getUid());
-                             users.put("users2",item.getUserId());
+                             HashMap<String,Object> users = new HashMap<>();
+                             users.put(user.getUid(),true);
+                             users.put(item.getUserId(),true);
                              Map<String,Object> roomChat = new HashMap<>();
                              roomChat.put("Users",users);
                              roomChat.put("itemID",KEY_ITEM_ID);
