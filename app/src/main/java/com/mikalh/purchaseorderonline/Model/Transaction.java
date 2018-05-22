@@ -11,8 +11,8 @@ public class Transaction extends Cart{
     private String notificationIdPengirim;
     private String totalHarga;
 
-    public Transaction(String nama_barang, String userId, String unit, String namaPerusahaan, String harga_barang, String imageItemUrl, String notificationId, String kategori, int quantitas_banyakBarang, String pengirim_id, String penerima_id, String status, String tanggal, String notificationIdPengirim, String totalHarga) {
-        super(nama_barang, userId, unit, namaPerusahaan, harga_barang, imageItemUrl, notificationId, kategori, quantitas_banyakBarang);
+    public Transaction(String nama_barang, String userId, String unit, String namaPerusahaan, String harga_barang, String imageItemUrl, String notificationId, String kategori, int quantitas_banyakBarang, int totalHargaBarang, String pengirim_id, String penerima_id, String status, String tanggal, String notificationIdPengirim, String totalHarga) {
+        super(nama_barang, userId, unit, namaPerusahaan, harga_barang, imageItemUrl, notificationId, kategori, quantitas_banyakBarang, totalHargaBarang);
         this.pengirim_id = pengirim_id;
         this.penerima_id = penerima_id;
         this.status = status;

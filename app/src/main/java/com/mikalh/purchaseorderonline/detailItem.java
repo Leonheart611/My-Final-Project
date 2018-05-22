@@ -4,7 +4,9 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.hardware.camera2.TotalCaptureResult;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -32,12 +34,16 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.Chat;
 import com.mikalh.purchaseorderonline.Model.Item;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,6 +67,7 @@ public class detailItem extends AppCompatActivity {
     Button beliButton_do;
     Calendar myCalendar = Calendar.getInstance();
     Button chatButton;
+    int GrandTotal = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -215,38 +222,168 @@ public class detailItem extends AppCompatActivity {
         saveToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 int pcs = Integer.parseInt(banyakPCS_popCart.getText().toString());
-                Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit()
-                        ,item.getNamaPerusahaan(),item.getHarga_barang(),item.getImageItemUrl(),item.getNotificationId(),item.getKategori(),pcs);
+                BigDecimal harga = new BigDecimal(item.getHarga_barang().replace(".",""));
+                final BigDecimal totalHarga = totalCost(pcs,harga);
+                final Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit()
+                        ,item.getNamaPerusahaan(),item.getHarga_barang(),item.getImageItemUrl(),item.getNotificationId(),item.getKategori(),pcs,Integer.parseInt(totalHarga.toString()));
                 // add database firestore
                 Map<String,Object> cartStringMap = new HashMap<>();
-                cartStringMap.put("nama_barang",cart.getNama_barang());
-                cartStringMap.put("userId", cart.getUserId());
-                cartStringMap.put("unit",cart.getUnit());
-                cartStringMap.put("namaPerusahaan",cart.getNamaPerusahaan());
-                cartStringMap.put("harga_barang",cart.getHarga_barang());
-                cartStringMap.put("imageItemUrl",cart.getImageItemUrl());
-                cartStringMap.put("notificationId",cart.getNotificationId());
-                cartStringMap.put("kategori",cart.getKategori());
-                cartStringMap.put("quantitas_banyakBarang",cart.getQuantitas_banyakBarang());
-                Map<String,Object> dataBarang = new HashMap<>();
-                dataBarang.put("itemList",cartStringMap);
-                firestore.collection("Users").document(user.getUid()).collection("Cart").document(item.getNamaPerusahaan()).set(dataBarang).addOnFailureListener(new OnFailureListener() {
+                cartStringMap.put(item.getUserId(),true);
+                cartStringMap.put(user.getUid(),true);
+                final Map<String,Object> arrayUserID = new HashMap<>();
+                arrayUserID.put("UserList",cartStringMap);
+                arrayUserID.put("namaPerusahaan",item.getNamaPerusahaan());
+                arrayUserID.put("GrandTotal",Integer.parseInt(totalHarga.toString()));
+
+                DocumentReference ref = firestore.collection("Cart").document();
+                final String myId = ref.getId();
+                // teknik cara pengambilan
+                firestore.collection("Cart").
+                        whereEqualTo("UserList."+user.getUid(),true).whereEqualTo("UserList."+item.getUserId(),true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        final QuerySnapshot snapshots = task.getResult();
+                        if (snapshots.getDocuments().size() !=0){ // data jika sudah ada dan di tinggal diupdate
+                            final String curr = snapshots.getDocuments().get(0).getId();
+                            firestore.collection("Cart").document(curr).collection("ItemList").document().set(cart).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+
+                                        firestore.collection("Cart").document(curr).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                                    int i = Integer.parseInt(documentSnapshot.get("GrandTotal").toString());
+                                                    GrandTotal = i;
+
+                                                    // update data dan grand total dan semuanya  di update lah
+                                                    final Query query = firestore.collection("Cart").document(curr).collection("ItemList");
+                                                    query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                            if (task.isSuccessful()){
+                                                                QuerySnapshot snapshots1 = task.getResult();
+                                                                int banyakData = snapshots1.size();
+                                                                Map<String,Object> dataUPdate = new HashMap<>();
+                                                                dataUPdate.put("BanyakData",banyakData);
+                                                                int totalHargaBarang = Integer.parseInt(totalHarga.toString());
+                                                                int TotalSemua = GrandTotal + totalHargaBarang;
+                                                                dataUPdate.put("GrandTotal",TotalSemua);
+                                                                firestore.collection("Cart").document(curr).update(dataUPdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                        if (task.isSuccessful()){
+                                                                            Toast.makeText(detailItem.this,"berhasil memasukan data cart",Toast.LENGTH_LONG).show();
+                                                                            dialog.dismiss();
+                                                                        }
+                                                                    }
+                                                                }).addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(@NonNull Exception e) {
+                                                                        Crashlytics.logException(e);
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+
+                                                        }
+                                                    });
+
+
+                                                }
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Crashlytics.logException(e);
+                                            }
+                                        });
+                                                }
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Crashlytics.logException(e);
+
+                                            }
+                                        });
+
+                        }else { // kalau dokumennya tidak ada dan baru di buat
+                            firestore.collection("Cart").document(myId).set(arrayUserID).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Crashlytics.logException(e);
+                                    Toast.makeText(detailItem.this,e.getMessage(),Toast.LENGTH_LONG).show();
+                                }
+                            }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        firestore.collection("Cart").document(myId).collection("ItemList").document().set(cart).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()){
+                                                    Query query = firestore.collection("Cart").document(myId).collection("ItemList");
+                                                    query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                            if (task.isSuccessful()) {
+                                                                QuerySnapshot snapshots1 = task.getResult();
+                                                                Map<String,Object> dataUPdate = new HashMap<>();
+                                                                int banyakData = snapshots1.size();
+                                                                dataUPdate.put("BanyakData",banyakData);
+                                                                firestore.collection("Cart").document(myId).update(dataUPdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                        if (task.isSuccessful()) {
+                                                                           Toast.makeText(detailItem.this,"Data berhasil di Simpan",Toast.LENGTH_LONG).show();
+                                                                           dialog.dismiss();
+                                                                        }
+                                                                    }
+                                                                }).addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(@NonNull Exception e) {
+                                                                        Crashlytics.logException(e);
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+
+                                                        }
+                                                    });
+
+
+                                                }
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Crashlytics.logException(e);
+                                            }
+                                        });
+
+                                    }
+                                }
+                            });
+                        }
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Crashlytics.logException(e);
-                        Toast.makeText(detailItem.this,e.getMessage(),Toast.LENGTH_LONG).show();
-                    }
-                }).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Toast.makeText(detailItem.this,"Barang sudah masuk di Cart",Toast.LENGTH_LONG).show();
-                            dialog.show();
-                        }
                     }
                 });
+
                 // add database firestore
             }
         });
@@ -256,5 +393,11 @@ public class detailItem extends AppCompatActivity {
         String myFormat = "dd-MMM-yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
         textInputEditText.setText(sdf.format(myCalendar.getTime()));
+    }
+    public BigDecimal totalCost(int itemQuantity, BigDecimal itemPrice){
+        BigDecimal itemCost,totalCost = null;
+        itemCost = itemPrice.multiply(new BigDecimal(itemQuantity));
+        totalCost = itemCost;
+        return totalCost;
     }
 }

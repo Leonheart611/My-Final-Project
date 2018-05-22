@@ -6,13 +6,10 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,9 +24,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.mikalh.purchaseorderonline.Model.User;
 import com.mikalh.purchaseorderonline.Pager.RegisterPager;
 import com.pixelcan.inkpageindicator.InkPageIndicator;
-
-import github.chenupt.springindicator.SpringIndicator;
-import github.chenupt.springindicator.viewpager.ScrollerViewPager;
 
 public class register extends AppCompatActivity {
     EditText nama_register, nohp_register,email_register, password_register;
@@ -49,7 +43,7 @@ public class register extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         myViewPager = findViewById(R.id.myViewPagger);
 
-        inkPageIndicator = findViewById(R.id.indicator);
+        inkPageIndicator = findViewById(R.id.createPoIndicator);
         registerPager = new RegisterPager(getSupportFragmentManager(),2);
         myViewPager.setAdapter(registerPager);
 
