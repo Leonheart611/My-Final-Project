@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView21"
+        android:id="@+id/noPO"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -48,7 +48,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView20" />
 
     <TextView
-        android:id="@+id/textView23"
+        android:id="@+id/tanggalPO"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -65,7 +65,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="8dp"
         android:text="Kepada"
         android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="@+id/textView22"
@@ -133,7 +133,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView28" />
 
     <TextView
-        android:id="@+id/textView30"
+        android:id="@+id/penerimaPO"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -144,7 +144,7 @@
         app:layout_constraintTop_toTopOf="@+id/textView24" />
 
     <TextView
-        android:id="@+id/textView31"
+        android:id="@+id/alamatPO"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -155,7 +155,7 @@
         app:layout_constraintTop_toTopOf="@+id/textView25" />
 
     <TextView
-        android:id="@+id/textView32"
+        android:id="@+id/propinsiPO"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -166,7 +166,7 @@
         app:layout_constraintTop_toTopOf="@+id/textView26" />
 
     <TextView
-        android:id="@+id/textView33"
+        android:id="@+id/kotaPO"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -177,7 +177,7 @@
         app:layout_constraintTop_toTopOf="@+id/textView27" />
 
     <TextView
-        android:id="@+id/textView34"
+        android:id="@+id/noTelpnPO"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -188,7 +188,7 @@
         app:layout_constraintTop_toTopOf="@+id/textView28" />
 
     <TextView
-        android:id="@+id/textView35"
+        android:id="@+id/faxPO"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -199,15 +199,55 @@
         app:layout_constraintTop_toTopOf="@+id/textView29" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/nextPO"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="24dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="5dp"
         android:text="Next"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/createPO_RV" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/createPO_RV"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/nextPO"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView29"
+        app:layout_constraintVertical_bias="0.49" />
+
+    <TextView
+        android:id="@+id/totalHargaPO"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="TextView"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/nextPO"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/textView21"
+        app:layout_constraintTop_toBottomOf="@+id/textView21" />
+
+    <TextView
+        android:id="@+id/textView21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="TotalHarga"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/createPO_RV" />
 
 </android.support.constraint.ConstraintLayout>

@@ -42,6 +42,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.Chat;
 import com.mikalh.purchaseorderonline.Model.Item;
+import com.mikalh.purchaseorderonline.Model.User;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -65,7 +66,6 @@ public class detailItem extends AppCompatActivity {
     CustomDialog customDialog;
     Item item;
     Button beliButton_do;
-    Calendar myCalendar = Calendar.getInstance();
     Button chatButton;
     int GrandTotal = 0;
     @Override
@@ -129,7 +129,8 @@ public class detailItem extends AppCompatActivity {
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                firestore.collection("RoomChat").whereEqualTo("Users."+user.getUid(),true).whereEqualTo("Users."+item.getUserId(),true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                firestore.collection("RoomChat").whereEqualTo("Users."+user.getUid(),true).
+                        whereEqualTo("Users."+item.getUserId(),true).whereEqualTo("MakePO",false).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         Log.e("Hasil Query masa kosong",task.toString());
@@ -201,23 +202,7 @@ public class detailItem extends AppCompatActivity {
         final EditText banyakPCS_popCart = dialog.findViewById(R.id.banyakPCS_popCart);
         namaBarang_popUP.setText(":"+item.getNama_barang());
         // data tanggal untuk cart
-        /*final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                myCalendar.set(Calendar.YEAR, year);
-                myCalendar.set(Calendar.MONTH, month);
-                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                updateLabel(tanggalEstimasi);
-            }
-        };
-
-        tanggalEstimasi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DatePickerDialog(detailItem.this,date,myCalendar.get(Calendar.YEAR),
-                        myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
+        /*
 */
         saveToCart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -226,16 +211,8 @@ public class detailItem extends AppCompatActivity {
                 BigDecimal harga = new BigDecimal(item.getHarga_barang().replace(".",""));
                 final BigDecimal totalHarga = totalCost(pcs,harga);
                 final Cart cart = new Cart(item.getNama_barang(),item.getUserId(),item.getUnit()
-                        ,item.getNamaPerusahaan(),item.getHarga_barang(),item.getImageItemUrl(),item.getNotificationId(),item.getKategori(),pcs,Integer.parseInt(totalHarga.toString()));
+                        ,item.getNamaPerusahaan(),item.getHarga_barang(),item.getImageItemUrl(),item.getNotificationId(),item.getKategori(),pcs,totalHarga.intValue());
                 // add database firestore
-                Map<String,Object> cartStringMap = new HashMap<>();
-                cartStringMap.put(item.getUserId(),true);
-                cartStringMap.put(user.getUid(),true);
-                final Map<String,Object> arrayUserID = new HashMap<>();
-                arrayUserID.put("UserList",cartStringMap);
-                arrayUserID.put("namaPerusahaan",item.getNamaPerusahaan());
-                arrayUserID.put("GrandTotal",Integer.parseInt(totalHarga.toString()));
-
                 DocumentReference ref = firestore.collection("Cart").document();
                 final String myId = ref.getId();
                 // teknik cara pengambilan
@@ -250,7 +227,6 @@ public class detailItem extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()){
-
                                         firestore.collection("Cart").document(curr).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -258,7 +234,6 @@ public class detailItem extends AppCompatActivity {
                                                     DocumentSnapshot documentSnapshot = task.getResult();
                                                     int i = Integer.parseInt(documentSnapshot.get("GrandTotal").toString());
                                                     GrandTotal = i;
-
                                                     // update data dan grand total dan semuanya  di update lah
                                                     final Query query = firestore.collection("Cart").document(curr).collection("ItemList");
                                                     query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -314,36 +289,67 @@ public class detailItem extends AppCompatActivity {
                                             }
                                         });
 
-                        }else { // kalau dokumennya tidak ada dan baru di buat
-                            firestore.collection("Cart").document(myId).set(arrayUserID).addOnFailureListener(new OnFailureListener() {
+                        }else {
+                            // kalau dokumennya tidak ada dan baru di buat
+                            firestore.collection("Users").document(item.getUserId()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Crashlytics.logException(e);
-                                    Toast.makeText(detailItem.this,e.getMessage(),Toast.LENGTH_LONG).show();
-                                }
-                            }).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                     if (task.isSuccessful()){
-                                        firestore.collection("Cart").document(myId).collection("ItemList").document().set(cart).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        DocumentSnapshot snapshot = task.getResult();
+                                        User userCompany = snapshot.toObject(User.class);
+                                        Map<String,Object> cartStringMap = new HashMap<>();
+                                        cartStringMap.put(item.getUserId(),true);
+                                        cartStringMap.put(user.getUid(),true);
+                                        final Map<String,Object> arrayUserID = new HashMap<>();
+                                        arrayUserID.put("UserList",cartStringMap);
+                                        arrayUserID.put("namaPerusahaan",item.getNamaPerusahaan());
+                                        arrayUserID.put("GrandTotal",Integer.parseInt(totalHarga.toString()));
+                                        arrayUserID.put("NamaPIC",userCompany.getNama_PIC());
+                                        arrayUserID.put("Alamat",userCompany.getAlamat_perusahaan());
+                                        arrayUserID.put("Propinsi",userCompany.getProvinsi());
+                                        arrayUserID.put("Kota",userCompany.getKota());
+                                        arrayUserID.put("Telp",userCompany.getNomorTelphone());
+                                        arrayUserID.put("Fax",userCompany.getNo_fax());
+                                        arrayUserID.put("IDPenjual",item.getUserId());
+                                        arrayUserID.put("StatusPO","Belum Di buat PO");
+                                        arrayUserID.put("MakePO",false);
+                                        firestore.collection("Cart").document(myId).set(arrayUserID).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Crashlytics.logException(e);
+                                                Toast.makeText(detailItem.this,e.getMessage(),Toast.LENGTH_LONG).show();
+                                            }
+                                        }).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()){
-                                                    Query query = firestore.collection("Cart").document(myId).collection("ItemList");
-                                                    query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                    firestore.collection("Cart").document(myId).collection("ItemList").document().set(cart).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                         @Override
-                                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                            if (task.isSuccessful()) {
-                                                                QuerySnapshot snapshots1 = task.getResult();
-                                                                Map<String,Object> dataUPdate = new HashMap<>();
-                                                                int banyakData = snapshots1.size();
-                                                                dataUPdate.put("BanyakData",banyakData);
-                                                                firestore.collection("Cart").document(myId).update(dataUPdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            if (task.isSuccessful()){
+                                                                Query query = firestore.collection("Cart").document(myId).collection("ItemList");
+                                                                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                                                     @Override
-                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                                                         if (task.isSuccessful()) {
-                                                                           Toast.makeText(detailItem.this,"Data berhasil di Simpan",Toast.LENGTH_LONG).show();
-                                                                           dialog.dismiss();
+                                                                            QuerySnapshot snapshots1 = task.getResult();
+                                                                            Map<String,Object> dataUPdate = new HashMap<>();
+                                                                            int banyakData = snapshots1.size();
+                                                                            dataUPdate.put("BanyakData",banyakData);
+                                                                            firestore.collection("Cart").document(myId).update(dataUPdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                    if (task.isSuccessful()) {
+                                                                                        Toast.makeText(detailItem.this,"Data berhasil di Simpan",Toast.LENGTH_LONG).show();
+                                                                                        dialog.dismiss();
+                                                                                    }
+                                                                                }
+                                                                            }).addOnFailureListener(new OnFailureListener() {
+                                                                                @Override
+                                                                                public void onFailure(@NonNull Exception e) {
+                                                                                    Crashlytics.logException(e);
+                                                                                }
+                                                                            });
                                                                         }
                                                                     }
                                                                 }).addOnFailureListener(new OnFailureListener() {
@@ -357,23 +363,22 @@ public class detailItem extends AppCompatActivity {
                                                     }).addOnFailureListener(new OnFailureListener() {
                                                         @Override
                                                         public void onFailure(@NonNull Exception e) {
-
+                                                            Crashlytics.logException(e);
                                                         }
                                                     });
 
-
                                                 }
                                             }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Crashlytics.logException(e);
-                                            }
                                         });
-
                                     }
                                 }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Crashlytics.logException(e);
+                                }
                             });
+
                         }
 
                     }
@@ -389,11 +394,7 @@ public class detailItem extends AppCompatActivity {
         });
         dialog.show();
     }
-    private void updateLabel(EditText textInputEditText){
-        String myFormat = "dd-MMM-yyyy";
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
-        textInputEditText.setText(sdf.format(myCalendar.getTime()));
-    }
+
     public BigDecimal totalCost(int itemQuantity, BigDecimal itemPrice){
         BigDecimal itemCost,totalCost = null;
         itemCost = itemPrice.multiply(new BigDecimal(itemQuantity));
