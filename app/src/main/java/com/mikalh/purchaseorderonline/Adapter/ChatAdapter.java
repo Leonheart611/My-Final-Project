@@ -87,8 +87,9 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
         public void bind(final DocumentSnapshot snapshot, final OnChatListenerListener listener, FirebaseUser user) {
             Chat chat = snapshot.toObject(Chat.class);
             // setting up chat properties
+            String time = formatTime(chat.getTime());
             text_message_body.setText(chat.getMessage());
-            text_message_time.setText(chat.getTime());
+            text_message_time.setText(time);
             text_message_name.setText(chat.getSender_name());
             itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -100,12 +101,12 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
                 });
         }
 
-        public String formatDate(String date) {
+        public String formatTime(String date) {
             try {
-                SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+                SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
                 Date newDate = format.parse(date);
 
-                format = new SimpleDateFormat("dd MMM yyyy");
+                format = new SimpleDateFormat("HH:mm");
                 return new String(format.format(newDate));
             } catch (Exception e) {
                 Crashlytics.logException(e);

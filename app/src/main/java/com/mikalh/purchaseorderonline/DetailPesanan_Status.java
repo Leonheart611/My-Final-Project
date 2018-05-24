@@ -9,17 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link Cart_buyyer.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link Cart_buyyer#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class Cart_buyyer extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+public class DetailPesanan_Status extends Fragment {
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -29,21 +20,13 @@ public class Cart_buyyer extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public Cart_buyyer() {
+    public DetailPesanan_Status() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Cart_buyyer.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static Cart_buyyer newInstance(String param1, String param2) {
-        Cart_buyyer fragment = new Cart_buyyer();
+
+    public static DetailPesanan_Status newInstance(String param1, String param2) {
+        DetailPesanan_Status fragment = new DetailPesanan_Status();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -64,7 +47,7 @@ public class Cart_buyyer extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_cart_buyyer, container, false);
+        return inflater.inflate(R.layout.fragment_detail_pesanan__status, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -74,7 +57,7 @@ public class Cart_buyyer extends Fragment {
         }
     }
 
-   /* @Override
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -83,7 +66,7 @@ public class Cart_buyyer extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-    }*/
+    }
 
     @Override
     public void onDetach() {

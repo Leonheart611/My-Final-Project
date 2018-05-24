@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.mikalh.purchaseorderonline.Cart_buyyer;
+import com.mikalh.purchaseorderonline.Chat_buyyer;
 import com.mikalh.purchaseorderonline.Transaction_buyyer;
 import com.mikalh.purchaseorderonline.home_buyyer;
 
@@ -21,9 +21,9 @@ public class BuyyerPagger extends FragmentStatePagerAdapter {
             case 0:
                 return new home_buyyer();
             case 1:
-                return new Cart_buyyer();
-            case 2:
                 return new Transaction_buyyer();
+            case 2:
+                return new Chat_buyyer();
             default:
                 return null;
         }

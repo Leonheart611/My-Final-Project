@@ -59,7 +59,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".CreatePO" />
-        <activity android:name=".SendPO"></activity>
+        <activity android:name=".SendPO" />
+        <activity android:name=".DetailPesanan"></activity>
     </application>
 
 </manifest>

@@ -16,6 +16,14 @@ public class Cart extends Item {
         TotalHargaBarang = totalHargaBarang;
     }
 
+    public int getTotalHargaBarang() {
+        return TotalHargaBarang;
+    }
+
+    public void setTotalHargaBarang(int totalHargaBarang) {
+        TotalHargaBarang = totalHargaBarang;
+    }
+
     public Cart() {
     }
 
