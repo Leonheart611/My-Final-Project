@@ -1,6 +1,8 @@
 package com.mikalh.purchaseorderonline;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,24 +19,36 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
+import com.google.gson.Gson;
 import com.mikalh.purchaseorderonline.Adapter.CreatePOAdapter;
+import com.mikalh.purchaseorderonline.Model.Counter;
+import com.mikalh.purchaseorderonline.Model.Shard;
+import com.mikalh.purchaseorderonline.Model.User;
 
 import java.math.BigDecimal;
 import java.nio.charset.CodingErrorAction;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePOSelectedListener{
@@ -42,7 +57,7 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
 
     private String mParam1;
     private String mParam2;
-
+    SharedPreferences mPrefs;
     private OnFragmentInteractionListener mListener;
     // Variable
     String ID,tanggal,tanggalbulan,tanggaltahun,tanggalDepan;
@@ -56,6 +71,8 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
     Query query;
     ViewPager createPOPagger;
     String noPOS;
+    Task<Integer> counter = null;
+    User myUser;
     public CreatePODate() {
         // Required empty public constructor
     }
@@ -85,14 +102,114 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
         SimpleDateFormat df = new SimpleDateFormat("dd-MMMM-yyyy");
         tanggal = df.format(c);
         SimpleDateFormat bulan = new SimpleDateFormat("MMMM");
-        SimpleDateFormat tahun = new SimpleDateFormat("yyyy");
+        final SimpleDateFormat tahun = new SimpleDateFormat("yyyy");
         SimpleDateFormat tanggalDepanf = new SimpleDateFormat("dd");
         tanggalbulan = bulan.format(c);
         tanggaltahun = tahun.format(c);
         tanggalDepan = tanggalDepanf.format(c);
         query = firestore.collection("Cart").document(ID).collection("ItemList").orderBy("nama_barang");
         createPOPagger = getActivity().findViewById(R.id.createPoPagger);
+        mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        // Counter TODO:buat nanti kalau sempat aja lol
+        /*final DocumentReference reference = firestore.collection("Counter").document();
+        getCount(reference).addOnCompleteListener(new OnCompleteListener<Integer>() {
+            @Override
+            public void onComplete(@NonNull Task<Integer> task) {
+                if (task.isSuccessful()){
+                    int i = task.getResult();
+                    if (i == 0){
+                        createCounter(reference,1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    Log.e("Berhasil","Buat data cek di Firestore");
+                                }
+                            }
+                        });
+                    }
+                    Log.e("Data hasil dari i",i+"");
+                }else {
+                    Log.e("Gagal Ambil data","Find Another Way");
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Crashlytics.logException(e);
+            }
+        });*/
+
+
+
+
     }
+    public Task<Integer> getCount(final DocumentReference ref) {
+        // Sum the count of each shard in the subcollection
+        return ref.collection("shards").get()
+                .continueWith(new Continuation<QuerySnapshot, Integer>() {
+                    @Override
+                    public Integer then(@NonNull Task<QuerySnapshot> task) throws Exception {
+                        int count = 0;
+                        for (DocumentSnapshot snap : task.getResult()) {
+                            Shard shard = snap.toObject(Shard.class);
+                            count += shard.count;
+                        }
+                        return count;
+                    }
+                });
+    }
+    public Task<User> getUser(String ID){
+        DocumentReference ref = firestore.collection("Users").document(ID);
+
+        return ref.get().continueWith(new Continuation<DocumentSnapshot, User>() {
+            @Override
+            public User then(@NonNull Task<DocumentSnapshot> task) throws Exception{
+                User user = task.getResult().toObject(User.class);
+                return user;
+            }
+        });
+    }
+    public Task<Void> createCounter(final DocumentReference ref, final int numShards) {
+        // Initialize the counter document, then initialize each shard.
+        return ref.set(new Counter(numShards))
+                .continueWithTask(new Continuation<Void, Task<Void>>() {
+                    @Override
+                    public Task<Void> then(@NonNull Task<Void> task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
+                        }
+
+                        List<Task<Void>> tasks = new ArrayList<>();
+
+                        // Initialize each shard with count=0
+                        for (int i = 0; i < numShards; i++) {
+                            Task<Void> makeShard = ref.collection("shards")
+                                    .document(String.valueOf(i))
+                                    .set(new Shard(0));
+
+                            tasks.add(makeShard);
+                        }
+
+                        return Tasks.whenAll(tasks);
+                    }
+                });
+    }
+    public Task<Void> incrementCounter(final DocumentReference ref, final int numShards) {
+        int shardId = (int) Math.floor(Math.random() * numShards);
+        final DocumentReference shardRef = ref.collection("shards").document(String.valueOf(shardId));
+
+        return firestore.runTransaction(new Transaction.Function<Void>() {
+            @Override
+            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+                Shard shard = transaction.get(shardRef).toObject(Shard.class);
+                shard.count += 1;
+
+                transaction.set(shardRef, shard);
+                return null;
+            }
+        });
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -150,8 +267,7 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
                 String Fax = snapshot.get("Fax").toString();
                 int TotalHarga = Integer.parseInt(snapshot.get("GrandTotal").toString());
                 String Grandtotal = formatRP(TotalHarga);
-                noPOS = tanggalDepan+"/"+user.getDisplayName().substring(1,3)+"/"+tanggalbulan+"/PO"+"/"+tanggaltahun;
-
+                noPOS = tanggalDepan + "/" + user.getDisplayName().substring(1, 3) + "/" + tanggalbulan + "/PO" +1+"/" + tanggaltahun;
                 noPO.setText(": "+noPOS);
                 tanggalPO.setText(": "+tanggal);
                 penerimaPO.setText(": "+namaPIC);
@@ -171,9 +287,15 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
         nextPO.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences.Editor prefEdit = mPrefs.edit();
+                prefEdit.putString("NoPO",noPOS);
+                prefEdit.commit();
                 createPOPagger.setCurrentItem(1,true);
             }
         });
+
+
+
         return v;
     }
 

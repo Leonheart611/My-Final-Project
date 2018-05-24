@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -50,6 +51,8 @@ public class CreatePOItem extends Fragment {
     String ID;
     Calendar myCalendar;
     String tanggalHariIni;
+    SharedPreferences mPref;
+    String NoPO;
     public CreatePOItem() {
         // Required empty public constructor
     }
@@ -78,6 +81,8 @@ public class CreatePOItem extends Fragment {
         Date c = myCalendar.getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMMM-yyyy");
         tanggalHariIni = df.format(c);
+        mPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        NoPO = mPref.getString("NoPO","");
     }
 
     @Override
@@ -116,11 +121,12 @@ public class CreatePOItem extends Fragment {
                 dataUpdate.put("alamatPengiriman",alamat);
                 dataUpdate.put("tanggalPermintaanKirim",tanggal);
                 dataUpdate.put("tanggalPembuatanPO",tanggalHariIni);
+                dataUpdate.put("NomorPO",NoPO);
                 firestore.collection("Cart").document(ID).update(dataUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
-                            Intent i = new Intent(getActivity(),home_buyyer.class);
+                            Intent i = new Intent(getActivity(),buyerActivity.class);
                             startActivity(i);
                             Toast.makeText(getActivity(),"PO Berhasil di kirim, Untuk update cek Bagian Transaksi",Toast.LENGTH_LONG).show();
                         }

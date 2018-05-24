@@ -36,7 +36,9 @@ public class SendPO extends AppCompatActivity implements POActiveAdapter.OnPOSel
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
         poActive_RC = findViewById(R.id.poActive_RC);
-        query = firestore.collection("Cart").whereEqualTo("UserList."+user.getUid(),true).whereEqualTo("MakePO",false);
+        query = firestore.collection("Cart")
+                .whereEqualTo("UserList."+user.getUid(),true)
+                .whereEqualTo("MakePO",false);
         adapter = new POActiveAdapter(query,this){
             @Override
             protected void onDataChanged() {

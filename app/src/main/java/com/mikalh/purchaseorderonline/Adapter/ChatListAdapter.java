@@ -61,9 +61,10 @@ public class ChatListAdapter extends FirestoreAdapter<ChatListAdapter.ChatListHo
         }
         public void bind(final DocumentSnapshot snapshot, final OnChatListListenerListener listener, FirebaseUser user){
             LastChat chat = snapshot.toObject(LastChat.class);
+            String time = formatTime(chat.getTime());
             name_chatList.setText(chat.getName());
             lastMessage_chatList.setText(chat.getMessage());
-            timeStampt_chatList.setText(chat.getTime());
+            timeStampt_chatList.setText(time);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -88,10 +89,9 @@ public class ChatListAdapter extends FirestoreAdapter<ChatListAdapter.ChatListHo
 
             }*/
 
-        }
-        public static String formatDate(String date) {
+        public String formatTime(String date) {
             try {
-                SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+                SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
                 Date newDate = format.parse(date);
 
                 format = new SimpleDateFormat("HH:mm");
@@ -101,5 +101,7 @@ public class ChatListAdapter extends FirestoreAdapter<ChatListAdapter.ChatListHo
             }
             return null;
         }
+        }
+
     }
 

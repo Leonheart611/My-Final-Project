@@ -244,7 +244,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="TotalHarga"
+        android:text="Total Harga"
         android:textColor="@android:color/black"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"

@@ -130,7 +130,7 @@ public class detailItem extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 firestore.collection("RoomChat").whereEqualTo("Users."+user.getUid(),true).
-                        whereEqualTo("Users."+item.getUserId(),true).whereEqualTo("MakePO",false).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        whereEqualTo("Users."+item.getUserId(),true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         Log.e("Hasil Query masa kosong",task.toString());
@@ -217,7 +217,8 @@ public class detailItem extends AppCompatActivity {
                 final String myId = ref.getId();
                 // teknik cara pengambilan
                 firestore.collection("Cart").
-                        whereEqualTo("UserList."+user.getUid(),true).whereEqualTo("UserList."+item.getUserId(),true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        whereEqualTo("UserList."+user.getUid(),true).whereEqualTo("UserList."+item.getUserId(),true)
+                        .whereEqualTo("MakePO",false).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         final QuerySnapshot snapshots = task.getResult();

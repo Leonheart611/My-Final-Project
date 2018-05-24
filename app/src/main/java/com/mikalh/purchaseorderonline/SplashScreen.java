@@ -33,13 +33,20 @@ public class SplashScreen extends AppCompatActivity {
             firebaseFirestore.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
                 public void onSuccess(DocumentSnapshot snapshot) {
-                    User user1ogin = snapshot.toObject(User.class);
-                    if (user1ogin.getRoleActive().equals("Penjual")) {
-                        Intent i = new Intent(SplashScreen.this, newUserUI.class);
+                    if (!snapshot.exists()){
+                        Intent i = new Intent(SplashScreen.this,MainActivity.class);
                         startActivity(i);
-                    }else if (user1ogin.getRoleActive().equals("Pembeli")){
-                        Intent i = new Intent(SplashScreen.this,buyerActivity.class);
-                        startActivity(i);
+                    }else {
+                        User user1ogin = snapshot.toObject(User.class);
+
+                        if (user1ogin.getRoleActive().equals("Penjual")) {
+                            Intent i = new Intent(SplashScreen.this, newUserUI.class);
+                            startActivity(i);
+                        } else if (user1ogin.getRoleActive().equals("Pembeli")) {
+                            Intent i = new Intent(SplashScreen.this, buyerActivity.class);
+                            startActivity(i);
+                        }
+
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {

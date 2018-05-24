@@ -2,7 +2,6 @@ package com.mikalh.purchaseorderonline.Adapter;
 
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,19 +9,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.itextpdf.text.pdf.PRIndirectReference;
-import com.mikalh.purchaseorderonline.Model.Company;
 import com.mikalh.purchaseorderonline.Model.Transaction;
 import com.mikalh.purchaseorderonline.R;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -52,46 +46,36 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
     }
 
     public static class TransactionHolder extends RecyclerView.ViewHolder {
-        TextView date_transaction, namaBarang_transaction, quantitas_transaction, status_transaction, total_transaction, companyName_transaction;
+        TextView date_transaction, tanggalPengiriman_transaction, quantitas_transaction,statusPemsanan_transaction, total_transaction, noPo_transaction;
         ImageView statusComplete_transaction;
 
         public TransactionHolder(View itemView) {
             super(itemView);
             date_transaction = itemView.findViewById(R.id.date_transaction);
-            namaBarang_transaction = itemView.findViewById(R.id.namaBarang_transaction);
+            tanggalPengiriman_transaction = itemView.findViewById(R.id.tanggalPengiriman_transaction);
             quantitas_transaction = itemView.findViewById(R.id.quantitas_transaction);
-            status_transaction = itemView.findViewById(R.id.status_transaction);
             total_transaction = itemView.findViewById(R.id.total_transaction);
-            companyName_transaction = itemView.findViewById(R.id.companyName_transaction);
+            noPo_transaction = itemView.findViewById(R.id.noPo_transaction);
             statusComplete_transaction = itemView.findViewById(R.id.statusComplete_transaction);
+            statusPemsanan_transaction = itemView.findViewById(R.id.statusPemesanan_transaction);
         }
 
         public void bind(final DocumentSnapshot snapshot
                 , final OnTransactionSelectedListener listener) {
-            Transaction transaction = new Transaction();
-            String TotalCur = "";
-            try {
-                transaction = snapshot.toObject(Transaction.class);
-                BigDecimal harga = new BigDecimal(transaction.getHarga_barang().replace(".",""));
-                int quantitas = transaction.getQuantitas_banyakBarang();
-                BigDecimal total = totalCost(quantitas,harga);
-                TotalCur = formatRP(total);
-                if (!transaction.getStatus().equals("Complete")){
-                    statusComplete_transaction.setImageResource(R.mipmap.x_button);
-                }
-            }
-            catch (Exception e){
-                Crashlytics.logException(e);
-            }
+            String tanggalPembuatanPO = snapshot.get("tanggalPembuatanPO").toString();
+            String tanggalPermintaanKirim = snapshot.get("tanggalPermintaanKirim").toString();
+            String NomorPO = snapshot.get("NomorPO").toString();
+            int Total = Integer.parseInt(snapshot.get("GrandTotal").toString());
+            String Status = snapshot.get("StatusPO").toString();
+            int banyakBarang = Integer.parseInt(snapshot.get("BanyakData").toString());
+            String GrandTotal = formatRP(Total);
+            date_transaction.setText(tanggalPembuatanPO);
+            noPo_transaction.setText(NomorPO);
+            statusPemsanan_transaction.setText(Status);
+            total_transaction.setText(GrandTotal);
+            quantitas_transaction.setText(banyakBarang+"");
+            tanggalPengiriman_transaction.setText(tanggalPermintaanKirim);
 
-
-            String date = formatDate(transaction.getTanggal());
-            date_transaction.setText(date);
-            namaBarang_transaction.setText(transaction.getNama_barang());
-            quantitas_transaction.setText(transaction.getQuantitas_banyakBarang()+""+transaction.getUnit());
-            status_transaction.setText(transaction.getStatus());
-            total_transaction.setText(TotalCur);
-            companyName_transaction.setText(transaction.getNamaPerusahaan());
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -104,13 +88,7 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
 
 
         }
-        public BigDecimal totalCost(int itemQuantity, BigDecimal itemPrice){
-            BigDecimal itemCost,totalCost = null;
-            itemCost = itemPrice.multiply(new BigDecimal(itemQuantity));
-            totalCost = itemCost;
-            return totalCost;
-        }
-        public String formatRP (BigDecimal n){
+        public String formatRP (Integer n){
             DecimalFormat kursIndonesia = (DecimalFormat) DecimalFormat.getCurrencyInstance();
             DecimalFormatSymbols formatRp = new DecimalFormatSymbols();
 
@@ -122,17 +100,5 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
             return kursIndonesia.format(n);
         }
 
-        public String formatDate(String date) {
-            try {
-                SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-                Date newDate = format.parse(date);
-
-                format = new SimpleDateFormat("dd-MMM-yyyy");
-                return new String(format.format(newDate));
-            }catch (Exception e){
-                Crashlytics.logException(e);
-            }
-            return null;
-        }
     }
 }
