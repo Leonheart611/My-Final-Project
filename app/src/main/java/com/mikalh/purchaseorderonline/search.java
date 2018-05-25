@@ -37,12 +37,12 @@ import com.mikalh.purchaseorderonline.Pager.SearchPagger;
 public class search extends AppCompatActivity implements ItemAdapter.OnItemSelectedListener{
     private Toolbar searchToolBar;
     TabLayout searchTab;
-    Query query;
+    Query query,queryKategori;
     FirebaseFirestore firestore;
     FirebaseUser user;
     FirebaseAuth auth;
     CardView searchItem_cardView;
-    ItemAdapter itemAdapter;
+    ItemAdapter itemAdapter,itemAdapterKategori;
     RecyclerView itemRV_search;
     public static final String KEY_ITEM_ID = "keyItemID";
     @Override

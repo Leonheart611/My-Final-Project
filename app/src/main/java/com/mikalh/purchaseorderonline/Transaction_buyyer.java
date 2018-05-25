@@ -1,9 +1,14 @@
 package com.mikalh.purchaseorderonline;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,6 +39,7 @@ public class Transaction_buyyer extends Fragment implements TransactionAdapter.O
     Query query;
     TransactionAdapter adapter;
     RecyclerView transactionList_RV;
+    public static String KEY_UID = "id";
     private OnFragmentInteractionListener mListener;
     //Deklarasi Variable
 
@@ -133,6 +139,18 @@ public class Transaction_buyyer extends Fragment implements TransactionAdapter.O
 
     @Override
     public void onTransactionSelectedListener(DocumentSnapshot transaction) {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    1);
+        }else {
+            String ID = transaction.getId();
+            Intent i =  new Intent(getActivity(),DetailPesanan.class);
+            i.putExtra(KEY_UID,ID);
+            startActivity(i);
+        }
 
     }
 
