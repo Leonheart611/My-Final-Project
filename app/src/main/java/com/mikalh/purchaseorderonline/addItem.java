@@ -113,8 +113,6 @@ public class addItem extends AppCompatActivity {
         imageItem_add = findViewById(R.id.itemImage_add);
         Kategori = findViewById(R.id.Kategori);
         //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        ArrayAdapter waktu = new ArrayAdapter(this,android.R.layout.simple_spinner_item,pilihanTime);
-        pilihanWaktu.setAdapter(waktu);
         ArrayAdapter kategoriAdapter = new ArrayAdapter(this,android.R.layout.simple_spinner_item,kategori);
         Kategori.setAdapter(kategoriAdapter);
 

@@ -312,6 +312,7 @@ public class detailItem extends AppCompatActivity {
                                         arrayUserID.put("Telp",userCompany.getNomorTelphone());
                                         arrayUserID.put("Fax",userCompany.getNo_fax());
                                         arrayUserID.put("IDPenjual",item.getUserId());
+                                        arrayUserID.put("IDPembeli",user.getUid());
                                         arrayUserID.put("StatusPO","Belum Di buat PO");
                                         arrayUserID.put("MakePO",false);
                                         firestore.collection("Cart").document(myId).set(arrayUserID).addOnFailureListener(new OnFailureListener() {

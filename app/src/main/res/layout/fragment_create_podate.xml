@@ -199,7 +199,7 @@
         app:layout_constraintTop_toTopOf="@+id/textView29" />
 
     <Button
-        android:id="@+id/nextPO"
+        android:id="@+id/nextPO_detail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
@@ -211,16 +211,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/createPO_RV" />
+        app:layout_constraintTop_toBottomOf="@+id/createPO_RV_detail" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/createPO_RV"
+        android:id="@+id/createPO_RV_detail"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/nextPO"
+        app:layout_constraintBottom_toTopOf="@+id/nextPO_detail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView29"
@@ -234,7 +234,7 @@
         android:text="TextView"
         android:textColor="@android:color/black"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/nextPO"
+        app:layout_constraintEnd_toStartOf="@+id/nextPO_detail"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/textView21"
         app:layout_constraintTop_toBottomOf="@+id/textView21" />
@@ -248,6 +248,6 @@
         android:textColor="@android:color/black"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/createPO_RV" />
+        app:layout_constraintTop_toBottomOf="@+id/createPO_RV_detail" />
 
 </android.support.constraint.ConstraintLayout>

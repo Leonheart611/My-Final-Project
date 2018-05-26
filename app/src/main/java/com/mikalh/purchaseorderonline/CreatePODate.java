@@ -11,7 +11,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,6 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,14 +32,11 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
-import com.google.gson.Gson;
 import com.mikalh.purchaseorderonline.Adapter.CreatePOAdapter;
 import com.mikalh.purchaseorderonline.Model.Counter;
 import com.mikalh.purchaseorderonline.Model.Shard;
 import com.mikalh.purchaseorderonline.Model.User;
 
-import java.math.BigDecimal;
-import java.nio.charset.CodingErrorAction;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -49,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 
 public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePOSelectedListener{
@@ -73,6 +69,8 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
     String noPOS;
     Task<Integer> counter = null;
     User myUser;
+    Random rand = new Random();
+    int  n = rand.nextInt(100) + 1;
     public CreatePODate() {
         // Required empty public constructor
     }
@@ -225,8 +223,8 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
         noTelpnPO = v.findViewById(R.id.noTelpnPO);
         faxPO = v.findViewById(R.id.faxPO);
         totalHargaPO = v.findViewById(R.id.totalHargaPO);
-        createPO_RV = v.findViewById(R.id.createPO_RV);
-        nextPO = v.findViewById(R.id.nextPO);
+        createPO_RV = v.findViewById(R.id.createPO_RV_detail);
+        nextPO = v.findViewById(R.id.nextPO_detail);
         adapter = new CreatePOAdapter(query,this){
             @Override
             protected void onDataChanged() {
@@ -267,7 +265,7 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
                 String Fax = snapshot.get("Fax").toString();
                 int TotalHarga = Integer.parseInt(snapshot.get("GrandTotal").toString());
                 String Grandtotal = formatRP(TotalHarga);
-                noPOS = tanggalDepan + "/" + user.getDisplayName().substring(1, 3) + "/" + tanggalbulan + "/PO" +1+"/" + tanggaltahun;
+                noPOS = tanggalDepan + "/" + user.getDisplayName().substring(1, 3) + "/" + tanggalbulan + "/PO" +n+"/" + tanggaltahun;
                 noPO.setText(": "+noPOS);
                 tanggalPO.setText(": "+tanggal);
                 penerimaPO.setText(": "+namaPIC);

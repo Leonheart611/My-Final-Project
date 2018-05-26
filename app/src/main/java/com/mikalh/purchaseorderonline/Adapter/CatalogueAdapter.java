@@ -44,22 +44,22 @@ public class CatalogueAdapter extends FirestoreAdapter<CatalogueAdapter.Catalogu
 
     public static class CatalogueHolder extends RecyclerView.ViewHolder {
         ImageView img_catalogue;
-        TextView namaBarang_catalogue;
+        TextView namaBarang_catalogue,kategori_catalogue;
         public CatalogueHolder(View itemView) {
             super(itemView);
             img_catalogue = itemView.findViewById(R.id.img_catalogue);
             namaBarang_catalogue = itemView.findViewById(R.id.namaBarang_catalogue);
+            kategori_catalogue = itemView.findViewById(R.id.kategori_catalogue);
         }
         public void bind(final DocumentSnapshot snapshot, final OnClickCatalogueListener listener){
             Item item = snapshot.toObject(Item.class);
-            /*if (!item.getImageItemUrl().isEmpty()) {
+            if (!item.getImageItemUrl().isEmpty()) {
                 Glide.with(img_catalogue.getContext())
                         .load(item.getImageItemUrl())
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true)
                         .into(img_catalogue);
-            }*/
+            }
             namaBarang_catalogue.setText(item.getNama_barang());
+            kategori_catalogue.setText(item.getKategori());
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
