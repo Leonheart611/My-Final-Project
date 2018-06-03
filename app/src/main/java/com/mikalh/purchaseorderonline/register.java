@@ -48,10 +48,7 @@ public class register extends AppCompatActivity {
         myViewPager.setAdapter(registerPager);
 
         inkPageIndicator.setViewPager(myViewPager);
-
-
     }
-
 
     void Register(){
         final String Email = email_register.getText().toString();

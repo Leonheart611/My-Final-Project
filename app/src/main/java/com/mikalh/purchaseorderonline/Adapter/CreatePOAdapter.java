@@ -4,8 +4,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.mikalh.purchaseorderonline.Model.Cart;
@@ -41,6 +43,7 @@ public class CreatePOAdapter  extends FirestoreAdapter<CreatePOAdapter.CreatePOA
 
     public static class CreatePOAdapterHolder extends RecyclerView.ViewHolder{
         TextView namaItem_PO,banyakBarang_PO,totalHarga_PO,quantitas_PO,hargaSatuan_PO;
+        ImageView imagePO;
         public CreatePOAdapterHolder(View itemView) {
             super(itemView);
             namaItem_PO = itemView.findViewById(R.id.namaItem_PO);
@@ -48,6 +51,7 @@ public class CreatePOAdapter  extends FirestoreAdapter<CreatePOAdapter.CreatePOA
             totalHarga_PO = itemView.findViewById(R.id.totalHarga_PO);
             quantitas_PO = itemView.findViewById(R.id.quantitas_PO);
             hargaSatuan_PO = itemView.findViewById(R.id.hargaSatuan_PO);
+            imagePO = itemView.findViewById(R.id.image_PO);
         }
         public void bind(final DocumentSnapshot snapshot, final OnCreatePOSelectedListener listener){
             Cart cart = snapshot.toObject(Cart.class);
@@ -57,6 +61,21 @@ public class CreatePOAdapter  extends FirestoreAdapter<CreatePOAdapter.CreatePOA
             totalHarga_PO.setText(totalHarga);
             quantitas_PO.setText(cart.getUnit());
             hargaSatuan_PO.setText("@ "+cart.getHarga_barang());
+            if (!cart.getImageItemUrl().isEmpty()){
+                Glide.with(imagePO.getContext())
+                        .load(cart.getImageItemUrl())
+                        .into(imagePO);
+            }
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (listener!=null){
+                        if (listener != null){
+                            listener.onCreatePOSelectedListener(snapshot);
+                        }
+                    }
+                }
+            });
         }
         public String formatRP (Integer n){
             DecimalFormat kursIndonesia = (DecimalFormat) DecimalFormat.getCurrencyInstance();

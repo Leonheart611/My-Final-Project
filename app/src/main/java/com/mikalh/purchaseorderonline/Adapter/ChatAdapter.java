@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -91,6 +92,11 @@ public class ChatAdapter extends FirestoreAdapter<ChatAdapter.ChatHolder> {
             text_message_body.setText(chat.getMessage());
             text_message_time.setText(time);
             text_message_name.setText(chat.getSender_name());
+            if (image_message_profile != null){
+                Glide.with(image_message_profile.getContext())
+                        .load(chat.getSenderImageUrl())
+                        .into(image_message_profile);
+            }
             itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

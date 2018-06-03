@@ -31,7 +31,7 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
     FirebaseAuth auth;
     FirebaseUser user;
     private OnFragmentInteractionListener mListener;
-
+    ViewPager mainPagger;
     public home() {
         // Required empty public constructor
     }
@@ -55,6 +55,7 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
         }
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
+        mainPagger = getActivity().findViewById(R.id.mainPagger);
     }
 
     @Override
@@ -128,8 +129,7 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
             startActivity(i);
         }
         if(view == myOrderImage || view == myOrderTxt){
-            Intent i = new Intent(getActivity(),MyOrder.class);
-            startActivity(i);
+            mainPagger.setCurrentItem(1,true);
         }
     }
 

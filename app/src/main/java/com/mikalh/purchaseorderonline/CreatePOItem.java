@@ -7,10 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +27,24 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
 
 
 public class CreatePOItem extends Fragment {
@@ -53,6 +66,8 @@ public class CreatePOItem extends Fragment {
     String tanggalHariIni;
     SharedPreferences mPref;
     String NoPO;
+    String Key = "key=AAAAx1NMbj0:APA91bHv2Yky3eenD79mwmY1unL3bLEI57VLpDkFoxQ2rfowQXju2DkeRV4_SvOF-LCaO9IsZfAhFIliTTeo5RPs5EwBxlImuoeDlfBzKsTDEiHsGBqtJlp8fCNgHEjlOAx9UqU_mWaT";
+    String NotificationTarget;
     public CreatePOItem() {
         // Required empty public constructor
     }
@@ -83,6 +98,15 @@ public class CreatePOItem extends Fragment {
         tanggalHariIni = df.format(c);
         mPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         NoPO = mPref.getString("NoPO","");
+        firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot snapshot = task.getResult();
+                    NotificationTarget = snapshot.get("PenjualNotif").toString();
+                }
+            }
+        });
     }
 
     @Override
@@ -90,6 +114,7 @@ public class CreatePOItem extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_create_poitem, container, false);
+
         tanggalPermintaanKirim = v.findViewById(R.id.tanggalPermintaanKirim);
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -100,7 +125,6 @@ public class CreatePOItem extends Fragment {
                 updateLabel(tanggalPermintaanKirim);
             }
         };
-
         tanggalPermintaanKirim.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,6 +177,66 @@ public class CreatePOItem extends Fragment {
         String myFormat = "dd-MMM-yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
         textInputEditText.setText(sdf.format(myCalendar.getTime()));
+    }
+    public class Sendnotif extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... arg0) {
+            try {
+                URL url = new URL("https://fcm.googleapis.com/fcm/send");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(30000);
+                conn.setConnectTimeout(30000);
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Authorization", Key);
+                conn.setRequestProperty("Content-Type", "application/json");
+
+
+                JSONObject notification = new JSONObject();
+                notification.put("body", "You Have New Purchase Order");
+
+                JSONObject postDataParam = new JSONObject();
+                postDataParam.put("to", notification);
+                postDataParam.put("notification", notification);
+                Log.e("param", postDataParam.toString());
+
+                OutputStream os = conn.getOutputStream();
+                OutputStreamWriter writer = new OutputStreamWriter(os, "UTF-8");
+                writer.write(postDataParam.toString());
+                writer.flush();
+                writer.close();
+                os.close();
+
+
+                int responseCode = conn.getResponseCode();
+
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream()));
+                    StringBuffer sb = new StringBuffer();
+                    String line = "";
+                    while ((line = in.readLine()) != null) {
+                        sb.append(line);
+                        break;
+                    }
+                    in.close();
+                    return sb.toString();
+                } else {
+                    return new String("False: " + responseCode);
+
+                }
+
+            } catch (Exception e) {
+                return new String("Exception: " + e.getMessage());
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+        }
     }
 
     /*@Override

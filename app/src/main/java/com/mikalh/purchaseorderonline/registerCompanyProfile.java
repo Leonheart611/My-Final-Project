@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 
 import com.github.kimkevin.cachepot.CachePot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mikalh.purchaseorderonline.Model.Company;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
@@ -27,13 +28,10 @@ import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
  * create an instance of this fragment.
  */
 public class registerCompanyProfile extends android.support.v4.app.Fragment implements View.OnClickListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     public static final String COMPANY_KEY = "company";
     registerUser next = new registerUser();
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     String[] listProvince = new String[]{
@@ -79,20 +77,10 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment impl
     TextInputEditText companyName_register, adress_register
             ,city_register,telephone_register,fax_register;
     SearchableSpinner province_register;
-    ImageView logoCompany_register;
     public registerCompanyProfile() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment registerCompanyProfile.
-     */
-    // TODO: Rename and change types and number of parameters
     public static registerCompanyProfile newInstance(String param1, String param2) {
         registerCompanyProfile fragment = new registerCompanyProfile();
         Bundle args = new Bundle();
@@ -101,7 +89,6 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment impl
         fragment.setArguments(args);
         return fragment;
     }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,7 +115,6 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment impl
         province_register.setAdapter(adapter);
         province_register.setTitle("Select Province");
         myViewPagger = getActivity().findViewById(R.id.myViewPagger);
-
 
         return view;
     }
@@ -180,18 +166,6 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment impl
 
         }
     }
-
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);

@@ -1,6 +1,8 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,8 +14,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.mikalh.purchaseorderonline.Adapter.CreatePOAdapter;
 import com.mikalh.purchaseorderonline.Adapter.TransactionAdapter;
+import com.mikalh.purchaseorderonline.Model.Cart;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -61,6 +67,7 @@ public class DetailPesanan_DataItem extends Fragment implements CreatePOAdapter.
     Query query;
     String ID;
     ViewPager paggerDetailPesanan;
+    int TotalHarga;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +139,8 @@ public class DetailPesanan_DataItem extends Fragment implements CreatePOAdapter.
                     String Telp = snapshot.get("Telp").toString();
                     String Fax = snapshot.get("Fax").toString();
                     String noPO = snapshot.get("StatusPO").toString();
-                    int TotalHarga = Integer.parseInt(snapshot.get("GrandTotal").toString());
+                    String tanggal = snapshot.get("tanggalPembuatanPO").toString();
+                    TotalHarga = Integer.parseInt(snapshot.get("GrandTotal").toString());
                     String Grandtotal = formatRP(TotalHarga);
 
                     noPO_detail.setText(noPO);
@@ -143,6 +151,7 @@ public class DetailPesanan_DataItem extends Fragment implements CreatePOAdapter.
                     alamatPO_detail.setText(Alamat);
                     penerimaPO_detail.setText(namaPIC);
                     totalHargaPO_detail.setText(Grandtotal);
+                    tanggalPO_detail.setText(tanggal);
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -151,8 +160,6 @@ public class DetailPesanan_DataItem extends Fragment implements CreatePOAdapter.
                 Crashlytics.logException(e);
             }
         });
-
-
         return v;
     }
     public String formatRP (Integer n){
@@ -166,8 +173,6 @@ public class DetailPesanan_DataItem extends Fragment implements CreatePOAdapter.
 
         return kursIndonesia.format(n);
     }
-
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -204,11 +209,76 @@ public class DetailPesanan_DataItem extends Fragment implements CreatePOAdapter.
 
     @Override
     public void onCreatePOSelectedListener(DocumentSnapshot cart) {
+       /* String id = cart.getId();
+        popUpDetailItem(id);*/
+    }
+    public void popUpDetailItem(final String id){
+        final Dialog dialog = new Dialog(getActivity());
+        final int[] hargaKurang = new int[1];
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.create_po_item_delete);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        //This makes the dialog take up the full width
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(lp);
+        final TextView namaBarang_createPO, banyakBarang_createPO,totalBarang_createPO,satuanBarang_createPO;
+        final Button deleteDo_createPO;
+        namaBarang_createPO = dialog.findViewById(R.id.namaBarang_createPO);
+        banyakBarang_createPO = dialog.findViewById(R.id.banyakBarang_createPO);
+        totalBarang_createPO = dialog.findViewById(R.id.totalBarang_createPO);
+        satuanBarang_createPO = dialog.findViewById(R.id.satuanBarang_createPO);
+        deleteDo_createPO = dialog.findViewById(R.id.deleteDo_createPO);
+        deleteDo_createPO.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                firestore.collection("Cart").document(ID).collection("ItemList").document(id).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            int HasilTotal = TotalHarga - hargaKurang[0];
+                            if (HasilTotal==0){
+                                firestore.collection("Cart").document(id).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()){
+                                            dialog.dismiss();
+                                            Intent i = new Intent(getActivity(),SendPO.class);
+                                            startActivity(i);
+                                            Toast.makeText(getActivity(),"Cart Kosong",Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
+                            }else {
+                                firestore.collection("Cart").document(id).update("GrandTotal",HasilTotal);
+                                dialog.dismiss();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        firestore.collection("Cart").document(ID).collection("ItemList").document(id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot snapshot = task.getResult();
+                    Cart cart = snapshot.toObject(Cart.class);
+                    namaBarang_createPO.setText(cart.getNama_barang());
+                    banyakBarang_createPO.setText(cart.getQuantitas_banyakBarang()+"");
+                    totalBarang_createPO.setText(cart.getTotalHargaBarang()+"");
+                    satuanBarang_createPO.setText(cart.getUnit());
+                    hargaKurang[0] = cart.getTotalHargaBarang();
+                    dialog.show();
+                }
+            }
+        });
 
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

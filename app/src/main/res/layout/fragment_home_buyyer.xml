@@ -21,28 +21,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView13"
+        android:id="@+id/search_buyyerTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:text="My Profile"
-        android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@+id/myProfile_buyyer"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/myProfile_buyyer"
-        app:layout_constraintTop_toTopOf="@+id/myProfile_buyyer" />
-
-    <TextView
-        android:id="@+id/textView14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginBottom="9dp"
         android:layout_marginTop="8dp"
         android:text="Search"
         android:textColor="@android:color/black"
@@ -50,7 +32,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/search_buyyer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/search_buyyer"
+        app:layout_constraintStart_toStartOf="@+id/profileBuyyer_txt"
         app:layout_constraintTop_toTopOf="@+id/search_buyyer" />
 
     <ImageButton
@@ -66,28 +48,32 @@
 
     <ImageButton
         android:id="@+id/send_po"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
+        android:layout_width="0dp"
+        android:layout_height="62dp"
         android:layout_marginTop="32dp"
+        android:adjustViewBounds="true"
         android:background="@android:color/transparent"
-        android:src="@mipmap/send_po"
-        app:layout_constraintStart_toStartOf="parent"
+        android:cropToPadding="true"
+        android:scaleType="fitXY"
+        android:src="@mipmap/cart"
+        app:layout_constraintEnd_toEndOf="@+id/search_buyyer"
+        app:layout_constraintStart_toStartOf="@+id/search_buyyer"
         app:layout_constraintTop_toBottomOf="@+id/search_buyyer" />
 
     <TextView
+        android:id="@+id/sent_buyyerTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Send Purchase Order"
+        android:text="Cart"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/send_po"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/send_po"
+        app:layout_constraintStart_toStartOf="@+id/search_buyyerTxt"
         app:layout_constraintTop_toTopOf="@+id/send_po" />
 
     <ImageButton
@@ -102,11 +88,11 @@
         app:layout_constraintTop_toBottomOf="@+id/send_po" />
 
     <TextView
-        android:id="@+id/textView16"
+        android:id="@+id/logOut_buyyerTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         android:text="Log Out"
         android:textColor="@android:color/black"
@@ -116,5 +102,21 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/logout_buyyer"
         app:layout_constraintTop_toTopOf="@+id/logout_buyyer" />
+
+    <TextView
+        android:id="@+id/profileBuyyer_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="164dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="8dp"
+        android:text="Profile"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/myProfile_buyyer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/myProfile_buyyer"
+        app:layout_constraintTop_toTopOf="@+id/myProfile_buyyer" />
 
 </android.support.constraint.ConstraintLayout>

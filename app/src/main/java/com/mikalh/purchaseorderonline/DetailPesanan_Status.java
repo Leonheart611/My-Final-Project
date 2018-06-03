@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.Continuation;
@@ -80,7 +81,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
     FirebaseAuth auth;
     FirebaseFirestore firestore;
     FirebaseUser user;
-    String ID,tanggalPengiriman;
+    String ID,tanggalPengiriman,nomorPO;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,7 +114,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                 tanggalPengiriman = snapshot.get("tanggalPermintaanKirim").toString();
                 String Alamat = snapshot.get("alamatPengiriman").toString();
                 String Status = snapshot.get("StatusPO").toString();
-
+                nomorPO = snapshot.get("NomorPO").toString();
                 tanggalPermintaanKirim_detail.setText(tanggalPengiriman, TextView.BufferType.EDITABLE);
                 AlamatPengiriman_detail.setText(Alamat, TextView.BufferType.EDITABLE);
                 statusKirimPO.setText(Status);
@@ -312,6 +313,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                 String dataPDF = jsonObject.getString("response");
                 ConvertToPDF(dataPDF);
                 Log.e("Result",s);
+                Toast.makeText(getActivity(),"PDF berhasil di buat mohon cek di bagian file Download",Toast.LENGTH_LONG).show();
 
             }catch (Exception e){
                 e.printStackTrace();
@@ -321,8 +323,8 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
         }
     }
     public void ConvertToPDF(String data) throws Exception{
-        String filesDirPath = Environment.getExternalStorageDirectory().toString() +"/" + "DataPDF";
-        final File dwldsPath = new File(filesDirPath+"Testing.pdf");
+        String filesDirPath = Environment.getExternalStorageDirectory().toString() +"/Download";
+        final File dwldsPath = new File(filesDirPath+nomorPO+".pdf");
         byte[] pdfAsBytes = Base64.decode(data, 0);
         FileOutputStream os;
         os = new FileOutputStream(dwldsPath, false);

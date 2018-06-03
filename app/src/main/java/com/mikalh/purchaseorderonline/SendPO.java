@@ -55,14 +55,12 @@ public class SendPO extends AppCompatActivity implements POActiveAdapter.OnPOSel
                 super.onError(e);
                 Crashlytics.logException(e);
             }
-
         };
         poActive_RC.setAdapter(adapter);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setSmoothScrollbarEnabled(true);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         poActive_RC.setLayoutManager(llm);
-
     }
 
     @Override
@@ -83,5 +81,12 @@ public class SendPO extends AppCompatActivity implements POActiveAdapter.OnPOSel
         Intent i =  new Intent(SendPO.this,CreatePO.class);
         i.putExtra(KEY_UID,ID);
         startActivity(i);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(SendPO.this,buyerActivity.class);
+        startActivity(i);
+        onDestroy();
     }
 }

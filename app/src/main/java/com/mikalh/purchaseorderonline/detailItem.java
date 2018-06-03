@@ -55,7 +55,7 @@ import javax.security.auth.login.LoginException;
 
 public class detailItem extends AppCompatActivity {
     private String KEY_ITEM_ID;
-    public static String SENDER_ID = "senderId", RECIEVER_ID = "recieverId",KEY_ID = "ItemID",ROOMID = "RoomId";
+    public static String SENDER_ID = "senderId", RECIEVER_ID = "recieverId",KEY_ID = "ItemID",ROOMID = "RoomId",NAMA="nama";
     TextInputEditText namaBarang_detail,hargaBarang_detail,unit_detail;
     TextView namaPerusahaan_detail;
     ImageView imageBarang_detail;
@@ -130,7 +130,7 @@ public class detailItem extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 firestore.collection("RoomChat").whereEqualTo("Users."+user.getUid(),true).
-                        whereEqualTo("Users."+item.getUserId(),true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        whereEqualTo("Users."+item.getUserId(),true).whereEqualTo("itemID",KEY_ITEM_ID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         Log.e("Hasil Query masa kosong",task.toString());
@@ -144,6 +144,7 @@ public class detailItem extends AppCompatActivity {
                              i.putExtra(RECIEVER_ID,item.getUserId());
                              i.putExtra(KEY_ID,KEY_ITEM_ID);
                              i.putExtra(ROOMID,Id);
+                             i.putExtra(NAMA,item.getNamaPerusahaan());
                              startActivity(i);
                          }else {
                              DocumentReference ref = firestore.collection("RoomChat").document();
@@ -155,6 +156,7 @@ public class detailItem extends AppCompatActivity {
                              roomChat.put("Users",users);
                              roomChat.put("itemID",KEY_ITEM_ID);
                              roomChat.put("senderName",user.getDisplayName());
+                             roomChat.put("sellerName",item.getNamaPerusahaan());
                              Log.e("ID Data",myId);
                              firestore.collection("RoomChat").document(myId).set(roomChat).addOnCompleteListener(new OnCompleteListener<Void>() {
                                  @Override
@@ -315,6 +317,8 @@ public class detailItem extends AppCompatActivity {
                                         arrayUserID.put("IDPembeli",user.getUid());
                                         arrayUserID.put("StatusPO","Belum Di buat PO");
                                         arrayUserID.put("MakePO",false);
+                                        arrayUserID.put("PembeliNotif",userCompany.getNotificationId());
+                                        arrayUserID.put("PenjualNotif",item.getNotificationId());
                                         firestore.collection("Cart").document(myId).set(arrayUserID).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {

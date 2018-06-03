@@ -8,6 +8,42 @@
 
     <!-- TODO: Update blank fragment layout -->
 
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Logo Perusahaan"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout10" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imagePerusahaan_add"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/profile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imageView4"
+        android:layout_width="27dp"
+        android:layout_height="27dp"
+        android:layout_marginStart="45dp"
+        android:background="@drawable/circle_background"
+        android:backgroundTint="@android:color/holo_blue_bright"
+        android:src="@drawable/add_icon"
+        app:layout_constraintBottom_toBottomOf="@+id/imagePerusahaan_add"
+        app:layout_constraintStart_toStartOf="@+id/imagePerusahaan_add"
+        app:layout_constraintTop_toTopOf="@+id/imagePerusahaan_add"
+        app:layout_constraintVertical_bias="1.0" />
+
     <android.support.design.widget.TextInputLayout
         android:id="@+id/textInputLayout6"
         android:layout_width="0dp"
@@ -113,5 +149,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout10" />
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout10"
+        app:layout_constraintVertical_bias="0.98" />
 </android.support.constraint.ConstraintLayout>

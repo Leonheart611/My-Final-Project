@@ -1,8 +1,13 @@
 package com.mikalh.purchaseorderonline;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +36,7 @@ public class Transaction_fragment extends android.support.v4.app.Fragment implem
     FirebaseAuth auth;
     FirebaseUser user;
     TransactionAdapter adapter;
+    public static String KEY_UID = "id";
     private String mParam1;
     private String mParam2;
 
@@ -138,7 +144,18 @@ public class Transaction_fragment extends android.support.v4.app.Fragment implem
 
     @Override
     public void onTransactionSelectedListener(DocumentSnapshot transaction) {
-
+        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    1);
+        }else {
+            String ID = transaction.getId();
+            Intent i =  new Intent(getActivity(),DetailPesanan.class);
+            i.putExtra(KEY_UID,ID);
+            startActivity(i);
+        }
     }
 
     public interface OnFragmentInteractionListener {

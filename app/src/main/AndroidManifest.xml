@@ -60,7 +60,8 @@
         </activity>
         <activity android:name=".CreatePO" />
         <activity android:name=".SendPO" />
-        <activity android:name=".DetailPesanan"></activity>
+        <activity android:name=".DetailPesanan" />
+        <activity android:name=".SearchResult"></activity>
     </application>
 
 </manifest>

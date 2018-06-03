@@ -1,39 +1,32 @@
 package com.mikalh.purchaseorderonline;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.ServerTimestamp;
 import com.mikalh.purchaseorderonline.Adapter.ChatAdapter;
 import com.mikalh.purchaseorderonline.Model.Chat;
-import com.mikalh.purchaseorderonline.Model.Item;
 import com.mikalh.purchaseorderonline.Model.User;
 
 import java.text.SimpleDateFormat;
@@ -44,9 +37,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import io.fabric.sdk.android.services.common.Crash;
-
 public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatListenerListener {
+    public static String IDSeller= "ID";
     RecyclerView reyclerview_message;
     EditText edittext_chatbox;
     Button button_chatbox;
@@ -59,18 +51,53 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
     ArrayList<String> userList;
     final Date calendar = Calendar.getInstance().getTime();
     Chat chat;
+    String imageUrl;
+    String sellerID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_chat);
         reyclerview_message = findViewById(R.id.reyclerview_message_list);
         firestore = FirebaseFirestore.getInstance();
+        RoomId = getIntent().getExtras().getString(detailItem.ROOMID);
+        firestore.collection("RoomChat").document(RoomId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot snapshot = task.getResult();
+                    String itemId = snapshot.get("itemID").toString();
+                    firestore.collection("Items").document(itemId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()){
+                                DocumentSnapshot snapshot1 = task.getResult();
+                                String nama = snapshot1.get("nama_barang").toString();
+                                setTitle(nama);
+                                sellerID = snapshot1.get("userId").toString();
+                            }
+                        }
+                    });
+
+                }
+            }
+        });
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         senderId = getIntent().getExtras().getString(detailItem.SENDER_ID);
-        RoomId = getIntent().getExtras().getString(detailItem.ROOMID);
-        query = firestore.collection("RoomChat").document(RoomId).collection("ChatList").orderBy("time").limit(20);
 
+        query = firestore.collection("RoomChat").document(RoomId).collection("ChatList").orderBy("time").limit(20);
+        firestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                User user = task.getResult().toObject(User.class);
+                imageUrl = user.getUrl_pictLogo();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Crashlytics.logException(e);
+            }
+        });
 
         adapter = new ChatAdapter(query,this,user){
             @Override
@@ -117,11 +144,12 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                 final String tanggal = formatDate(date);
                 if (!ChatValue.isEmpty()) {
                     edittext_chatbox.setText("");
-                    chat = new Chat(user.getUid(),user.getDisplayName(),ChatValue,tanggal,time);
+                    chat = new Chat(user.getUid(),user.getDisplayName(),ChatValue,tanggal,time,imageUrl);
                     final Map<String,Object> lastChat = new HashMap<>();
                     lastChat.put("message",chat.getMessage());
                     lastChat.put("name",chat.getSender_name());
                     lastChat.put("time",chat.getTime());
+                    lastChat.put("image",imageUrl);
                     //add to Conversasion session
                     firestore.collection("RoomChat").document(RoomId).collection("ChatList").add(chat).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                         @Override
@@ -148,8 +176,6 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                             Crashlytics.logException(e);
                         }
                     });
-
-
                 }
             }
         });
@@ -183,6 +209,7 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
         }
         return null;
     }
+
     public static String formatDate(String date) {
         try {
             SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
@@ -194,5 +221,25 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
             Crashlytics.logException(e);
         }
         return null;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.catalog_chat, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.moreItem_chat:
+                Intent i = new Intent(getApplicationContext(),SearchResult.class);
+                i.putExtra(IDSeller,sellerID);
+                startActivity(i);
+                return true;
+            default:
+                return false;
+        }
     }
 }

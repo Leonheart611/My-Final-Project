@@ -1,7 +1,24 @@
 package com.mikalh.purchaseorderonline.Model;
 
+import android.net.Uri;
+
 public class LastChat {
-    String message,name,time;
+    String message,name,time,image;
+
+    public LastChat(String message, String name, String time, String image) {
+        this.message = message;
+        this.name = name;
+        this.time = time;
+        this.image = image;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 
     public LastChat() {
     }
