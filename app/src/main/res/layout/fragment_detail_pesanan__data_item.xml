@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".DetailPesanan_DataItem">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:id="@+id/textView20"
         android:layout_width="0dp"
@@ -198,7 +197,7 @@
         app:layout_constraintTop_toTopOf="@+id/textView29" />
 
     <Button
-        android:id="@+id/nextPO_detail"
+        android:id="@+id/nextPO_POBuyer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
@@ -210,16 +209,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/createPO_RV_detail" />
+        app:layout_constraintTop_toBottomOf="@+id/createPO_RV_POBuyer" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/createPO_RV_detail"
+        android:id="@+id/createPO_RV_POBuyer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/nextPO_detail"
+        app:layout_constraintBottom_toTopOf="@+id/nextPO_POBuyer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView29"
@@ -233,7 +232,7 @@
         android:text="TextView"
         android:textColor="@android:color/black"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/nextPO_detail"
+        app:layout_constraintEnd_toStartOf="@+id/nextPO_POBuyer"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/textView21"
         app:layout_constraintTop_toBottomOf="@+id/textView21" />
@@ -247,6 +246,6 @@
         android:textColor="@android:color/black"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/createPO_RV_detail" />
+        app:layout_constraintTop_toBottomOf="@+id/createPO_RV_POBuyer" />
 
 </android.support.constraint.ConstraintLayout>

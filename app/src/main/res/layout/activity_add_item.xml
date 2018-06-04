@@ -32,7 +32,6 @@
         android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="Price"
-        android:inputType="number"
         android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

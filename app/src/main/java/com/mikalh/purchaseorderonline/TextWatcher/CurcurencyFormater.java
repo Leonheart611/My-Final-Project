@@ -34,7 +34,6 @@ public class CurcurencyFormater implements TextWatcher {
 
         if (!editable.toString().equals(current)) {
             editText.removeTextChangedListener(this);
-
             Locale local = new Locale("US", "id");
             String replaceable = String.format("[Rp,.\\s]",
                     NumberFormat.getCurrencyInstance().getCurrency()

@@ -232,8 +232,8 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
         noTelpnPO = v.findViewById(R.id.noTelpnPO);
         faxPO = v.findViewById(R.id.faxPO);
         totalHargaPO = v.findViewById(R.id.totalHargaPO);
-        createPO_RV = v.findViewById(R.id.createPO_RV_detail);
-        nextPO = v.findViewById(R.id.nextPO_detail);
+        createPO_RV = v.findViewById(R.id.createPO_RV_POBuyer);
+        nextPO = v.findViewById(R.id.nextPO_POBuyer);
         adapter = new CreatePOAdapter(query,this){
             @Override
             protected void onDataChanged() {
@@ -405,6 +405,7 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
                                             Map<String,Object> updateData = new HashMap<>();
                                             updateData.put("GrandTotal",HasilTotal);
                                             updateData.put("BanyakData",BanyakData);
+                                            updateData.put("LinkBuktiBayar","");
                                             firestore.collection("Cart").document(ID).update(updateData).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {

@@ -75,6 +75,11 @@ public class TransactionAdapter extends FirestoreAdapter<TransactionAdapter.Tran
             total_transaction.setText(GrandTotal);
             quantitas_transaction.setText(banyakBarang+"");
             tanggalPengiriman_transaction.setText(tanggalPermintaanKirim);
+            if (!Status.equals("Selesai")){
+                statusComplete_transaction.setImageResource(R.mipmap.tanda_seru);
+            }else {
+
+            }
 
 
             itemView.setOnClickListener(new View.OnClickListener() {

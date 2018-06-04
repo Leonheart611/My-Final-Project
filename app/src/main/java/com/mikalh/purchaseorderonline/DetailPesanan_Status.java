@@ -23,18 +23,15 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.User;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -46,9 +43,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -102,7 +97,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
         View v = inflater.inflate(R.layout.fragment_detail_pesanan__status, container, false);
         tanggalPermintaanKirim_detail = v.findViewById(R.id.tanggalPermintaanKirim_detail);
         AlamatPengiriman_detail = v.findViewById(R.id.AlamatPengiriman_detail);
-        updateStatus_detail = v.findViewById(R.id.updateStatus_detail);
+        updateStatus_detail = v.findViewById(R.id.pesananSudahDikirim);
         updateStatus_detail.setOnClickListener(this);
         convertPdf_detail = v.findViewById(R.id.convertPdf_detail);
         convertPdf_detail.setOnClickListener(this);
@@ -314,7 +309,6 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                 ConvertToPDF(dataPDF);
                 Log.e("Result",s);
                 Toast.makeText(getActivity(),"PDF berhasil di buat mohon cek di bagian file Download",Toast.LENGTH_LONG).show();
-
             }catch (Exception e){
                 e.printStackTrace();
                 Crashlytics.logException(e);
@@ -323,7 +317,8 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
         }
     }
     public void ConvertToPDF(String data) throws Exception{
-        String filesDirPath = Environment.getExternalStorageDirectory().toString() +"/Download";
+        String filesDirPath = Environment.getExternalStorageDirectory().toString() +"/Download/";
+        nomorPO = nomorPO.replace("/","");
         final File dwldsPath = new File(filesDirPath+nomorPO+".pdf");
         byte[] pdfAsBytes = Base64.decode(data, 0);
         FileOutputStream os;

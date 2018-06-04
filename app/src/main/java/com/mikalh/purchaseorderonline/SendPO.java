@@ -85,8 +85,6 @@ public class SendPO extends AppCompatActivity implements POActiveAdapter.OnPOSel
 
     @Override
     public void onBackPressed() {
-        Intent i = new Intent(SendPO.this,buyerActivity.class);
-        startActivity(i);
-        onDestroy();
+        finish();
     }
 }

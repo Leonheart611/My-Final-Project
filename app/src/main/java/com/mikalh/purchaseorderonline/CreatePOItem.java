@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -150,9 +151,8 @@ public class CreatePOItem extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
-                            Intent i = new Intent(getActivity(),buyerActivity.class);
-                            startActivity(i);
-                            Toast.makeText(getActivity(),"PO Berhasil di kirim, Untuk update cek Bagian Transaksi",Toast.LENGTH_LONG).show();
+                            new Sendnotif().execute();
+
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -179,7 +179,6 @@ public class CreatePOItem extends Fragment {
         textInputEditText.setText(sdf.format(myCalendar.getTime()));
     }
     public class Sendnotif extends AsyncTask<String, Void, String> {
-
         @Override
         protected String doInBackground(String... arg0) {
             try {
@@ -198,7 +197,7 @@ public class CreatePOItem extends Fragment {
                 notification.put("body", "You Have New Purchase Order");
 
                 JSONObject postDataParam = new JSONObject();
-                postDataParam.put("to", notification);
+                postDataParam.put("to",NotificationTarget);
                 postDataParam.put("notification", notification);
                 Log.e("param", postDataParam.toString());
 
@@ -235,7 +234,17 @@ public class CreatePOItem extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                int Success = jsonObject.getInt("success");
+                if (Success==1){
+                    Intent i = new Intent(getActivity(),buyerActivity.class);
+                    startActivity(i);
+                    Toast.makeText(getActivity(),"PO Berhasil di kirim, Untuk update cek Bagian Transaksi",Toast.LENGTH_LONG).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 

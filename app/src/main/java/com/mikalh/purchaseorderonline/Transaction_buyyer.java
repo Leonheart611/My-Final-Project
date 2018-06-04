@@ -147,7 +147,7 @@ public class Transaction_buyyer extends Fragment implements TransactionAdapter.O
                     1);
         }else {
             String ID = transaction.getId();
-            Intent i =  new Intent(getActivity(),DetailPesanan.class);
+            Intent i =  new Intent(getActivity(),POBuyer.class);
             i.putExtra(KEY_UID,ID);
             startActivity(i);
         }

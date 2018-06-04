@@ -51,7 +51,9 @@ public class search extends AppCompatActivity implements ItemAdapter.OnItemSelec
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         firestore = FirebaseFirestore.getInstance();
-        query = firestore.collection("Items").orderBy("nama_barang", Query.Direction.ASCENDING);
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+        query = firestore.collection("Items").whereLessThan("userId",user.getUid()).orderBy("nama_barang", Query.Direction.ASCENDING);
         itemRV_search = findViewById(R.id.itemRV_search);
         itemAdapter = new ItemAdapter(query,this){
             @Override

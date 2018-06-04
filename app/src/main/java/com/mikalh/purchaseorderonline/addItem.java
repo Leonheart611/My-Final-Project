@@ -71,7 +71,6 @@ public class addItem extends AppCompatActivity {
     ArrayList<String> imageList = new ArrayList<>();
     Company company = new Company();
     String instanceId = FirebaseInstanceId.getInstance().getToken();
-    String[] pilihanTime = {"Hari","Bulan"};
     String[] kategori = {"Barang Baku","Barang Mentah","Barang Dasar","Dll"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +107,6 @@ public class addItem extends AppCompatActivity {
         //jenisItem_add = findViewById(R.id.jenisItem_add);
         unitItem_add = findViewById(R.id.unitItem_add);
         hargaItem_add = findViewById(R.id.hargaItem_add);
-        hargaItem_add.addTextChangedListener(new CurcurencyFormater(hargaItem_add));
         addItemDo = findViewById(R.id.addItemDo);
         imageItem_add = findViewById(R.id.itemImage_add);
         Kategori = findViewById(R.id.Kategori);
