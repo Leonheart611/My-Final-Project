@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -65,23 +66,36 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    DocumentSnapshot snapshot = task.getResult();
+                    final DocumentSnapshot snapshot = task.getResult();
                     String itemId = snapshot.get("itemID").toString();
                     firestore.collection("Items").document(itemId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful()){
                                 DocumentSnapshot snapshot1 = task.getResult();
-                                nama = snapshot1.get("namaPerusahaan").toString();
-                                setTitle(nama);
-                                sellerID = snapshot1.get("userId").toString();
-                                firestore.collection("Users").document(sellerID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        DocumentSnapshot snapshot2 = task.getResult();
-                                        imageUrlSeller = snapshot2.get("url_pictLogo").toString();
+                                if (snapshot1.exists()) {
+                                    try {
+                                        nama = snapshot1.get("namePerusahaan").toString();
+                                        setTitle(nama);
+                                    } catch (Exception e) {
+                                        nama = snapshot1.get("namaPerusahaan").toString();
+                                        setTitle(nama);
                                     }
-                                });
+                                    sellerID = snapshot1.get("userId").toString();
+                                    firestore.collection("Users").document(sellerID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            DocumentSnapshot snapshot2 = task.getResult();
+                                            if (snapshot2.exists()) {
+                                                imageUrlSeller = snapshot2.get("url_pictLogo").toString();
+                                            }else {
+                                                Toast.makeText(DetailChat.this,"Data Untuk PIC URL kosong",Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    });
+                                }else {
+                                    Toast.makeText(DetailChat.this,"Data Untuk Name Perusahaan Kosong",Toast.LENGTH_LONG).show();
+                                }
                             }
                         }
                     });

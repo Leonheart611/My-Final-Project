@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mikalh.purchaseorderonline.Adapter.ChatListAdapter;
+import com.mikalh.purchaseorderonline.Adapter.ChatListBuyerAdapter;
 import com.mikalh.purchaseorderonline.Model.User;
 
 
@@ -47,7 +48,7 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
     FirebaseAuth auth;
     FirebaseUser user;
     RecyclerView chatList_RV;
-    ChatListAdapter adapter;
+    ChatListBuyerAdapter adapter;
     String Id;
 
     private String mParam1;
@@ -58,15 +59,6 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
     public ChatList() {
         // Required empty public constructor
     }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ChatList.
-     */
 
     public static ChatList newInstance(String param1, String param2) {
         ChatList fragment = new ChatList();
@@ -85,17 +77,18 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         auth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
         user = auth.getCurrentUser();
-        query = firestore.collection("RoomChat")
-                .whereEqualTo("Users."+user.getUid(),true).whereEqualTo("idPenjual",user.getUid());
+        firestore = FirebaseFirestore.getInstance();
         firestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                     DocumentSnapshot snapshot = task.getResult();
-                     userModel = snapshot.toObject(User.class);
+                DocumentSnapshot snapshot = task.getResult();
+                userModel = snapshot.toObject(User.class);
             }
         });
+        query = firestore.collection("RoomChat")
+                .whereEqualTo("Users."+user.getUid(),true).whereEqualTo("idPenjual",user.getUid());
+
     }
 
     @Override
@@ -104,25 +97,15 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_chat, container, false);
         chatList_RV = view.findViewById(R.id.chatList_RV);
-        adapter = new ChatListAdapter(query,this,userModel){
+        adapter = new ChatListBuyerAdapter(query,this){
             @Override
             protected void onDataChanged() {
                 super.onDataChanged();
             }
 
             @Override
-            public void onBindViewHolder(ChatListHolder holder, int position) {
-                super.onBindViewHolder(holder, position);
-            }
-
-            @Override
-            public ChatListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return super.onCreateViewHolder(parent, viewType);
-            }
-            @Override
             protected void onError(FirebaseFirestoreException e) {
                 super.onError(e);
-                Crashlytics.logException(e);
             }
         };
         chatList_RV.setAdapter(adapter);

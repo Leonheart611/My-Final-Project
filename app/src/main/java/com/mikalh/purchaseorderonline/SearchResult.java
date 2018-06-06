@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -14,9 +15,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.mikalh.purchaseorderonline.Adapter.CatalogueAdapter;
 import com.mikalh.purchaseorderonline.Adapter.ItemAdapter;
 
-public class SearchResult extends AppCompatActivity implements ItemAdapter.OnItemSelectedListener{
+public class SearchResult extends AppCompatActivity implements CatalogueAdapter.OnClickCatalogueListener{
     TextView searchText;
     RecyclerView resultSearch_RV;
     FirebaseFirestore firestore;
@@ -24,7 +26,8 @@ public class SearchResult extends AppCompatActivity implements ItemAdapter.OnIte
     FirebaseAuth auth;
     Query query;
     String ID;
-    ItemAdapter adapter;
+    CatalogueAdapter adapter;
+    public static final String KEY_ITEM_ID = "keyItemID";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,12 +37,12 @@ public class SearchResult extends AppCompatActivity implements ItemAdapter.OnIte
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
         query = firestore.collection("Items").whereEqualTo("userId",ID);
-        adapter = new ItemAdapter(query,this){
+        adapter = new CatalogueAdapter(query,this){
             @Override
             protected void onError(FirebaseFirestoreException e) {
                 super.onError(e);
-                Crashlytics.logException(e);
             }
+
             @Override
             protected void onDataChanged() {
                 super.onDataChanged();
@@ -56,11 +59,6 @@ public class SearchResult extends AppCompatActivity implements ItemAdapter.OnIte
     }
 
     @Override
-    public void onItemSelected(DocumentSnapshot item) {
-
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         adapter.startListening();
@@ -70,5 +68,12 @@ public class SearchResult extends AppCompatActivity implements ItemAdapter.OnIte
     protected void onStop() {
         super.onStop();
         adapter.stopListening();
+    }
+
+    @Override
+    public void onClickCatalogueListener(DocumentSnapshot item) {
+        Intent i = new Intent(this,detailItem.class);
+        i.putExtra(KEY_ITEM_ID,item.getId());
+        startActivity(i);
     }
 }

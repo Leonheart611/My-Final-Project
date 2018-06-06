@@ -99,15 +99,6 @@ public class CreatePOItem extends Fragment {
         tanggalHariIni = df.format(c);
         mPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         NoPO = mPref.getString("NoPO","");
-        firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()){
-                    DocumentSnapshot snapshot = task.getResult();
-                    NotificationTarget = snapshot.get("PenjualNotif").toString();
-                }
-            }
-        });
     }
 
     @Override
@@ -152,7 +143,17 @@ public class CreatePOItem extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
-                            new Sendnotif().execute();
+                            firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()){
+                                        DocumentSnapshot snapshot = task.getResult();
+                                        NotificationTarget = snapshot.get("PenjualNotif").toString();
+                                        new Sendnotif().execute();
+                                    }
+                                }
+                            });
+
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -191,9 +192,8 @@ public class CreatePOItem extends Fragment {
                 conn.setRequestProperty("Authorization", Key);
                 conn.setRequestProperty("Content-Type", "application/json");
 
-
                 JSONObject notification = new JSONObject();
-                notification.put("body", "You Have New Purchase Order");
+                notification.put("body", "Anda memiliki Purchase Order baru");
 
                 JSONObject postDataParam = new JSONObject();
                 postDataParam.put("to",NotificationTarget);

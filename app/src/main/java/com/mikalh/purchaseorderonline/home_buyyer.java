@@ -42,16 +42,6 @@ public class home_buyyer extends Fragment implements View.OnClickListener{
     public home_buyyer() {
         // Required empty public constructor
     }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment home_buyyer.
-     */
-    // TODO: Rename and change types and number of parameters
     public static home_buyyer newInstance(String param1, String param2) {
         home_buyyer fragment = new home_buyyer();
         Bundle args = new Bundle();

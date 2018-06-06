@@ -1,7 +1,6 @@
 package com.mikalh.purchaseorderonline.Adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,72 +8,68 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
-import com.mikalh.purchaseorderonline.Model.Chat;
 import com.mikalh.purchaseorderonline.Model.LastChat;
 import com.mikalh.purchaseorderonline.Model.User;
 import com.mikalh.purchaseorderonline.R;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChatListAdapter extends FirestoreAdapter<ChatListAdapter.ChatListHolder>  {
+public class ChatListBuyerAdapter extends FirestoreAdapter<ChatListBuyerAdapter.ChatListBuyerHolder>  {
+
     public interface OnChatListListenerListener {
 
         void onChatListSelected(DocumentSnapshot chat);
 
     }
-    private OnChatListListenerListener mListener;
+    private ChatListAdapter.OnChatListListenerListener mListener;
     private User user;
     private String senderID;
-    public ChatListAdapter(Query query, OnChatListListenerListener listener) {
+    public ChatListBuyerAdapter(Query query, ChatListAdapter.OnChatListListenerListener listener) {
         super(query);
         mListener = listener;
     }
 
     @Override
-    public ChatListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ChatListBuyerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_list,parent,false);
-        return new ChatListHolder(view);
+        return new ChatListBuyerHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ChatListHolder holder, int position) {
+    public void onBindViewHolder(ChatListBuyerHolder holder, int position) {
         holder.bind(getSnapshot(position),mListener);
     }
 
 
-    public static class ChatListHolder extends RecyclerView.ViewHolder{
+
+
+    public static class ChatListBuyerHolder extends RecyclerView.ViewHolder{
         TextView name_chatList,lastMessage_chatList,timeStampt_chatList;
         CircleImageView image_chatList;
-        public ChatListHolder(View itemView) {
+        public ChatListBuyerHolder(View itemView) {
             super(itemView);
             name_chatList = itemView.findViewById(R.id.name_chatList);
             lastMessage_chatList = itemView.findViewById(R.id.lastMessage_chatList);
             timeStampt_chatList = itemView.findViewById(R.id.timeStamp_chatList);
             image_chatList = itemView.findViewById(R.id.image_chatList);
         }
-        public void bind(final DocumentSnapshot snapshot, final OnChatListListenerListener listener){
+        public void bind(final DocumentSnapshot snapshot, final ChatListAdapter.OnChatListListenerListener listener){
             LastChat chat = snapshot.toObject(LastChat.class);
             String time = formatTime(chat.getTime());
             lastMessage_chatList.setText(chat.getMessage());
             timeStampt_chatList.setText(time);
-            if (chat.getImageSeller()!=null) {
+            if (chat.getImageBuyer()!=null) {
                 Glide.with(image_chatList.getContext())
-                            .load(chat.getImageSeller())
-                            .into(image_chatList);
+                        .load(chat.getImageBuyer())
+                        .into(image_chatList);
             }
-            name_chatList.setText(chat.getNamePerusahaan());
+            name_chatList.setText(chat.getNamaPembeli());
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -96,7 +91,7 @@ public class ChatListAdapter extends FirestoreAdapter<ChatListAdapter.ChatListHo
             }
             return null;
         }
-        }
-
     }
+
+}
 

@@ -77,7 +77,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
         return fragment;
     }
     TextInputEditText tanggalPermintaanKirim_detail,AlamatPengiriman_detail;
-    TextView statusKirimPO;
+    TextView statusKirimPO, perusahaan_detailPesan;
     Button pesananSudahDikirim,lihatBuktiBayar,transaksiSelesai,convertPdf_detail;
     FirebaseAuth auth;
     FirebaseFirestore firestore;
@@ -115,6 +115,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
         convertPdf_detail = v.findViewById(R.id.convertPdf_detail);
         convertPdf_detail.setOnClickListener(this);
         statusKirimPO = v.findViewById(R.id.statusKirimPO);
+        perusahaan_detailPesan = v.findViewById(R.id.perusahaan_detailPesanan);
         firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -122,6 +123,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                 tanggalPengiriman = snapshot.get("tanggalPermintaanKirim").toString();
                 String Alamat = snapshot.get("alamatPengiriman").toString();
                 String Status = snapshot.get("StatusPO").toString();
+                String namaPerusahaanPemesan = snapshot.get("namaPerusahaanPembeli").toString();
                 nomorPO = snapshot.get("NomorPO").toString();
                 buktiPembayaranLink = snapshot.get("LinkBuktiBayar").toString();
                 NotificationTarget = snapshot.get("PembeliNotif").toString();
@@ -132,9 +134,11 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                     transaksiSelesai.setEnabled(false);
                 }if (Status.equals("Sudah Diterima")&& !buktiPembayaranLink.isEmpty()){
                     pesananSudahDikirim.setEnabled(false);
+                    transaksiSelesai.setEnabled(false);
                 }if (buktiPembayaranLink.isEmpty()){
                     lihatBuktiBayar.setEnabled(false);
                 }
+                perusahaan_detailPesan.setText(namaPerusahaanPemesan);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

@@ -19,9 +19,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -368,6 +370,8 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
         window.setAttributes(lp);
         final TextView namaBarang_createPO, banyakBarang_createPO,totalBarang_createPO,satuanBarang_createPO;
         final Button deleteDo_createPO;
+        final ImageView detailDeleteItem;
+        detailDeleteItem = dialog.findViewById(R.id.detailDeleteItem);
         namaBarang_createPO = dialog.findViewById(R.id.namaBarang_createPO);
         banyakBarang_createPO = dialog.findViewById(R.id.banyakBarang_createPO);
         totalBarang_createPO = dialog.findViewById(R.id.totalBarang_createPO);
@@ -387,8 +391,7 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()){
                                             dialog.dismiss();
-                                            Intent i = new Intent(getActivity(),SendPO.class);
-                                            startActivity(i);
+                                            getActivity().finish();
                                             Toast.makeText(getActivity(),"Cart Kosong",Toast.LENGTH_LONG).show();
                                         }
                                     }
@@ -463,6 +466,9 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
                     totalBarang_createPO.setText(cart.getTotalHargaBarang()+"");
                     satuanBarang_createPO.setText(cart.getUnit());
                     hargaKurang[0] = cart.getTotalHargaBarang();
+                    Glide.with(detailDeleteItem.getContext())
+                            .load(cart.getImageItemUrl())
+                            .into(detailDeleteItem);
                     dialog.show();
                 }
             }

@@ -69,6 +69,7 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
     Button chatButton;
     int GrandTotal = 0;
     public static final String USER_ID = "userID";
+    User userModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,38 +89,50 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
         firestore = FirebaseFirestore.getInstance();
         KEY_ITEM_ID = getIntent().getExtras().getString(userUI.KEY_ITEM_ID);
         customDialog.show();
-        documentReference = firestore.collection("Items").document(KEY_ITEM_ID);
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot snapshot) {
-
-            }
-        }).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        firestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()){
-                    DocumentSnapshot documentSnapshot = task.getResult();
-                    item = documentSnapshot.toObject(Item.class);
-                    namaBarang_detail.setText(item.getNama_barang());;
-                    hargaBarang_detail.setText(item.getHarga_barang()+"");
-                    unit_detail.setText(item.getUnit()+"");
-                    namaPerusahaan_detail.setText(item.getNamaPerusahaan());
-                    Glide.with(imageBarang_detail.getContext())
-                            .load(item.getImageItemUrl())
-                            .into(imageBarang_detail);
-                    customDialog.dismiss();
-                    if (item.getUserId() == user.getUid()){
-                        beliButton_do.setVisibility(View.GONE);
-                        chatButton.setVisibility(View.GONE);
-                    }
+                    DocumentSnapshot snapshot = task.getResult();
+                    userModel = snapshot.toObject(User.class);
+
+                    // lanjutan untuk dapat data View
+                    documentReference = firestore.collection("Items").document(KEY_ITEM_ID);
+                    documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot snapshot) {
+
+                        }
+                    }).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()){
+                                DocumentSnapshot documentSnapshot = task.getResult();
+                                item = documentSnapshot.toObject(Item.class);
+                                namaBarang_detail.setText(item.getNama_barang());;
+                                hargaBarang_detail.setText(item.getHarga_barang()+"");
+                                unit_detail.setText(item.getUnit()+"");
+                                namaPerusahaan_detail.setText(item.getNamaPerusahaan());
+                                Glide.with(imageBarang_detail.getContext())
+                                        .load(item.getImageItemUrl())
+                                        .into(imageBarang_detail);
+                                customDialog.dismiss();
+                                if (item.getUserId() == user.getUid()){
+                                    beliButton_do.setVisibility(View.GONE);
+                                    chatButton.setVisibility(View.GONE);
+                                }
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e("Error Get Data",e.getMessage());
+                        }
+                    });
                 }
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e("Error Get Data",e.getMessage());
-            }
         });
+
 
         beliButton_do.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,7 +140,6 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                 popupBuyCart();
             }
         });
-
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -314,6 +326,7 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                                         arrayUserID.put("Fax",userCompany.getNo_fax());
                                         arrayUserID.put("IDPenjual",item.getUserId());
                                         arrayUserID.put("IDPembeli",user.getUid());
+                                        arrayUserID.put("namaPerusahaanPembeli",userModel.getNama_perusahaan());
                                         arrayUserID.put("StatusPO","Belum Di buat PO");
                                         arrayUserID.put("MakePO",false);
                                         arrayUserID.put("PembeliNotif",userCompany.getNotificationId());

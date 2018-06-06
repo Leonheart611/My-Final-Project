@@ -112,7 +112,7 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
         customDialog = new CustomDialog(getActivity());
 
     }
-    TextView statusKirimPO;
+    TextView statusKirimPO,perusahaan_poBuyer;
     TextInputEditText tanggalPermintaanKirim_poBuyyer, AlamatPengiriman_poBuyer;
     Button uploadBuktiBayar, convertPdf_poBuyer, barangSudahDiterima;
 
@@ -127,6 +127,7 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
         uploadBuktiBayar = v.findViewById(R.id.pesananSudahDikirim);
         convertPdf_poBuyer = v.findViewById(R.id.convertPdf_poBuyer);
         barangSudahDiterima = v.findViewById(R.id.barangSudahDiterima);
+        perusahaan_poBuyer = v.findViewById(R.id.perusahaan_poBuyer);
         firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -139,12 +140,14 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
                     NotificationTarget = snapshot.getString("PenjualNotif");
                     tanggalPermintaanKirim_poBuyyer.setText(tanggalPengiriman, TextView.BufferType.EDITABLE);
                     AlamatPengiriman_poBuyer.setText(Alamat, TextView.BufferType.EDITABLE);
+                    String namaPerusahaanPemesan = snapshot.get("namaPerusahaanPembeli").toString();
                     statusKirimPO.setText(Status);
                     if (!Status.equals("Pesanan Sedang Dikirim")) {
                         barangSudahDiterima.setEnabled(false);
                     }if (!Status.equals("Sudah Diterima")){
                         uploadBuktiBayar.setEnabled(false);
                     }
+                    perusahaan_poBuyer.setText(namaPerusahaanPemesan);
                 }
             }
         });
@@ -297,7 +300,6 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
         @Override
         protected String doInBackground(String... strings) {
             try {
-                Gson gson = new Gson();
                 URL url = new URL("https://pdfgeneratorapi.com/api/v3/templates/33028/output");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setReadTimeout(30000);
@@ -593,7 +595,7 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
 
 
                 JSONObject notification = new JSONObject();
-                notification.put("body", "You Item was Recieved");
+                notification.put("body", "Barang sudah diterima");
 
                 JSONObject postDataParam = new JSONObject();
                 postDataParam.put("to", NotificationTarget);

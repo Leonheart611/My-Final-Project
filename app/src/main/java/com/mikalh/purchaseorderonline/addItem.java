@@ -274,6 +274,7 @@ public class addItem extends AppCompatActivity {
                 if (task.isSuccessful()){
                     Toast.makeText(addItem.this,"item added Success",Toast.LENGTH_LONG).show();
                     customDialog.dismiss();
+                    finish();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {

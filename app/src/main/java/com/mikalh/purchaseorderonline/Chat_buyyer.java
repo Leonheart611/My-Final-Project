@@ -73,15 +73,7 @@ public class Chat_buyyer extends Fragment implements ChatListAdapter.OnChatListL
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_chat_buyyer, container, false);
         chatBuyer_RV = v.findViewById(R.id.chatBuyyer_RV);
-        if (firestore.collection("Users").document(user.getUid()).get().isSuccessful()) {
-            firestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    DocumentSnapshot snapshot = task.getResult();
-                    userModel = snapshot.toObject(User.class);
-                }
-            });
-            adapter = new ChatListAdapter(query, this, userModel) {
+        adapter = new ChatListAdapter(query, this) {
                 @Override
                 protected void onDataChanged() {
                     super.onDataChanged();
@@ -103,7 +95,6 @@ public class Chat_buyyer extends Fragment implements ChatListAdapter.OnChatListL
             llm.setSmoothScrollbarEnabled(true);
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             chatBuyer_RV.setLayoutManager(llm);
-        }
         return v;
     }
 

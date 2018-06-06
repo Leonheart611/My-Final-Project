@@ -26,7 +26,7 @@ import com.google.firebase.firestore.Query;
 import com.mikalh.purchaseorderonline.Adapter.TransactionAdapter;
 
 
-
+// ini buat Seller
 public class Transaction_fragment extends android.support.v4.app.Fragment implements TransactionAdapter.OnTransactionSelectedListener {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -65,8 +65,7 @@ public class Transaction_fragment extends android.support.v4.app.Fragment implem
         }
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-        query = FirebaseFirestore.getInstance().collection("Cart")
-                .whereEqualTo("UserList."+user.getUid(),true)
+        query = FirebaseFirestore.getInstance().collection("Cart").whereEqualTo("IDPenjual",user.getUid())
                 .whereEqualTo("MakePO",true);
         
     }
