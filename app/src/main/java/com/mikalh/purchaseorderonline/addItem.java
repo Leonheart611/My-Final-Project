@@ -126,7 +126,6 @@ public class addItem extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!hasPermissions(addItem.this,permissionsRequired)) {
-
                     requestPermissions(permissionsRequired,1);
                 }else {
                     Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -172,10 +171,6 @@ public class addItem extends AppCompatActivity {
                             }
                             final Bitmap bitmap;
                             bitmap = decodeSampledBitmapFromUri(outputFile,imageItem_add.getWidth(),imageItem_add.getHeight());
-                        /*if (databasePicture.Checker() != 0){
-                            databasePicture.clearTable();
-                        }*/
-
                             if (bitmap == null){
                                 Toast.makeText(getApplicationContext(),"The Image Data Currop",Toast.LENGTH_LONG).show();
                             }else {

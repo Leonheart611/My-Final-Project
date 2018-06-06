@@ -53,7 +53,7 @@ public class search extends AppCompatActivity implements ItemAdapter.OnItemSelec
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-        query = firestore.collection("Items").whereLessThan("userId",user.getUid()).orderBy("nama_barang", Query.Direction.ASCENDING);
+        query = firestore.collection("Items").orderBy("nama_barang", Query.Direction.ASCENDING);
         itemRV_search = findViewById(R.id.itemRV_search);
         itemAdapter = new ItemAdapter(query,this){
             @Override

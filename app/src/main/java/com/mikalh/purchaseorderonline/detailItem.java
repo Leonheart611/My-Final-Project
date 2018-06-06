@@ -53,7 +53,7 @@ import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
-public class detailItem extends AppCompatActivity {
+public class detailItem extends AppCompatActivity implements View.OnClickListener {
     private String KEY_ITEM_ID;
     public static String SENDER_ID = "senderId", RECIEVER_ID = "recieverId",KEY_ID = "ItemID",ROOMID = "RoomId",NAMA="nama";
     TextInputEditText namaBarang_detail,hargaBarang_detail,unit_detail;
@@ -68,6 +68,7 @@ public class detailItem extends AppCompatActivity {
     Button beliButton_do;
     Button chatButton;
     int GrandTotal = 0;
+    public static final String USER_ID = "userID";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +84,7 @@ public class detailItem extends AppCompatActivity {
         chatButton = findViewById(R.id.chatButton);
         beliButton_do = findViewById(R.id.beliButton_do);
         namaPerusahaan_detail = findViewById(R.id.namaPerusahaan_detail);
+        namaPerusahaan_detail.setOnClickListener(this);
         firestore = FirebaseFirestore.getInstance();
         KEY_ITEM_ID = getIntent().getExtras().getString(userUI.KEY_ITEM_ID);
         customDialog.show();
@@ -130,7 +132,7 @@ public class detailItem extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 firestore.collection("RoomChat").whereEqualTo("Users."+user.getUid(),true).
-                        whereEqualTo("Users."+item.getUserId(),true).whereEqualTo("itemID",KEY_ITEM_ID).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        whereEqualTo("Users."+item.getUserId(),true).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         Log.e("Hasil Query masa kosong",task.toString());
@@ -157,6 +159,8 @@ public class detailItem extends AppCompatActivity {
                              roomChat.put("itemID",KEY_ITEM_ID);
                              roomChat.put("senderName",user.getDisplayName());
                              roomChat.put("sellerName",item.getNamaPerusahaan());
+                             roomChat.put("idPenjual",item.getUserId());
+                             roomChat.put("idPembeli",user.getUid());
                              Log.e("ID Data",myId);
                              firestore.collection("RoomChat").document(myId).set(roomChat).addOnCompleteListener(new OnCompleteListener<Void>() {
                                  @Override
@@ -180,10 +184,8 @@ public class detailItem extends AppCompatActivity {
                      }
                     }
                 });
-
             }
         });
-
     }
     void popupBuyCart(){
         final Dialog dialog = new Dialog(this);
@@ -269,11 +271,8 @@ public class detailItem extends AppCompatActivity {
                                                     }).addOnFailureListener(new OnFailureListener() {
                                                         @Override
                                                         public void onFailure(@NonNull Exception e) {
-
                                                         }
                                                     });
-
-
                                                 }
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
@@ -372,7 +371,6 @@ public class detailItem extends AppCompatActivity {
                                                             Crashlytics.logException(e);
                                                         }
                                                     });
-
                                                 }
                                             }
                                         });
@@ -384,7 +382,6 @@ public class detailItem extends AppCompatActivity {
                                     Crashlytics.logException(e);
                                 }
                             });
-
                         }
 
                     }
@@ -406,5 +403,14 @@ public class detailItem extends AppCompatActivity {
         itemCost = itemPrice.multiply(new BigDecimal(itemQuantity));
         totalCost = itemCost;
         return totalCost;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view == namaPerusahaan_detail){
+            Intent i = new Intent(detailItem.this,Profile.class);
+            i.putExtra(USER_ID,item.getUserId());
+            startActivity(i);
+        }
     }
 }

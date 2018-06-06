@@ -59,7 +59,6 @@ public class detailEdit extends AppCompatActivity implements View.OnClickListene
         firestore = FirebaseFirestore.getInstance();
         itemName_edit = findViewById(R.id.itemName_edit);
         price_edit = findViewById(R.id.price_edit);
-        price_edit.addTextChangedListener(new CurcurencyFormater(price_edit));
         unit_edit = findViewById(R.id.unit_edit);
         updateDo = findViewById(R.id.updateDo);
         updateDo.setOnClickListener(this);

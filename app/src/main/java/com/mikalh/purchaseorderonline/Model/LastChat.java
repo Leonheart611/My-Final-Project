@@ -3,21 +3,48 @@ package com.mikalh.purchaseorderonline.Model;
 import android.net.Uri;
 
 public class LastChat {
-    String message,name,time,image;
+    String message,name,time,imageSeller,imageBuyer,namePerusahaan,namaPembeli;
 
-    public LastChat(String message, String name, String time, String image) {
+    public LastChat(String message, String name, String time, String imageSeller, String imageBuyer, String namePerusahaan, String namaPembeli) {
         this.message = message;
         this.name = name;
         this.time = time;
-        this.image = image;
+        this.imageSeller = imageSeller;
+        this.imageBuyer = imageBuyer;
+        this.namePerusahaan = namePerusahaan;
+        this.namaPembeli = namaPembeli;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageSeller() {
+        return imageSeller;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImageSeller(String imageSeller) {
+        this.imageSeller = imageSeller;
+    }
+
+    public String getImageBuyer() {
+        return imageBuyer;
+    }
+
+    public void setImageBuyer(String imageBuyer) {
+        this.imageBuyer = imageBuyer;
+    }
+
+    public String getNamePerusahaan() {
+        return namePerusahaan;
+    }
+
+    public void setNamePerusahaan(String namePerusahaan) {
+        this.namePerusahaan = namePerusahaan;
+    }
+
+    public String getNamaPembeli() {
+        return namaPembeli;
+    }
+
+    public void setNamaPembeli(String namaPembeli) {
+        this.namaPembeli = namaPembeli;
     }
 
     public LastChat() {
@@ -47,9 +74,5 @@ public class LastChat {
         this.time = time;
     }
 
-    public LastChat(String message, String name, String time) {
-        this.message = message;
-        this.name = name;
-        this.time = time;
-    }
+
 }

@@ -9,7 +9,7 @@
     <!-- TODO: Update blank fragment layout -->
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout18"
+        android:id="@+id/TIL_picName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -24,78 +24,83 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="PIC Name"
+            android:singleLine="true"
             android:textColor="@android:color/black" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout19"
+        android:id="@+id/TIL_picPosition"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout18">
+        app:layout_constraintTop_toBottomOf="@+id/TIL_picName">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/picPosition_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="PIC Position"
+            android:singleLine="true"
             android:textColor="@android:color/black" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout20"
+        android:id="@+id/TIL_telephone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout19">
+        app:layout_constraintTop_toBottomOf="@+id/TIL_picPosition">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/telephone_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Telephone"
+            android:singleLine="true"
             android:textColor="@android:color/black" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout21"
+        android:id="@+id/TIL_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout20">
+        app:layout_constraintTop_toBottomOf="@+id/TIL_telephone">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/email_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
+            android:singleLine="true"
             android:textColor="@android:color/black" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout23"
+        android:id="@+id/textInputLayout14"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout21">
+        app:layout_constraintTop_toBottomOf="@+id/TIL_email">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/username_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Username"
+            android:singleLine="true"
             android:textColor="@android:color/black" />
     </android.support.design.widget.TextInputLayout>
 
@@ -103,21 +108,26 @@
         android:id="@+id/saveButton_profile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="32dp"
         android:text="Save"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout23" />
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout14"
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/changePassword_profile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="8dp"
         android:text="change password"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout23" />
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout14"
+        app:layout_constraintVertical_bias="1.0" />
 </android.support.constraint.ConstraintLayout>

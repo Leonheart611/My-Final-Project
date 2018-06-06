@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.Dialog;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,10 +13,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -72,11 +78,14 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
     }
     TextInputEditText tanggalPermintaanKirim_detail,AlamatPengiriman_detail;
     TextView statusKirimPO;
-    Button updateStatus_detail, convertPdf_detail;
+    Button pesananSudahDikirim,lihatBuktiBayar,transaksiSelesai,convertPdf_detail;
     FirebaseAuth auth;
     FirebaseFirestore firestore;
     FirebaseUser user;
     String ID,tanggalPengiriman,nomorPO;
+    String buktiPembayaranLink;
+    String Key = "key=AAAAx1NMbj0:APA91bHv2Yky3eenD79mwmY1unL3bLEI57VLpDkFoxQ2rfowQXju2DkeRV4_SvOF-LCaO9IsZfAhFIliTTeo5RPs5EwBxlImuoeDlfBzKsTDEiHsGBqtJlp8fCNgHEjlOAx9UqU_mWaT";
+    String NotificationTarget;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,8 +106,12 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
         View v = inflater.inflate(R.layout.fragment_detail_pesanan__status, container, false);
         tanggalPermintaanKirim_detail = v.findViewById(R.id.tanggalPermintaanKirim_detail);
         AlamatPengiriman_detail = v.findViewById(R.id.AlamatPengiriman_detail);
-        updateStatus_detail = v.findViewById(R.id.pesananSudahDikirim);
-        updateStatus_detail.setOnClickListener(this);
+        pesananSudahDikirim = v.findViewById(R.id.pesananSudahDikirim);
+        pesananSudahDikirim.setOnClickListener(this);
+        lihatBuktiBayar = v.findViewById(R.id.lihatBuktiBayar);
+        lihatBuktiBayar.setOnClickListener(this);
+        transaksiSelesai = v.findViewById(R.id.transaksiSelesai);
+        transaksiSelesai.setOnClickListener(this);
         convertPdf_detail = v.findViewById(R.id.convertPdf_detail);
         convertPdf_detail.setOnClickListener(this);
         statusKirimPO = v.findViewById(R.id.statusKirimPO);
@@ -110,10 +123,18 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                 String Alamat = snapshot.get("alamatPengiriman").toString();
                 String Status = snapshot.get("StatusPO").toString();
                 nomorPO = snapshot.get("NomorPO").toString();
+                buktiPembayaranLink = snapshot.get("LinkBuktiBayar").toString();
+                NotificationTarget = snapshot.get("PembeliNotif").toString();
                 tanggalPermintaanKirim_detail.setText(tanggalPengiriman, TextView.BufferType.EDITABLE);
                 AlamatPengiriman_detail.setText(Alamat, TextView.BufferType.EDITABLE);
                 statusKirimPO.setText(Status);
-
+                if (Status.equals("Sedang Di konfirmasi Kepenjual")){
+                    transaksiSelesai.setEnabled(false);
+                }if (Status.equals("Sudah Diterima")&& !buktiPembayaranLink.isEmpty()){
+                    pesananSudahDikirim.setEnabled(false);
+                }if (buktiPembayaranLink.isEmpty()){
+                    lihatBuktiBayar.setEnabled(false);
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -123,6 +144,33 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
         });
 
         return v;
+    }
+    public void BuktiBayar(){
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.pop_up_bukti_bayar);
+        dialog.setCanceledOnTouchOutside(false);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+//This makes the dialog take up the full width
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+        window.setAttributes(lp);
+
+        final ImageView gambarBuktiBayar = dialog.findViewById(R.id.gambarBuktiBayar);
+        Glide.with(gambarBuktiBayar.getContext())
+                .load(buktiPembayaranLink)
+                .into(gambarBuktiBayar);
+        final Button ok_buktiBayar = dialog.findViewById(R.id.ok_buktiBayar);
+        ok_buktiBayar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+
     }
 
     public void onButtonPressed(Uri uri) {
@@ -157,7 +205,6 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (v == convertPdf_detail){
-
             firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -220,9 +267,158 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                     Crashlytics.logException(e);
                 }
             });
+        }
+        if(v == pesananSudahDikirim){
+            firestore.collection("Cart").document(ID).update("StatusPO","Pesanan Sedang Dikirim").addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                DocumentSnapshot snapshot = task.getResult();
+                                String Status = snapshot.get("StatusPO").toString();
+                                statusKirimPO.setText(Status);
+                                Toast.makeText(getActivity(),"Berhasil ubah status Pesanan",Toast.LENGTH_LONG).show();
+                                new pengirimanBarangNotif().execute();
+                            }
+                        });
 
+                    }
+                }
+            });
+        }
+        if (v== lihatBuktiBayar){
+            BuktiBayar();
+        }
+        if (v == transaksiSelesai){
+            firestore.collection("Cart").document(ID).update("StatusPO","Selesai").addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful())  {
+                        firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                DocumentSnapshot snapshot = task.getResult();
+                                String Status = snapshot.get("StatusPO").toString();
+                                statusKirimPO.setText(Status);
+                                Toast.makeText(getActivity(),"Berhasil ubah status Pesanan",Toast.LENGTH_LONG).show();
+                                new transaksiSelesai().execute();
+                            }
+                        });
+                    }
+                }
+            });
         }
 
+    }
+    public class transaksiSelesai extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... arg0) {
+            try {
+                URL url = new URL("https://fcm.googleapis.com/fcm/send");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(30000);
+                conn.setConnectTimeout(30000);
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Authorization", Key);
+                conn.setRequestProperty("Content-Type", "application/json");
+
+
+                JSONObject notification = new JSONObject();
+                notification.put("body", "Transaksi Sudah Selesai Terima kasih");
+
+                JSONObject postDataParam = new JSONObject();
+                postDataParam.put("to", NotificationTarget);
+                postDataParam.put("notification", notification);
+                Log.e("param", postDataParam.toString());
+
+                OutputStream os = conn.getOutputStream();
+                OutputStreamWriter writer = new OutputStreamWriter(os, "UTF-8");
+                writer.write(postDataParam.toString());
+                writer.flush();
+                writer.close();
+                os.close();
+
+
+                int responseCode = conn.getResponseCode();
+
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream()));
+                    StringBuffer sb = new StringBuffer();
+                    String line = "";
+                    while ((line = in.readLine()) != null) {
+                        sb.append(line);
+                        break;
+                    }
+                    in.close();
+                    return sb.toString();
+                } else {
+                    return new String("False: " + responseCode);
+
+                }
+
+            } catch (Exception e) {
+                return new String("Exception: " + e.getMessage());
+            }
+        }
+    }
+    public class pengirimanBarangNotif extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... arg0) {
+            try {
+                URL url = new URL("https://fcm.googleapis.com/fcm/send");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(30000);
+                conn.setConnectTimeout(30000);
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Authorization", Key);
+                conn.setRequestProperty("Content-Type", "application/json");
+
+
+                JSONObject notification = new JSONObject();
+                notification.put("body", "Barang yang dipesan telah dikirm");
+
+                JSONObject postDataParam = new JSONObject();
+                postDataParam.put("to", NotificationTarget);
+                postDataParam.put("notification", notification);
+                Log.e("param", postDataParam.toString());
+
+                OutputStream os = conn.getOutputStream();
+                OutputStreamWriter writer = new OutputStreamWriter(os, "UTF-8");
+                writer.write(postDataParam.toString());
+                writer.flush();
+                writer.close();
+                os.close();
+
+
+                int responseCode = conn.getResponseCode();
+
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream()));
+                    StringBuffer sb = new StringBuffer();
+                    String line = "";
+                    while ((line = in.readLine()) != null) {
+                        sb.append(line);
+                        break;
+                    }
+                    in.close();
+                    return sb.toString();
+                } else {
+                    return new String("False: " + responseCode);
+
+                }
+
+            } catch (Exception e) {
+                return new String("Exception: " + e.getMessage());
+            }
+        }
     }
 
 

@@ -239,13 +239,11 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
             protected void onDataChanged() {
                 super.onDataChanged();
             }
-
             @Override
             protected void onError(FirebaseFirestoreException e) {
                 super.onError(e);
                 Crashlytics.logException(e);
             }
-
             @Override
             public void onBindViewHolder(CreatePOAdapterHolder holder, int position) {
                 super.onBindViewHolder(holder, position);
@@ -405,7 +403,6 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
                                             Map<String,Object> updateData = new HashMap<>();
                                             updateData.put("GrandTotal",HasilTotal);
                                             updateData.put("BanyakData",BanyakData);
-                                            updateData.put("LinkBuktiBayar","");
                                             firestore.collection("Cart").document(ID).update(updateData).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {

@@ -4,6 +4,11 @@
 
     <item
         android:id="@+id/moreItem_chat"
-        android:title="catalogue"
-        app:showAsAction="always" />
+        android:title="catalogue" />
+    <item
+        android:id="@+id/deleteChat"
+        android:title="Delete Chat" />
+    <item
+        android:id="@+id/reportUser"
+        android:title="Report User" />
 </menu>

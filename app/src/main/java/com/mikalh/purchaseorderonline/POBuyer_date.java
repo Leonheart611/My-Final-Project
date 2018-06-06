@@ -95,7 +95,7 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
     Uri filePath, imageResult;
     StorageReference storageReference;
     FirebaseStorage storage;
-
+    CustomDialog customDialog;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +109,7 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
         firestore = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+        customDialog = new CustomDialog(getActivity());
 
     }
     TextView statusKirimPO;
@@ -141,6 +142,8 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
                     statusKirimPO.setText(Status);
                     if (!Status.equals("Pesanan Sedang Dikirim")) {
                         barangSudahDiterima.setEnabled(false);
+                    }if (!Status.equals("Sudah Diterima")){
+                        uploadBuktiBayar.setEnabled(false);
                     }
                 }
             }
@@ -266,8 +269,18 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()){
-                        new Sendnotif().execute();
-                        Toast.makeText(getActivity(),"Berhasil merubah status Pesanan",Toast.LENGTH_LONG).show();
+                        firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                DocumentSnapshot snapshot = task.getResult();
+                                String Status = snapshot.get("StatusPO").toString();
+                                statusKirimPO.setText(Status);
+                                uploadBuktiBayar.setEnabled(true);
+                                new Sendnotif().execute();
+                                Toast.makeText(getActivity(),"Berhasil merubah status Pesanan",Toast.LENGTH_LONG).show();
+                            }
+                        });
+
                     }
                 }
             });
@@ -367,8 +380,8 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
 
     public void ConvertToPDF(String data) throws Exception {
         String filesDirPath = Environment.getExternalStorageDirectory().toString() + "/Download/";
-        nomorPO = nomorPO.replace("/", "");
-        final File dwldsPath = new File(filesDirPath + nomorPO + ".pdf");
+        nomorPO = nomorPO.replace("/", "-");
+        final File dwldsPath = new File(filesDirPath +nomorPO+".pdf");
         byte[] pdfAsBytes = Base64.decode(data, 0);
         FileOutputStream os;
         os = new FileOutputStream(dwldsPath, false);
@@ -431,17 +444,17 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
+            customDialog.show();
             filePath = data.getData();
-            nomorPO = nomorPO.replace("/", "");
-            final StorageReference ref = storageReference.child("BuktiBayar/" + nomorPO);
+            String hasilPO = nomorPO.replace("/", "");
+            final StorageReference ref = storageReference.child("BuktiBayar/" + hasilPO);
             UploadTask uploadTask = ref.putFile(filePath);
             Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (task.isSuccessful()){
+                    if (!task.isSuccessful()){
                         throw task.getException();
-                    }
-                    return ref.getDownloadUrl();
+                    }return ref.getDownloadUrl();
                 }
             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                 @Override
@@ -453,6 +466,8 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()){
                                     Toast.makeText(getActivity(),"Berhasil MengUpload Bukti Bayar",Toast.LENGTH_LONG).show();
+                                    customDialog.dismiss();
+                                    new buktiUploadNotif().execute();
                                 }
                             }
                         });
@@ -463,18 +478,20 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
                 public void onFailure(@NonNull Exception e) {
                     Crashlytics.logException(e);
                     e.printStackTrace();
+                    customDialog.dismiss();
                 }
             });
         }
         if (requestCode == 0 && resultCode == RESULT_OK && filePath != null) {
             if (filePath != null) {
-                nomorPO = nomorPO.replace("/", "");
-                final StorageReference ref = storageReference.child("BuktiBayar/" + nomorPO);
+                customDialog.show();
+                String hasilPO = nomorPO.replace("/", "-");
+                final StorageReference ref = storageReference.child("BuktiBayar/" + hasilPO);
                 UploadTask uploadTask = ref.putFile(filePath);
                 Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                     @Override
                     public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                        if (task.isSuccessful()){
+                        if (!task.isSuccessful()){
                             throw task.getException();
                         }
                         return ref.getDownloadUrl();
@@ -489,6 +506,8 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()){
                                         Toast.makeText(getActivity(),"Berhasil MengUpload Bukti Bayar",Toast.LENGTH_LONG).show();
+                                        customDialog.dismiss();
+                                        new buktiUploadNotif().execute();
                                     }
                                 }
                             });
@@ -496,12 +515,68 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
                     }
                 });
             }else {
+                customDialog.dismiss();
 
             }
             // letak if di sini coy
 
         }
     }
+    public class buktiUploadNotif extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... arg0) {
+            try {
+                URL url = new URL("https://fcm.googleapis.com/fcm/send");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(30000);
+                conn.setConnectTimeout(30000);
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Authorization", Key);
+                conn.setRequestProperty("Content-Type", "application/json");
+
+
+                JSONObject notification = new JSONObject();
+                notification.put("body", "Bukti Pembayaran untuk PO "+nomorPO+" Sudah di upload");
+
+                JSONObject postDataParam = new JSONObject();
+                postDataParam.put("to", NotificationTarget);
+                postDataParam.put("notification", notification);
+                Log.e("param", postDataParam.toString());
+
+                OutputStream os = conn.getOutputStream();
+                OutputStreamWriter writer = new OutputStreamWriter(os, "UTF-8");
+                writer.write(postDataParam.toString());
+                writer.flush();
+                writer.close();
+                os.close();
+
+
+                int responseCode = conn.getResponseCode();
+
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream()));
+                    StringBuffer sb = new StringBuffer();
+                    String line = "";
+                    while ((line = in.readLine()) != null) {
+                        sb.append(line);
+                        break;
+                    }
+                    in.close();
+                    return sb.toString();
+                } else {
+                    return new String("False: " + responseCode);
+
+                }
+
+            } catch (Exception e) {
+                return new String("Exception: " + e.getMessage());
+            }
+        }
+    }
+
     public class Sendnotif extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... arg0) {

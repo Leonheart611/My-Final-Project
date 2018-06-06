@@ -32,6 +32,7 @@ public class SendPO extends AppCompatActivity implements POActiveAdapter.OnPOSel
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_po);
+        setTitle("Cart");
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();

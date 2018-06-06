@@ -147,12 +147,12 @@ public class CreatePOItem extends Fragment {
                 dataUpdate.put("tanggalPermintaanKirim",tanggal);
                 dataUpdate.put("tanggalPembuatanPO",tanggalHariIni);
                 dataUpdate.put("NomorPO",NoPO);
+                dataUpdate.put("LinkBuktiBayar","");
                 firestore.collection("Cart").document(ID).update(dataUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
                             new Sendnotif().execute();
-
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -164,7 +164,6 @@ public class CreatePOItem extends Fragment {
 
             }
         });
-
         return v;
     }
 

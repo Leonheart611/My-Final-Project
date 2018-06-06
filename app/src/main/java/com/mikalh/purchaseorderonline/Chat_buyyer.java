@@ -3,6 +3,7 @@ package com.mikalh.purchaseorderonline;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -20,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.mikalh.purchaseorderonline.Adapter.ChatAdapter;
 import com.mikalh.purchaseorderonline.Adapter.ChatListAdapter;
+import com.mikalh.purchaseorderonline.Model.User;
 
 
 public class Chat_buyyer extends Fragment implements ChatListAdapter.OnChatListListenerListener{
@@ -48,7 +52,7 @@ public class Chat_buyyer extends Fragment implements ChatListAdapter.OnChatListL
         fragment.setArguments(args);
         return fragment;
     }
-
+    User userModel;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +63,8 @@ public class Chat_buyyer extends Fragment implements ChatListAdapter.OnChatListL
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
-        query = firestore.collection("RoomChat").whereEqualTo("Users."+user.getUid(),true);
+        query = firestore.collection("RoomChat").whereEqualTo("Users."+user.getUid(),true).whereEqualTo("idPembeli",user.getUid());
+
     }
 
     @Override
@@ -68,28 +73,37 @@ public class Chat_buyyer extends Fragment implements ChatListAdapter.OnChatListL
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_chat_buyyer, container, false);
         chatBuyer_RV = v.findViewById(R.id.chatBuyyer_RV);
-        adapter = new ChatListAdapter(query,this,user){
-            @Override
-            protected void onDataChanged() {
-                super.onDataChanged();
-            }
+        if (firestore.collection("Users").document(user.getUid()).get().isSuccessful()) {
+            firestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot snapshot = task.getResult();
+                    userModel = snapshot.toObject(User.class);
+                }
+            });
+            adapter = new ChatListAdapter(query, this, userModel) {
+                @Override
+                protected void onDataChanged() {
+                    super.onDataChanged();
+                }
 
-            @Override
-            public void onBindViewHolder(ChatListHolder holder, int position) {
-                super.onBindViewHolder(holder, position);
-            }
+                @Override
+                public void onBindViewHolder(ChatListHolder holder, int position) {
+                    super.onBindViewHolder(holder, position);
+                }
 
-            @Override
-            protected void onError(FirebaseFirestoreException e) {
-                super.onError(e);
-                Crashlytics.logException(e);
-            }
-        };
-        chatBuyer_RV.setAdapter(adapter);
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setSmoothScrollbarEnabled(true);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        chatBuyer_RV.setLayoutManager(llm);
+                @Override
+                protected void onError(FirebaseFirestoreException e) {
+                    super.onError(e);
+                    Crashlytics.logException(e);
+                }
+            };
+            chatBuyer_RV.setAdapter(adapter);
+            LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+            llm.setSmoothScrollbarEnabled(true);
+            llm.setOrientation(LinearLayoutManager.VERTICAL);
+            chatBuyer_RV.setLayoutManager(llm);
+        }
         return v;
     }
 

@@ -37,12 +37,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ThrowOnExtraProperties;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.mikalh.purchaseorderonline.Model.User;
 import com.mikalh.purchaseorderonline.Pager.ProfilePagger;
 
 import java.io.File;
@@ -70,6 +72,7 @@ public class Profile extends AppCompatActivity implements TabLayout.OnTabSelecte
             android.Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     Uri filePath,imageResult;
     String ImageURL;
+    User userModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,7 +89,14 @@ public class Profile extends AppCompatActivity implements TabLayout.OnTabSelecte
         imageProfile = findViewById(R.id.imageProfile);
         changeImage_profile = findViewById(R.id.changeImage_profile);
         changeImage_profile.setOnClickListener(this);
-        Glide.with(imageProfile.getContext()).load(user.getPhotoUrl()).into(imageProfile);
+        firestore.collection("Users").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                DocumentSnapshot snapshot = task.getResult();
+                userModel = snapshot.toObject(User.class);
+                Glide.with(imageProfile.getContext()).load(userModel.getUrl_pictLogo()).into(imageProfile);
+            }
+        });
         changImage_profile = findViewById(R.id.changeImage_profile);
         if (!user.getUid().equals(userID)){
             changImage_profile.hide();
@@ -275,6 +285,7 @@ public class Profile extends AppCompatActivity implements TabLayout.OnTabSelecte
                     }).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
+
                             progressDialog.dismiss();
                             Toast.makeText(getApplicationContext(),"Suscess change Profile",Toast.LENGTH_LONG).show();
                         }

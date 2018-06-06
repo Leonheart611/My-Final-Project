@@ -35,17 +35,7 @@ import com.mikalh.purchaseorderonline.Model.User;
 import java.util.HashMap;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link PIC_Profile.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link PIC_Profile#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PIC_Profile extends android.support.v4.app.Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -67,16 +57,6 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
     public PIC_Profile() {
         // Required empty public constructor
     }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PIC_Profile.
-     */
-    // TODO: Rename and change types and number of parameters
     public static PIC_Profile newInstance(String param1, String param2) {
         PIC_Profile fragment = new PIC_Profile();
         Bundle args = new Bundle();
@@ -100,11 +80,10 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
         users = firestore.collection("Users");
         customDialog = new CustomDialog(getActivity());
     }
-
+    TextInputLayout TIL_picName, TIL_picPos,TIL_telephone,TIL_email;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_piccontact, container, false);
         customDialog.show();
         picName_profile = v.findViewById(R.id.picName_profile);
@@ -114,10 +93,42 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
         changePassword_profile = v.findViewById(R.id.changePassword_profile);
         email_profile = v.findViewById(R.id.email_profile);
         username_profile = v.findViewById(R.id.username_profile);
+        TIL_email = v.findViewById(R.id.TIL_email);
+        TIL_picName = v.findViewById(R.id.TIL_picName);
+        TIL_picPos = v.findViewById(R.id.TIL_picPosition);
+        TIL_telephone = v.findViewById(R.id.TIL_telephone);
         saveButton_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateProfile();
+                boolean lanjut = true;
+                TIL_picName.setErrorEnabled(false);
+                TIL_picName.setError(null);
+                TIL_picPos.setErrorEnabled(false);
+                TIL_picPos.setError(null);
+                TIL_telephone.setErrorEnabled(false);
+                TIL_telephone.setError(null);
+                TIL_email.setErrorEnabled(false);
+                TIL_email.setError(null);
+                if (picName_profile.getText().toString().isEmpty()){
+                    TIL_picName.setErrorEnabled(true);
+                    TIL_picName.setError("Harus Diisi");
+                    lanjut = false;
+                }if (picPosition_profile.getText().toString().isEmpty()){
+                    TIL_picPos.setErrorEnabled(true);
+                    TIL_picPos.setError("Harus Diisi");
+                    lanjut = false;
+                }if (telephone_profile.getText().toString().isEmpty()){
+                    TIL_telephone.setErrorEnabled(true);
+                    TIL_telephone.setError("Harus Diisi");
+                    lanjut = false;
+                }if (email_profile.getText().toString().isEmpty()){
+                    TIL_email.setErrorEnabled(true);
+                    TIL_email.setError("Harus Diisi");
+                    lanjut = false;
+                }
+                if (lanjut) {
+                    updateProfile();
+                }
             }
         });
         changePassword_profile.setOnClickListener(new View.OnClickListener() {
@@ -138,7 +149,6 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
             email_profile.setFocusable(false);
             username_profile.setEnabled(false);
             username_profile.setFocusable(false);
-
             saveButton_profile.setVisibility(View.INVISIBLE);
             changePassword_profile.setVisibility(View.INVISIBLE);
 
@@ -172,8 +182,6 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
 
         return v;
     }
-
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -193,6 +201,7 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
                     customDialog.dismiss();
+                    Toast.makeText(getActivity(),"Berhasil Update Profile",Toast.LENGTH_LONG).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -227,7 +236,7 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         Window window = dialog.getWindow();
         lp.copyFrom(window.getAttributes());
-//This makes the dialog take up the full width
+        //This makes the dialog take up the full width
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         window.setAttributes(lp);

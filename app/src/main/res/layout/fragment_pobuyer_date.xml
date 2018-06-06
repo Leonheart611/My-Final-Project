@@ -45,6 +45,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Alamat Pengiriman"
+            android:editable="false"
+            android:focusable="false"
             android:inputType="textPostalAddress" />
     </android.support.design.widget.TextInputLayout>
 
@@ -85,7 +87,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:text="upload Bukti Pembayaran"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

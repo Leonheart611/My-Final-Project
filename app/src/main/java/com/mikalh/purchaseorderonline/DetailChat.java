@@ -51,8 +51,9 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
     ArrayList<String> userList;
     final Date calendar = Calendar.getInstance().getTime();
     Chat chat;
-    String imageUrl;
+    String imageUrlSeller,imageUrlBuyer;
     String sellerID;
+    String nama;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,26 +72,31 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful()){
                                 DocumentSnapshot snapshot1 = task.getResult();
-                                String nama = snapshot1.get("nama_barang").toString();
+                                nama = snapshot1.get("namaPerusahaan").toString();
                                 setTitle(nama);
                                 sellerID = snapshot1.get("userId").toString();
+                                firestore.collection("Users").document(sellerID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        DocumentSnapshot snapshot2 = task.getResult();
+                                        imageUrlSeller = snapshot2.get("url_pictLogo").toString();
+                                    }
+                                });
                             }
                         }
                     });
-
                 }
             }
         });
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         senderId = getIntent().getExtras().getString(detailItem.SENDER_ID);
-
         query = firestore.collection("RoomChat").document(RoomId).collection("ChatList").orderBy("time").limit(20);
         firestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 User user = task.getResult().toObject(User.class);
-                imageUrl = user.getUrl_pictLogo();
+                imageUrlBuyer = user.getUrl_pictLogo();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -98,19 +104,16 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                 Crashlytics.logException(e);
             }
         });
-
         adapter = new ChatAdapter(query,this,user){
             @Override
             protected void onDataChanged() {
                 super.onDataChanged();
                 reyclerview_message.smoothScrollToPosition(adapter.getItemCount());
             }
-
             @Override
             public void onBindViewHolder(ChatHolder holder, int position) {
                 super.onBindViewHolder(holder, position);
             }
-
             @Override
             public ChatHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 return super.onCreateViewHolder(parent, viewType);
@@ -121,7 +124,6 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                 super.onError(e);
                 Crashlytics.logException(e);
             }
-
         };
 
         reyclerview_message.setAdapter(adapter);
@@ -144,12 +146,14 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                 final String tanggal = formatDate(date);
                 if (!ChatValue.isEmpty()) {
                     edittext_chatbox.setText("");
-                    chat = new Chat(user.getUid(),user.getDisplayName(),ChatValue,tanggal,time,imageUrl);
+                    chat = new Chat(user.getUid(),user.getDisplayName(),ChatValue,tanggal,time,imageUrlBuyer);
                     final Map<String,Object> lastChat = new HashMap<>();
                     lastChat.put("message",chat.getMessage());
-                    lastChat.put("name",chat.getSender_name());
+                    lastChat.put("namePerusahaan",nama);
+                    lastChat.put("namaPembeli",user.getDisplayName());
                     lastChat.put("time",chat.getTime());
-                    lastChat.put("image",imageUrl);
+                    lastChat.put("imageSeller",imageUrlSeller);
+                    lastChat.put("imageBuyer",imageUrlBuyer);
                     //add to Conversasion session
                     firestore.collection("RoomChat").document(RoomId).collection("ChatList").add(chat).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                         @Override

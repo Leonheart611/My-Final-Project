@@ -45,6 +45,8 @@
             android:id="@+id/AlamatPengiriman_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:editable="false"
+            android:focusable="false"
             android:hint="Alamat Pengiriman"
             android:inputType="textPostalAddress" />
     </android.support.design.widget.TextInputLayout>

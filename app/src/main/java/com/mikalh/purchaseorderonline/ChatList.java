@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.mikalh.purchaseorderonline.Adapter.ChatListAdapter;
+import com.mikalh.purchaseorderonline.Model.User;
 
 
 /**
@@ -75,7 +76,7 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
         fragment.setArguments(args);
         return fragment;
     }
-
+    User userModel;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,10 +88,14 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
         firestore = FirebaseFirestore.getInstance();
         user = auth.getCurrentUser();
         query = firestore.collection("RoomChat")
-                .whereEqualTo("Users."+user.getUid(),true);
-
-
-
+                .whereEqualTo("Users."+user.getUid(),true).whereEqualTo("idPenjual",user.getUid());
+        firestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                     DocumentSnapshot snapshot = task.getResult();
+                     userModel = snapshot.toObject(User.class);
+            }
+        });
     }
 
     @Override
@@ -99,7 +104,7 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_chat, container, false);
         chatList_RV = view.findViewById(R.id.chatList_RV);
-        adapter = new ChatListAdapter(query,this,user){
+        adapter = new ChatListAdapter(query,this,userModel){
             @Override
             protected void onDataChanged() {
                 super.onDataChanged();
@@ -114,7 +119,6 @@ public class ChatList extends android.support.v4.app.Fragment implements ChatLis
             public ChatListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 return super.onCreateViewHolder(parent, viewType);
             }
-
             @Override
             protected void onError(FirebaseFirestoreException e) {
                 super.onError(e);

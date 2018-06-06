@@ -14,6 +14,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.mikalh.purchaseorderonline.Model.Chat;
 import com.mikalh.purchaseorderonline.Model.LastChat;
+import com.mikalh.purchaseorderonline.Model.User;
 import com.mikalh.purchaseorderonline.R;
 
 import org.json.JSONException;
@@ -34,9 +35,9 @@ public class ChatListAdapter extends FirestoreAdapter<ChatListAdapter.ChatListHo
 
     }
     private OnChatListListenerListener mListener;
-    private FirebaseUser user;
+    private User user;
     private String senderID;
-    public ChatListAdapter(Query query, OnChatListListenerListener listener,FirebaseUser user) {
+    public ChatListAdapter(Query query, OnChatListListenerListener listener, User user) {
         super(query);
         mListener = listener;
         this.user = user;
@@ -64,16 +65,25 @@ public class ChatListAdapter extends FirestoreAdapter<ChatListAdapter.ChatListHo
             timeStampt_chatList = itemView.findViewById(R.id.timeStamp_chatList);
             image_chatList = itemView.findViewById(R.id.image_chatList);
         }
-        public void bind(final DocumentSnapshot snapshot, final OnChatListListenerListener listener, FirebaseUser user){
+        public void bind(final DocumentSnapshot snapshot, final OnChatListListenerListener listener, User user){
             LastChat chat = snapshot.toObject(LastChat.class);
             String time = formatTime(chat.getTime());
-            name_chatList.setText(chat.getName());
             lastMessage_chatList.setText(chat.getMessage());
             timeStampt_chatList.setText(time);
-            if (chat.getImage()!=null) {
-                Glide.with(image_chatList.getContext())
-                        .load(chat.getImage())
-                        .into(image_chatList);
+            if (user.getRoleActive().equals("Pembeli")){
+                if (chat.getImageSeller()!=null) {
+                    Glide.with(image_chatList.getContext())
+                            .load(chat.getImageSeller())
+                            .into(image_chatList);
+                }
+                name_chatList.setText(chat.getNamePerusahaan());
+            }else {
+                if (!chat.getImageBuyer().isEmpty()){
+                    Glide.with(image_chatList.getContext())
+                            .load(chat.getImageBuyer())
+                            .into(image_chatList);
+                }
+                name_chatList.setText(chat.getNamaPembeli());
             }
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -83,10 +93,7 @@ public class ChatListAdapter extends FirestoreAdapter<ChatListAdapter.ChatListHo
                     }
                 }
             });
-
-
         }
-
         public String formatTime(String date) {
             try {
                 SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
