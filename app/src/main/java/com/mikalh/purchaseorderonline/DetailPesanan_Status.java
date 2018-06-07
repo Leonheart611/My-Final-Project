@@ -38,6 +38,7 @@ import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.User;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -306,7 +307,6 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                                 DocumentSnapshot snapshot = task.getResult();
                                 String Status = snapshot.get("StatusPO").toString();
                                 statusKirimPO.setText(Status);
-                                Toast.makeText(getActivity(),"Berhasil ubah status Pesanan",Toast.LENGTH_LONG).show();
                                 new transaksiSelesai().execute();
                             }
                         });
@@ -369,6 +369,21 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                 return new String("Exception: " + e.getMessage());
             }
         }
+
+        @Override
+        protected void onPostExecute(String s) {
+            try {
+                JSONObject jsonObject = new JSONObject(s);
+                int HasilNotif = jsonObject.getInt("success");
+                if (HasilNotif == 1){
+                    Toast.makeText(getActivity(),"Berhasil ubah status Pesanan",Toast.LENGTH_LONG).show();
+                }else {
+                    Toast.makeText(getActivity(),"Status Berhasil berubah, tetapi gagal kirim notif",Toast.LENGTH_LONG).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
     public class pengirimanBarangNotif extends AsyncTask<String, Void, String> {
         @Override
@@ -421,6 +436,21 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
 
             } catch (Exception e) {
                 return new String("Exception: " + e.getMessage());
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            try {
+                JSONObject jsonObject = new JSONObject(s);
+                int HasilNotif = jsonObject.getInt("success");
+                if (HasilNotif == 1){
+                    Toast.makeText(getActivity(),"Berhasil ubah status Pesanan",Toast.LENGTH_LONG).show();
+                }else {
+                    Toast.makeText(getActivity(),"Status Berhasil berubah, tetapi gagal kirim notif",Toast.LENGTH_LONG).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
     }

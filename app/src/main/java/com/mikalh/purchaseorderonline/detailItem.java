@@ -329,37 +329,50 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                                         arrayUserID.put("namaPerusahaanPembeli",userModel.getNama_perusahaan());
                                         arrayUserID.put("StatusPO","Belum Di buat PO");
                                         arrayUserID.put("MakePO",false);
-                                        arrayUserID.put("PembeliNotif",userCompany.getNotificationId());
-                                        arrayUserID.put("PenjualNotif",item.getNotificationId());
-                                        firestore.collection("Cart").document(myId).set(arrayUserID).addOnFailureListener(new OnFailureListener() {
+                                        firestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                             @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Crashlytics.logException(e);
-                                                Toast.makeText(detailItem.this,e.getMessage(),Toast.LENGTH_LONG).show();
-                                            }
-                                        }).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                 if (task.isSuccessful()){
-                                                    firestore.collection("Cart").document(myId).collection("ItemList").document().set(cart).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    User pembeli = task.getResult().toObject(User.class);
+                                                    arrayUserID.put("PembeliNotif",pembeli.getNotificationId());
+                                                    arrayUserID.put("PenjualNotif",item.getNotificationId());
+                                                    firestore.collection("Cart").document(myId).set(arrayUserID).addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Crashlytics.logException(e);
+                                                            Toast.makeText(detailItem.this,e.getMessage(),Toast.LENGTH_LONG).show();
+                                                        }
+                                                    }).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
                                                             if (task.isSuccessful()){
-                                                                Query query = firestore.collection("Cart").document(myId).collection("ItemList");
-                                                                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                firestore.collection("Cart").document(myId).collection("ItemList").document().set(cart).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                     @Override
-                                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                        if (task.isSuccessful()) {
-                                                                            QuerySnapshot snapshots1 = task.getResult();
-                                                                            Map<String,Object> dataUPdate = new HashMap<>();
-                                                                            int banyakData = snapshots1.size();
-                                                                            dataUPdate.put("BanyakData",banyakData);
-                                                                            firestore.collection("Cart").document(myId).update(dataUPdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                        if (task.isSuccessful()){
+                                                                            Query query = firestore.collection("Cart").document(myId).collection("ItemList");
+                                                                            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                                                                 @Override
-                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                                                                     if (task.isSuccessful()) {
-                                                                                        Toast.makeText(detailItem.this,"Data berhasil di Simpan",Toast.LENGTH_LONG).show();
-                                                                                        dialog.dismiss();
+                                                                                        QuerySnapshot snapshots1 = task.getResult();
+                                                                                        Map<String,Object> dataUPdate = new HashMap<>();
+                                                                                        int banyakData = snapshots1.size();
+                                                                                        dataUPdate.put("BanyakData",banyakData);
+                                                                                        firestore.collection("Cart").document(myId).update(dataUPdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                            @Override
+                                                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                                                if (task.isSuccessful()) {
+                                                                                                    Toast.makeText(detailItem.this,"Data berhasil di Simpan",Toast.LENGTH_LONG).show();
+                                                                                                    dialog.dismiss();
+                                                                                                }
+                                                                                            }
+                                                                                        }).addOnFailureListener(new OnFailureListener() {
+                                                                                            @Override
+                                                                                            public void onFailure(@NonNull Exception e) {
+                                                                                                Crashlytics.logException(e);
+                                                                                            }
+                                                                                        });
                                                                                     }
                                                                                 }
                                                                             }).addOnFailureListener(new OnFailureListener() {
@@ -376,14 +389,9 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                                                                         Crashlytics.logException(e);
                                                                     }
                                                                 });
-                                                            }
-                                                        }
-                                                    }).addOnFailureListener(new OnFailureListener() {
-                                                        @Override
-                                                        public void onFailure(@NonNull Exception e) {
-                                                            Crashlytics.logException(e);
-                                                        }
-                                                    });
+                                                }
+                                            }
+                                        });
                                                 }
                                             }
                                         });
