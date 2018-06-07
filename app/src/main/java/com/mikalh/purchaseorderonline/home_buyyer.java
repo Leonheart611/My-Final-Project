@@ -123,7 +123,7 @@ public class home_buyyer extends Fragment implements View.OnClickListener{
             startActivity(i);
         }
         if(v == search_buyyer || v == search_buyyerTxt){
-            Intent i = new Intent(getActivity(),search.class);
+            Intent i = new Intent(getActivity(),Search.class);
             startActivity(i);
         }if (v == send_po || v == sent_buyyerTxt){
             Intent i = new Intent(getActivity(),SendPO.class);

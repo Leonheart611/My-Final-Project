@@ -1,9 +1,12 @@
 package com.mikalh.purchaseorderonline;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +18,7 @@ import android.widget.ImageView;
 
 import com.github.kimkevin.cachepot.CachePot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 import com.mikalh.purchaseorderonline.Model.Company;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
@@ -89,6 +93,7 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment impl
         fragment.setArguments(args);
         return fragment;
     }
+    SharedPreferences mPrefs;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,8 +101,10 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment impl
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
     }
-
+    TextInputLayout TIL_company_register
+            , TIL_adress_register,TIL_city_register,TIL_telephone_register,TIL_fax_register;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -110,6 +117,11 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment impl
         fax_register = view.findViewById(R.id.fax_register);
         nextDo = view.findViewById(R.id.nextDo);
         nextDo.setOnClickListener(this);
+        TIL_adress_register = view.findViewById(R.id.TIL_adress_register);
+        TIL_city_register = view.findViewById(R.id.TIL_city_register);
+        TIL_company_register = view.findViewById(R.id.TIL_company_register);
+        TIL_fax_register = view.findViewById(R.id.TIL_fax_register);
+        TIL_telephone_register = view.findViewById(R.id.TIL_telephone_register);
         province_register = view.findViewById(R.id.province_register);
         ArrayAdapter adapter = new ArrayAdapter(getActivity(),android.R.layout.simple_spinner_dropdown_item,listProvince);
         province_register.setAdapter(adapter);
@@ -147,23 +159,63 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment impl
     @Override
     public void onClick(View view) {
         if (view == nextDo){
+            Boolean next = true;
+            TIL_company_register.setError(null);
+            TIL_company_register.setErrorEnabled(false);
+            TIL_telephone_register.setError(null);
+            TIL_telephone_register.setErrorEnabled(false);
+            TIL_fax_register.setError(null);
+            TIL_fax_register.setErrorEnabled(false);
+            TIL_city_register.setError(null);
+            TIL_city_register.setErrorEnabled(false);
+            TIL_adress_register.setError(null);
+            TIL_adress_register.setErrorEnabled(false);
+            if (companyName_register.getText().toString().isEmpty()){
+                TIL_company_register.setErrorEnabled(true);
+                TIL_company_register.setError("Harus Di isi");
+                next = false;
+            }if (adress_register.getText().toString().isEmpty()){
+                TIL_adress_register.setErrorEnabled(true);
+                TIL_adress_register.setError("Harus Di isi");
+                next = false;
+            }if (city_register.getText().toString().isEmpty()){
+                TIL_city_register.setErrorEnabled(true);
+                TIL_city_register.setError("Harus Di isi");
+                next = false;
+            }if (fax_register.getText().toString().isEmpty()){
+                TIL_fax_register.setErrorEnabled(true);
+                TIL_fax_register.setError("Harus Di isi");
+                next = false;
+            }if (telephone_register.getText().toString().isEmpty()){
+                TIL_telephone_register.setErrorEnabled(true);
+                TIL_telephone_register.setError("Harus Di isi");
+                next = false;
+            }
+            if (next) {
+                Gson gson = new Gson();
+                Company company = new Company();
+                company.setNama_perusahaan(companyName_register.getText().toString());
+                company.setAlamat_perusahaan(adress_register.getText().toString());
+                company.setKota(city_register.getText().toString());
+                company.setNo_fax(fax_register.getText().toString());
+                company.setProvinsi(province_register.getSelectedItem().toString());
+                company.setNomorTelphone(telephone_register.getText().toString());
 
-            Company company = new Company();
-            company.setNama_perusahaan(companyName_register.getText().toString());
-            company.setAlamat_perusahaan(adress_register.getText().toString());
-            company.setKota(city_register.getText().toString());
-            company.setNo_fax(fax_register.getText().toString());
-            company.setProvinsi(province_register.getSelectedItem().toString());
-            company.setNomorTelphone(telephone_register.getText().toString());
+                SharedPreferences.Editor prefEditor = mPrefs.edit();
+                String jsonNext = gson.toJson(company);
+                prefEditor.putString("Company", jsonNext);
+                prefEditor.commit();
 
-            Bundle bundle = new Bundle();
+
+
+            /*Bundle bundle = new Bundle();
             bundle.putSerializable(COMPANY_KEY,company);
             next.setArguments(bundle);
-            CachePot.getInstance().push(company);
+            CachePot.getInstance().push(company);*/
 
 
-            myViewPagger.setCurrentItem(1,true);
-
+                myViewPagger.setCurrentItem(1, true);
+            }
         }
     }
     public interface OnFragmentInteractionListener {

@@ -26,7 +26,6 @@ public class newUserUI extends AppCompatActivity implements TabLayout.OnTabSelec
         getSupportActionBar().hide();
         setContentView(R.layout.activity_new_main);
         mainPagger = findViewById(R.id.mainPagger);
-        new InstanceIdService().onTokenRefresh();
         mainTab = findViewById(R.id.mainTab);
         adapter = new MainPager(getSupportFragmentManager(),3);
         mainPagger.setAdapter(adapter);

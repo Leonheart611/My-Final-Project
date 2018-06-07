@@ -36,10 +36,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
+import com.mikalh.purchaseorderonline.FCM.InstanceIdService;
 import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.User;
 
@@ -84,7 +86,7 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
         return fragment;
     }
     String Key = "key=AAAAx1NMbj0:APA91bHv2Yky3eenD79mwmY1unL3bLEI57VLpDkFoxQ2rfowQXju2DkeRV4_SvOF-LCaO9IsZfAhFIliTTeo5RPs5EwBxlImuoeDlfBzKsTDEiHsGBqtJlp8fCNgHEjlOAx9UqU_mWaT";
-    String NotificationTarget;
+    String NotificationTarget,notificationSelf;
     FirebaseAuth auth;
     FirebaseFirestore firestore;
     FirebaseUser user;
@@ -138,11 +140,23 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
                     String Status = snapshot.get("StatusPO").toString();
                     nomorPO = snapshot.get("NomorPO").toString();
                     NotificationTarget = snapshot.getString("PenjualNotif");
+                    notificationSelf = snapshot.getString("PembeliNotif");
+                    if (!notificationSelf.equals(FirebaseInstanceId.getInstance().getToken())){
+                        new InstanceIdService().onTokenRefresh();
+                        firestore.collection("Cart").document(ID).update("PembeliNotif",FirebaseInstanceId.getInstance().getToken()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    Crashlytics.log("Berhasil Update Token Notification Buyyer");
+                                }
+                            }
+                        });
+                    }
                     tanggalPermintaanKirim_poBuyyer.setText(tanggalPengiriman, TextView.BufferType.EDITABLE);
                     AlamatPengiriman_poBuyer.setText(Alamat, TextView.BufferType.EDITABLE);
                     String namaPerusahaanPemesan = snapshot.get("namaPerusahaanPembeli").toString();
                     statusKirimPO.setText(Status);
-                    if (!Status.equals("Pesanan Sedang Dikirim")) {
+                    if (!Status.equals("Pesanan Sedang Dikirim") || Status.equals("Sudah Diterima")) {
                         barangSudahDiterima.setEnabled(false);
                     }if (!Status.equals("Sudah Diterima")){
                         uploadBuktiBayar.setEnabled(false);
@@ -279,6 +293,7 @@ public class POBuyer_date extends Fragment implements View.OnClickListener {
                                 String Status = snapshot.get("StatusPO").toString();
                                 statusKirimPO.setText(Status);
                                 uploadBuktiBayar.setEnabled(true);
+                                barangSudahDiterima.setEnabled(false);
                                 new Sendnotif().execute();
                                 Toast.makeText(getActivity(),"Berhasil merubah status Pesanan",Toast.LENGTH_LONG).show();
                             }

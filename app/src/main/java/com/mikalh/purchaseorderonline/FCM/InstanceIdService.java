@@ -2,6 +2,7 @@ package com.mikalh.purchaseorderonline.FCM;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -23,11 +24,6 @@ public class InstanceIdService extends FirebaseInstanceIdService {
         Log.d("@@@@", "onTokenRefresh: " + instanceId);
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null) {
-            /*FirebaseDatabase.getInstance().getReference()
-                    .child("users")
-                    .child(firebaseUser.getUid())
-                    .child("instanceId")
-                    .setValue(instanceId);*/
             HashMap<String,Object> instance = new HashMap<>();
             instance.put("notificationId",instanceId);
             FirebaseFirestore.getInstance().collection("Users")
@@ -36,7 +32,7 @@ public class InstanceIdService extends FirebaseInstanceIdService {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isComplete()){
-                                Log.d("Add InstanseId",task.toString());
+                                Toast.makeText(getApplicationContext(),"Berhasil Update Notification ID",Toast.LENGTH_LONG).show();
                             }
                         }
                     }).addOnFailureListener(new OnFailureListener() {

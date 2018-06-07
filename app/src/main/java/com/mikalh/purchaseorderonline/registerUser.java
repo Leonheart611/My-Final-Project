@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +18,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,6 +49,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 import com.mikalh.purchaseorderonline.Model.Company;
 import com.mikalh.purchaseorderonline.Model.User;
 
@@ -97,7 +100,8 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
         fragment.setArguments(args);
         return fragment;
     }
-
+    SharedPreferences mPrefs;
+    TextInputLayout TIL_emailRegis,TIL_picRegis,TILpicPosRegis,TIL_usernameRegis,TIL_passRegis;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,7 +115,7 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
         instanceId = FirebaseInstanceId.getInstance().getToken();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-
+        mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
     }
 
     @Override
@@ -125,6 +129,11 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
         position_register = v.findViewById(R.id.position_register);
         username_register = v.findViewById(R.id.username_register);
         password_register = v.findViewById(R.id.password_register);
+        TIL_emailRegis = v.findViewById(R.id.TIL_emailRegis);
+        TIL_passRegis = v.findViewById(R.id.TIL_passRegis);
+        TIL_picRegis = v.findViewById(R.id.TIL_picRegis);
+        TILpicPosRegis = v.findViewById(R.id.TIL_picPosRegis);
+        TIL_usernameRegis = v.findViewById(R.id.TIL_usernameRegis);
         registerBtn = v.findViewById(R.id.registerBtn);
         registerBtn.setOnClickListener(this);
         imagePerusahaan_add.setOnClickListener(this);
@@ -159,155 +168,195 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
     @Override
     public void onClick(View view) {
         if (view == registerBtn){
+            Boolean register = true;
+            TIL_passRegis.setError(null);
+            TIL_passRegis.setErrorEnabled(false);
+            TIL_usernameRegis.setError(null);
+            TIL_usernameRegis.setErrorEnabled(false);
+            TILpicPosRegis.setError(null);
+            TILpicPosRegis.setErrorEnabled(false);
+            TIL_picRegis.setError(null);
+            TIL_picRegis.setErrorEnabled(false);
+            TIL_emailRegis.setError(null);
+            TIL_emailRegis.setErrorEnabled(false);
+            if (email_register.getText().toString().isEmpty()){
+                TIL_emailRegis.setErrorEnabled(true);
+                TIL_emailRegis.setError("Harap Di isi");
+                register = false;
+            }if (name_register.getText().toString().isEmpty()){
+                TIL_picRegis.setErrorEnabled(true);
+                TIL_picRegis.setError("Harap Di isi");
+                register = false;
+            }if (position_register.getText().toString().isEmpty()){
+                TILpicPosRegis.setErrorEnabled(true);
+                TILpicPosRegis.setError("Harap Di isi");
+                register = false;
+            }if (username_register.getText().toString().isEmpty()){
+                TIL_usernameRegis.setErrorEnabled(true);
+                TIL_usernameRegis.setError("Harap di isi");
+                register = false;
+            }if (password_register.getText().toString().isEmpty()){
+                TIL_passRegis.setErrorEnabled(true);
+                TIL_passRegis.setError("Harap di isi");
+                register = false;
+            }
+            if (register) {
                 RegisterDo();
+            }
         }if (view == imagePerusahaan_add){
             popUpAddFoto();
         }
     }
 
     void RegisterDo(){
-        cd = new CustomDialog(getActivity());
-        cd.show();
+        try {
+            cd = new CustomDialog(getActivity());
+            cd.show();
+            Gson gson = new Gson();
+            String json = mPrefs.getString("Company", "");
+            Company mcompany = gson.fromJson(json, Company.class);
+            //Company mcompany = CachePot.getInstance().pop(Company.class);
+            final String CompanyName = mcompany.getNama_perusahaan();
+            final String Address = mcompany.getAlamat_perusahaan();
+            final String Province = mcompany.getProvinsi();
+            final String City = mcompany.getKota();
+            final String Telephone = mcompany.getNomorTelphone();
+            final String FAX = mcompany.getNo_fax();
+            final String Email = email_register.getText().toString();
+            final String PICName = name_register.getText().toString();
+            final String PICPossition = position_register.getText().toString();
+            final String Username = username_register.getText().toString();
+            String Password = password_register.getText().toString();
 
-        Company mcompany = CachePot.getInstance().pop(Company.class);
-
-        final String CompanyName = mcompany.getNama_perusahaan();
-        final String Address = mcompany.getAlamat_perusahaan();
-        final String Province = mcompany.getProvinsi();
-        final String City = mcompany.getKota();
-        final String Telephone = mcompany.getNomorTelphone();
-        final String FAX = mcompany.getNo_fax();
-        final String Email = email_register.getText().toString();
-        final String PICName = name_register.getText().toString();
-        final String PICPossition = position_register.getText().toString();
-        final String Username = username_register.getText().toString();
-        String Password = password_register.getText().toString();
-
-        auth.createUserWithEmailAndPassword(Email,Password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()){
-                    user = auth.getCurrentUser();
-                    if (filePath!=null){
-                        final StorageReference ref = storageReference.child("images/"+ user.getUid());
-                        UploadTask uploadTask = ref.putFile(filePath);
-                        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                            @Override
-                            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                                if (!task.isSuccessful()) {
-                                    throw task.getException();
+            auth.createUserWithEmailAndPassword(Email, Password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        user = auth.getCurrentUser();
+                        if (filePath != null) {
+                            final StorageReference ref = storageReference.child("images/" + user.getUid());
+                            UploadTask uploadTask = ref.putFile(filePath);
+                            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                                @Override
+                                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                    if (!task.isSuccessful()) {
+                                        throw task.getException();
+                                    }
+                                    // Continue with the task to get the download URL
+                                    return ref.getDownloadUrl();
                                 }
-                                // Continue with the task to get the download URL
-                                return ref.getDownloadUrl();
-                            }
-                        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Uri> task) {
-                                if (task.isSuccessful()) {
-                                    imageResult = task.getResult();
-                                    UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(PICName).setPhotoUri(filePath).build();
-                                    user.updateProfile(profileChangeRequest).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            if (e==null){
-                                                Log.e("Error :",e.getMessage());
+                            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    if (task.isSuccessful()) {
+                                        imageResult = task.getResult();
+                                        UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(PICName).setPhotoUri(filePath).build();
+                                        user.updateProfile(profileChangeRequest).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                if (e == null) {
+                                                    Log.e("Error :", e.getMessage());
+                                                }
                                             }
-                                        }
-                                    });
-                                    User userAdd = new User(Address,CompanyName,Telephone,FAX,City,Province,imageResult.toString(),PICName,Email,user.getUid(),PICPossition,Username,instanceId,"");
-                                    firestore.collection("Users").document(user.getUid()).set(userAdd).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()){
-                                                //Toast.makeText(getActivity(),"Successfuly Create User",Toast.LENGTH_LONG).show();
-                                                user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if (task.isSuccessful()){
-                                                            cd.dismiss();
-                                                            popRole(user);
+                                        });
+                                        User userAdd = new User(Address, CompanyName, Telephone, FAX, City, Province, imageResult.toString(), PICName, Email, user.getUid(), PICPossition, Username, instanceId, "");
+                                        firestore.collection("Users").document(user.getUid()).set(userAdd).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    //Toast.makeText(getActivity(),"Successfuly Create User",Toast.LENGTH_LONG).show();
+                                                    user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            if (task.isSuccessful()) {
+                                                                cd.dismiss();
+                                                                popRole(user);
+                                                            }
                                                         }
-                                                    }
-                                                }).addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        Crashlytics.logException(e);
-                                                        cd.dismiss();
-                                                        Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_LONG).show();
-                                                    }
-                                                });
+                                                    }).addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Crashlytics.logException(e);
+                                                            cd.dismiss();
+                                                            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+                                                        }
+                                                    });
+                                                }
                                             }
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_LONG).show();
-                                            Crashlytics.logException(e);
-                                        }
-                                    });
-                                } else {
-                                    // Handle failures
-                                    // ...
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+                                                Crashlytics.logException(e);
+                                            }
+                                        });
+                                    } else {
+                                        // Handle failures
+                                        // ...
+                                    }
                                 }
-                            }
-                        });
-                    }else { // file path kosong
-                        UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(PICName).build();
-                        user.updateProfile(profileChangeRequest).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                if (e==null){
-                                    Log.e("Error :",e.getMessage());
+                            });
+                        } else { // file path kosong
+                            UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(PICName).build();
+                            user.updateProfile(profileChangeRequest).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    if (e == null) {
+                                        Log.e("Error :", e.getMessage());
+                                    }
                                 }
-                            }
-                        });
-                        User userAdd = new User(Address,CompanyName,Telephone,FAX,City,Province,"",PICName,Email,user.getUid(),PICPossition,Username,instanceId,"");
-                        firestore.collection("Users").document(user.getUid()).set(userAdd).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    //Toast.makeText(getActivity(),"Successfuly Create User",Toast.LENGTH_LONG).show();
-                                    user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()){
+                            });
+                            User userAdd = new User(Address, CompanyName, Telephone, FAX, City, Province, "", PICName, Email, user.getUid(), PICPossition, Username, instanceId, "");
+                            firestore.collection("Users").document(user.getUid()).set(userAdd).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        //Toast.makeText(getActivity(),"Successfuly Create User",Toast.LENGTH_LONG).show();
+                                        user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    cd.dismiss();
+                                                    popRole(user);
+                                                }
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Crashlytics.logException(e);
                                                 cd.dismiss();
-                                                popRole(user);
+                                                Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
                                             }
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Crashlytics.logException(e);
-                                            cd.dismiss();
-                                            Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_LONG).show();
-                                        }
-                                    });
+                                        });
+                                    }
                                 }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_LONG).show();
-                                Crashlytics.logException(e);
-                                cd.dismiss();
-                            }
-                        });
-                    }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+                                    Crashlytics.logException(e);
+                                    cd.dismiss();
+                                }
+                            });
+                        }
 
-                }else{
-                    FirebaseAuthException e = (FirebaseAuthException) task.getException();
-                    Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_LONG).show();
+                    } else {
+                        FirebaseAuthException e = (FirebaseAuthException) task.getException();
+                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+                        cd.dismiss();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e("Error Create User", e.getMessage());
                     cd.dismiss();
                 }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e("Error Create User",e.getMessage());
-                cd.dismiss();
-            }
-        });
+            });
+        }catch (Exception e){
+            Toast.makeText(getActivity(),"Terjadi Kesalahan Harap Masukan ulang data anda",Toast.LENGTH_LONG).show();
+            getActivity().onBackPressed();
+        }
     }
     public void popUpAddFoto(){
         final Dialog dialog = new Dialog(getActivity());

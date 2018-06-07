@@ -33,7 +33,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
+import com.mikalh.purchaseorderonline.FCM.InstanceIdService;
 import com.mikalh.purchaseorderonline.Model.Cart;
 import com.mikalh.purchaseorderonline.Model.User;
 
@@ -86,7 +88,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
     String ID,tanggalPengiriman,nomorPO;
     String buktiPembayaranLink;
     String Key = "key=AAAAx1NMbj0:APA91bHv2Yky3eenD79mwmY1unL3bLEI57VLpDkFoxQ2rfowQXju2DkeRV4_SvOF-LCaO9IsZfAhFIliTTeo5RPs5EwBxlImuoeDlfBzKsTDEiHsGBqtJlp8fCNgHEjlOAx9UqU_mWaT";
-    String NotificationTarget;
+    String NotificationTarget,NotificationSelf;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,12 +130,27 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                 nomorPO = snapshot.get("NomorPO").toString();
                 buktiPembayaranLink = snapshot.get("LinkBuktiBayar").toString();
                 NotificationTarget = snapshot.get("PembeliNotif").toString();
+                NotificationSelf = snapshot.get("PenjualNotif").toString();
+                if (!NotificationSelf.equals(FirebaseInstanceId.getInstance().getToken())){
+                    new InstanceIdService().onTokenRefresh();
+                    firestore.collection("Cart").document(ID).update("PenjualNotif",FirebaseInstanceId.getInstance().getToken()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                Crashlytics.log("Berhasil Update Notification ID");
+                            }
+                        }
+                    });
+                }
                 tanggalPermintaanKirim_detail.setText(tanggalPengiriman, TextView.BufferType.EDITABLE);
                 AlamatPengiriman_detail.setText(Alamat, TextView.BufferType.EDITABLE);
                 statusKirimPO.setText(Status);
                 if (Status.equals("Sedang Di konfirmasi Kepenjual")){
                     transaksiSelesai.setEnabled(false);
-                }if (Status.equals("Sudah Diterima")&& !buktiPembayaranLink.isEmpty()){
+                }if (Status.equals("Pesanan Sedang Dikirim")){
+                    pesananSudahDikirim.setEnabled(false);
+                }
+                if (Status.equals("Sudah Diterima") && !buktiPembayaranLink.isEmpty()){
                     pesananSudahDikirim.setEnabled(false);
                     transaksiSelesai.setEnabled(false);
                 }if (buktiPembayaranLink.isEmpty()){
@@ -285,6 +302,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                                 String Status = snapshot.get("StatusPO").toString();
                                 statusKirimPO.setText(Status);
                                 Toast.makeText(getActivity(),"Berhasil ubah status Pesanan",Toast.LENGTH_LONG).show();
+                                pesananSudahDikirim.setEnabled(false);
                                 new pengirimanBarangNotif().execute();
                             }
                         });
@@ -307,6 +325,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                                 DocumentSnapshot snapshot = task.getResult();
                                 String Status = snapshot.get("StatusPO").toString();
                                 statusKirimPO.setText(Status);
+                                transaksiSelesai.setEnabled(false);
                                 new transaksiSelesai().execute();
                             }
                         });

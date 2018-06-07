@@ -51,17 +51,14 @@ public class myCatalogue extends AppCompatActivity implements CatalogueAdapter.O
             protected void onDataChanged() {
                 super.onDataChanged();
             }
-
             @Override
             public void onBindViewHolder(CatalogueHolder holder, int position) {
                 super.onBindViewHolder(holder, position);
             }
-
             @Override
             public CatalogueHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 return super.onCreateViewHolder(parent, viewType);
             }
-
             @Override
             protected void onError(FirebaseFirestoreException e) {
                 super.onError(e);

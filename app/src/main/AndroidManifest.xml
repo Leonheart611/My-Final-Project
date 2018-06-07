@@ -26,11 +26,10 @@
         <activity android:name=".myCatalogue" />
         <activity android:name=".detailEdit" />
         <activity android:name=".Profile" />
-        <activity android:name=".search">
+        <activity android:name=".Search">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -62,7 +61,8 @@
         <activity android:name=".SendPO" />
         <activity android:name=".DetailPesanan" />
         <activity android:name=".SearchResult" />
-        <activity android:name=".POBuyer"></activity>
+        <activity android:name=".POBuyer" />
+        <activity android:name=".BuyerSearchResult"></activity>
     </application>
 
 </manifest>

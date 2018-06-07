@@ -25,18 +25,29 @@ public class SearchResult extends AppCompatActivity implements CatalogueAdapter.
     FirebaseUser user;
     FirebaseAuth auth;
     Query query;
-    String ID;
+    String ID,search;
     CatalogueAdapter adapter;
     public static final String KEY_ITEM_ID = "keyItemID";
+    public static final String QUERYSEARCH = "Search";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
-        ID = getIntent().getExtras().getString(DetailChat.IDSeller);
+        setTitle("Search Result");
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
-        query = firestore.collection("Items").whereEqualTo("userId",ID);
+        searchText = findViewById(R.id.searchText);
+        resultSearch_RV = findViewById(R.id.resultSearch_RV);
+        ID = getIntent().getExtras().getString(DetailChat.IDSeller);
+        if (ID != null){
+            query = firestore.collection("Items").whereEqualTo("userId",ID);
+            searchText.setText("Hasil Search Berdasarkan Perusahaan: "+ID);
+        }else {
+            search = getIntent().getExtras().getString(Search.QUERYSEARCH);
+            query = firestore.collection("Items").whereLessThanOrEqualTo("nama_barang",search);
+            searchText.setText("Hasil Pencarian Kata Kunci: "+search);
+        }
         adapter = new CatalogueAdapter(query,this){
             @Override
             protected void onError(FirebaseFirestoreException e) {
@@ -48,8 +59,7 @@ public class SearchResult extends AppCompatActivity implements CatalogueAdapter.
                 super.onDataChanged();
             }
         };
-        searchText = findViewById(R.id.searchText);
-        resultSearch_RV = findViewById(R.id.resultSearch_RV);
+
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         resultSearch_RV.setLayoutManager(llm);
@@ -59,11 +69,16 @@ public class SearchResult extends AppCompatActivity implements CatalogueAdapter.
     }
 
     @Override
+    public void onBackPressed() {
+        adapter.stopListening();
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         adapter.startListening();
     }
-
     @Override
     protected void onStop() {
         super.onStop();
