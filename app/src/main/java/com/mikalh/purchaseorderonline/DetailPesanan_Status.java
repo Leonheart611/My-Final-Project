@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
 import android.util.Log;
@@ -119,6 +120,7 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
         convertPdf_detail.setOnClickListener(this);
         statusKirimPO = v.findViewById(R.id.statusKirimPO);
         perusahaan_detailPesan = v.findViewById(R.id.perusahaan_detailPesanan);
+
         firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -433,7 +435,6 @@ public class DetailPesanan_Status extends Fragment implements View.OnClickListen
                 writer.flush();
                 writer.close();
                 os.close();
-
 
                 int responseCode = conn.getResponseCode();
 

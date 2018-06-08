@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -100,13 +101,14 @@ public class CreatePOItem extends Fragment {
         mPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         NoPO = mPref.getString("NoPO","");
     }
-
+    TextInputLayout TIL_tanggalKirim,TIL_alamatKirim;
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_create_poitem, container, false);
-
+        TIL_tanggalKirim = v.findViewById(R.id.TIL_tanggalKirim);
+        TIL_alamatKirim = v.findViewById(R.id.TIL_alamatKirim);
         tanggalPermintaanKirim = v.findViewById(R.id.tanggalPermintaanKirim);
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -129,40 +131,57 @@ public class CreatePOItem extends Fragment {
         kirimPO.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String alamat = AlamatPnegiriman.getText().toString();
-                final String tanggal = tanggalPermintaanKirim.getText().toString();
-                Map<String,Object> dataUpdate = new HashMap<>();
-                dataUpdate.put("MakePO",true);
-                dataUpdate.put("StatusPO","Sedang Di konfirmasi Kepenjual");
-                dataUpdate.put("alamatPengiriman",alamat);
-                dataUpdate.put("tanggalPermintaanKirim",tanggal);
-                dataUpdate.put("tanggalPembuatanPO",tanggalHariIni);
-                dataUpdate.put("NomorPO",NoPO);
-                dataUpdate.put("LinkBuktiBayar","");
-                firestore.collection("Cart").document(ID).update(dataUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful()){
-                                        DocumentSnapshot snapshot = task.getResult();
-                                        NotificationTarget = snapshot.get("PenjualNotif").toString();
-                                        new Sendnotif().execute();
+                Boolean kirim = true;
+                TIL_tanggalKirim.setError(null);
+                TIL_tanggalKirim.setErrorEnabled(false);
+                TIL_alamatKirim.setError(null);
+                TIL_alamatKirim.setErrorEnabled(false);
+                if (AlamatPnegiriman.getText().toString().isEmpty()) {
+                    TIL_alamatKirim.setError("Harus Diisi");
+                    TIL_alamatKirim.setErrorEnabled(true);
+                    kirim = false;
+                }
+                if (tanggalPermintaanKirim.getText().toString().isEmpty()) {
+                    TIL_tanggalKirim.setError("Harus Diisi");
+                    TIL_tanggalKirim.setErrorEnabled(true);
+                    kirim = false;
+                }
+                if (kirim) {
+                    final String alamat = AlamatPnegiriman.getText().toString();
+                    final String tanggal = tanggalPermintaanKirim.getText().toString();
+                    Map<String, Object> dataUpdate = new HashMap<>();
+                    dataUpdate.put("MakePO", true);
+                    dataUpdate.put("StatusPO", "Sedang Di konfirmasi Kepenjual");
+                    dataUpdate.put("alamatPengiriman", alamat);
+                    dataUpdate.put("tanggalPermintaanKirim", tanggal);
+                    dataUpdate.put("tanggalPembuatanPO", tanggalHariIni);
+                    dataUpdate.put("NomorPO", NoPO);
+                    dataUpdate.put("LinkBuktiBayar", "");
+                    firestore.collection("Cart").document(ID).update(dataUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                firestore.collection("Cart").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot snapshot = task.getResult();
+                                            NotificationTarget = snapshot.get("PenjualNotif").toString();
+                                            new Sendnotif().execute();
+                                        }
                                     }
-                                }
-                            });
+                                });
 
+                            }
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Crashlytics.logException(e);
-                    }
-                });
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Crashlytics.logException(e);
+                        }
+                    });
 
+                }
             }
         });
         return v;

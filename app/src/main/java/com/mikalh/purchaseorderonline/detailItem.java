@@ -71,6 +71,7 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
     Button chatButton;
     int GrandTotal = 0;
     public static final String USER_ID = "userID";
+    public static final String NAMAPERUSAHAAN = "perusahaan";
     User userModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

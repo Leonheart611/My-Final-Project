@@ -1,6 +1,7 @@
 package com.mikalh.purchaseorderonline;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -9,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -17,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.mikalh.purchaseorderonline.Adapter.CatalogueAdapter;
 import com.mikalh.purchaseorderonline.Adapter.ItemAdapter;
+import com.mikalh.purchaseorderonline.Model.User;
 
 public class SearchResult extends AppCompatActivity implements CatalogueAdapter.OnClickCatalogueListener{
     TextView searchText;
@@ -42,7 +46,15 @@ public class SearchResult extends AppCompatActivity implements CatalogueAdapter.
         ID = getIntent().getExtras().getString(DetailChat.IDSeller);
         if (ID != null){
             query = firestore.collection("Items").whereEqualTo("userId",ID);
-            searchText.setText("Hasil Search Berdasarkan Perusahaan: "+ID);
+            firestore.collection("Users").document(ID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot snapshot = task.getResult();
+                    User user = snapshot.toObject(User.class);
+                    searchText.setText("Hasil Search Berdasarkan Perusahaan: "+user.getNama_perusahaan());
+                }
+            });
+
         }else {
             search = getIntent().getExtras().getString(Search.QUERYSEARCH);
             query = firestore.collection("Items").whereLessThanOrEqualTo("nama_barang",search);

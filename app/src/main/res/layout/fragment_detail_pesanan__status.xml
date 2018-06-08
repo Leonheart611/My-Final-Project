@@ -9,7 +9,7 @@
 
     <!-- TODO: Update blank fragment layout -->
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout32"
+        android:id="@+id/TIL_tanggalKirim"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -31,7 +31,7 @@
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/textInputLayout34"
+        android:id="@+id/TIL_alamatKirim"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -39,7 +39,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout32">
+        app:layout_constraintTop_toBottomOf="@+id/TIL_tanggalKirim">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/AlamatPengiriman_detail"
@@ -135,7 +135,7 @@
         android:text="Pemesan"
         android:textColor="@android:color/black"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout34" />
+        app:layout_constraintTop_toBottomOf="@+id/TIL_alamatKirim" />
 
     <TextView
         android:id="@+id/perusahaan_detailPesanan"
