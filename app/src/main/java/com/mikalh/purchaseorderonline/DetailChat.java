@@ -105,7 +105,7 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         senderId = getIntent().getExtras().getString(detailItem.SENDER_ID);
-        query = firestore.collection("RoomChat").document(RoomId).collection("ChatList").orderBy("time").limit(20);
+        query = firestore.collection("RoomChat").document(RoomId).collection("ChatList").orderBy("date").orderBy("time").limit(35);
         firestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
