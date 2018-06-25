@@ -70,15 +70,54 @@ public class MainActivity extends AppCompatActivity {
         customDialog.show();
         String email = email_login.getText().toString();
         String password = password_login.getText().toString();
-        if (!email.isEmpty() && !password.isEmpty()){
+        if (email.equals("Adminss") && password.equals("Admin555")){
+            Intent i = new Intent(getApplicationContext(),AdminActivity.class);
+            startActivity(i);
+        }
+        else if (!email.isEmpty() && !password.isEmpty()){
             auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()){
                         customDialog.dismiss();
-                        FirebaseUser user = auth.getCurrentUser();
-                        popRole(user);
-                    }else {
+                        final FirebaseUser user = auth.getCurrentUser();
+                        firebaseFirestore.collection("Users").document(user.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot snapshot = task.getResult();
+                                    try {
+                                        boolean blocked = snapshot.getBoolean("Block").booleanValue();
+                                        if (blocked){
+                                            Toast.makeText(getApplicationContext(),"Akun Anda Terblokir",Toast.LENGTH_LONG).show();
+                                        }else {
+                                            popRole(user);
+                                        }
+                                    }catch (Exception e){
+                                        Log.e("Error Blocked",e.getMessage());
+                                        Crashlytics.logException(e);
+                                        firebaseFirestore.collection("Users").document(user.getUid()).update("Block",false).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()){
+                                                    popRole(user);
+                                                }
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Crashlytics.logException(e);
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Crashlytics.logException(e);
+                            }
+                        });
 
                     }
                 }

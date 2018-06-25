@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -53,8 +56,10 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
     final Date calendar = Calendar.getInstance().getTime();
     Chat chat;
     String imageUrlSeller,imageUrlBuyer;
-    String sellerID;
+    String sellerID,buyyerID;
     String nama;
+    CustomDialog customDialog;
+    String BlockId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,11 +67,13 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
         reyclerview_message = findViewById(R.id.reyclerview_message_list);
         firestore = FirebaseFirestore.getInstance();
         RoomId = getIntent().getExtras().getString(detailItem.ROOMID);
+        customDialog = new CustomDialog(this);
         firestore.collection("RoomChat").document(RoomId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     final DocumentSnapshot snapshot = task.getResult();
+                    buyyerID = snapshot.get("idPembeli").toString();
                     String itemId = snapshot.get("itemID").toString();
                     firestore.collection("Items").document(itemId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
@@ -247,6 +254,61 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
         inflater.inflate(R.menu.catalog_chat, menu);
         return super.onCreateOptionsMenu(menu);
     }
+    void popUpBlock(){
+        final Dialog dialog = new Dialog(this);
+        /* dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);*/
+        dialog.setContentView(R.layout.block_user_submit);
+        dialog.setCanceledOnTouchOutside(false);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+//This makes the dialog take up the full width
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(lp);
+
+        final EditText reason_block = dialog.findViewById(R.id.reason_block);
+        Button submit_block = dialog.findViewById(R.id.submit_block);
+        submit_block.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (reason_block.getText().toString().isEmpty()){
+                    Toast.makeText(getApplicationContext(),"Reason harus di isi",Toast.LENGTH_LONG).show();
+                }else {
+                    dialog.dismiss();
+                    customDialog.show();
+                    if (sellerID.equals(user.getUid())){
+                        BlockId = buyyerID;
+                    }else {
+                        BlockId = sellerID;
+                    }
+                    String reason = reason_block.getText().toString();
+                    Map<String,Object> dataBlock = new HashMap<>();
+                    dataBlock.put("BlockedID",BlockId);
+                    dataBlock.put("RequestBy",user.getUid());
+                    dataBlock.put("NamaPerusahaan",nama);
+                    dataBlock.put("Alasan",reason);
+                    dataBlock.put("Done",false);
+                    firestore.collection("BlockRequest").document().set(dataBlock).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                customDialog.dismiss();
+                                Toast.makeText(getApplicationContext(),"Data Berhasil dikirim,dan sedang dalam pengecekan",Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            customDialog.dismiss();
+                            Crashlytics.logException(e);
+                        }
+                    });
+                }
+            }
+        });
+    dialog.show();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -256,8 +318,12 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                 i.putExtra(IDSeller,sellerID);
                 startActivity(i);
                 return true;
+            case R.id.reportUser:
+                popUpBlock();
+                return true;
             default:
                 return false;
         }
     }
+
 }

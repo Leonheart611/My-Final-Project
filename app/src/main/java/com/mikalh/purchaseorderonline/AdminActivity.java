@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,8 +19,15 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         companyListTxt_admin = findViewById(R.id.companyListTxt_admin);
         blockedList_admin = findViewById(R.id.blockedList_admin);
         blockedListTxt_admin = findViewById(R.id.blockedListTxt_admin);
-        blockRequest_admin = findViewById(R.id.blockRequest_admin);
+        blockRequest_admin = findViewById(R.id.blockRequestRV_admin);
         blockRequestTxt_admin = findViewById(R.id.blockRequestTxt_admin);
+
+        companyList_admin.setOnClickListener(this);
+        companyListTxt_admin.setOnClickListener(this);
+        blockedList_admin.setOnClickListener(this);
+        blockedListTxt_admin.setOnClickListener(this);
+        blockRequest_admin.setOnClickListener(this);
+        blockRequestTxt_admin.setOnClickListener(this);
 
     }
 
@@ -30,7 +38,8 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         }if (v == blockedList_admin || v == blockedListTxt_admin){
 
         }if (v == blockRequest_admin || v == blockRequestTxt_admin){
-
+            Intent i = new Intent(this,BlockRequest.class);
+            startActivity(i);
         }
     }
 }
