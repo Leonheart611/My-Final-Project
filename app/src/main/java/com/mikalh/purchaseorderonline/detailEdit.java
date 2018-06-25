@@ -186,4 +186,10 @@ public class detailEdit extends AppCompatActivity implements View.OnClickListene
         }
 
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 }

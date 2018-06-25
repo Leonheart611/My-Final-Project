@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -59,6 +60,7 @@ public class addItem extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseUser user;
     //Image
+    TextView warnignDataKosong_addItem;
     String[] permissionsRequired = new String[]{Manifest.permission.CAMERA,
             Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
     Uri outputFile;
@@ -104,6 +106,8 @@ public class addItem extends AppCompatActivity {
 
         //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
         namaItem_add = findViewById(R.id.namaItem_add);
+        warnignDataKosong_addItem = findViewById(R.id.warningDataKosong_addItem);
+        warnignDataKosong_addItem.setVisibility(View.INVISIBLE);
         //jenisItem_add = findViewById(R.id.jenisItem_add);
         unitItem_add = findViewById(R.id.unitItem_add);
         hargaItem_add = findViewById(R.id.hargaItem_add);
@@ -119,7 +123,20 @@ public class addItem extends AppCompatActivity {
         addItemDo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveItem();
+                boolean save = true;
+                if (namaItem_add.getText().toString().isEmpty()){
+                    warnignDataKosong_addItem.setVisibility(View.VISIBLE);
+                    save = false;
+                }if (unitItem_add.getText().toString().isEmpty()){
+                    warnignDataKosong_addItem.setVisibility(View.VISIBLE);
+                    save = false;
+                }if (hargaItem_add.getText().toString().isEmpty()){
+                    warnignDataKosong_addItem.setVisibility(View.VISIBLE);
+                    save = false;
+                }if (save){
+                    saveItem();
+                }
+
             }
         });
         imageItem_add.setOnClickListener(new View.OnClickListener() {
@@ -138,9 +155,6 @@ public class addItem extends AppCompatActivity {
             }
         });
 
-        // Camera
-
-        // Creating image here
 
     }
 

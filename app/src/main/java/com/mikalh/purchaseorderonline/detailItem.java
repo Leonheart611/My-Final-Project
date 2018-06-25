@@ -437,4 +437,10 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
             startActivity(i);
         }
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 }

@@ -180,24 +180,24 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
             TIL_emailRegis.setError(null);
             TIL_emailRegis.setErrorEnabled(false);
             if (email_register.getText().toString().isEmpty()){
-                TIL_emailRegis.setErrorEnabled(true);
-                TIL_emailRegis.setError("Harap Diisi");
+                TIL_passRegis.setErrorEnabled(true);
+                TIL_passRegis.setError("Semua Data Harap diisi");
                 register = false;
             }if (name_register.getText().toString().isEmpty()){
-                TIL_picRegis.setErrorEnabled(true);
-                TIL_picRegis.setError("Harap Diisi");
+                TIL_passRegis.setErrorEnabled(true);
+                TIL_passRegis.setError("Semua Data Harap diisi");
                 register = false;
             }if (position_register.getText().toString().isEmpty()){
-                TILpicPosRegis.setErrorEnabled(true);
-                TILpicPosRegis.setError("Harap Diisi");
+                TIL_passRegis.setErrorEnabled(true);
+                TIL_passRegis.setError("Semua Data Harap diisi");
                 register = false;
             }if (username_register.getText().toString().isEmpty()){
-                TIL_usernameRegis.setErrorEnabled(true);
-                TIL_usernameRegis.setError("Harap diisi");
+                TIL_passRegis.setErrorEnabled(true);
+                TIL_passRegis.setError("Semua Data Harap diisi");
                 register = false;
             }if (password_register.getText().toString().isEmpty()){
                 TIL_passRegis.setErrorEnabled(true);
-                TIL_passRegis.setError("Harap diisi");
+                TIL_passRegis.setError("Semua Data Harap diisi");
                 register = false;
             }
             if (register) {

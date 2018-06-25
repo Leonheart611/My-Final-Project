@@ -171,24 +171,24 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment impl
             TIL_adress_register.setError(null);
             TIL_adress_register.setErrorEnabled(false);
             if (companyName_register.getText().toString().isEmpty()){
-                TIL_company_register.setErrorEnabled(true);
-                TIL_company_register.setError("Harus Diisi");
+                TIL_fax_register.setErrorEnabled(true);
+                TIL_fax_register.setError("Semua Data Harus Diisi");
                 next = false;
             }if (adress_register.getText().toString().isEmpty()){
-                TIL_adress_register.setErrorEnabled(true);
-                TIL_adress_register.setError("Harus Diisi");
+                TIL_fax_register.setErrorEnabled(true);
+                TIL_fax_register.setError("Semua Data Harus Diisi");
                 next = false;
             }if (city_register.getText().toString().isEmpty()){
-                TIL_city_register.setErrorEnabled(true);
-                TIL_city_register.setError("Harus Diisi");
+                TIL_fax_register.setErrorEnabled(true);
+                TIL_fax_register.setError("Semua Data Harus Diisi");
                 next = false;
             }if (fax_register.getText().toString().isEmpty()){
                 TIL_fax_register.setErrorEnabled(true);
-                TIL_fax_register.setError("Harus Diisi");
+                TIL_fax_register.setError("Semua Data Harus Diisi");
                 next = false;
             }if (telephone_register.getText().toString().isEmpty()){
-                TIL_telephone_register.setErrorEnabled(true);
-                TIL_telephone_register.setError("Harus Diisi");
+                TIL_fax_register.setErrorEnabled(true);
+                TIL_fax_register.setError("Semua Data Harus Diisi");
                 next = false;
             }
             if (next) {

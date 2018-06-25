@@ -57,7 +57,7 @@ public class SearchResult extends AppCompatActivity implements CatalogueAdapter.
 
         }else {
             search = getIntent().getExtras().getString(Search.QUERYSEARCH);
-            query = firestore.collection("Items").whereLessThanOrEqualTo("nama_barang",search);
+            query = firestore.collection("Items").whereEqualTo("nama_barang",search);
             searchText.setText("Hasil Pencarian Kata Kunci: "+search);
         }
         adapter = new CatalogueAdapter(query,this){
