@@ -11,6 +11,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.BoringLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -69,6 +70,8 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
     Item item;
     Button beliButton_do;
     Button chatButton;
+    String IDPenjual;
+    Boolean block;
     int GrandTotal = 0;
     public static final String USER_ID = "userID";
     public static final String NAMAPERUSAHAAN = "perusahaan";
@@ -116,6 +119,7 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                                 hargaBarang_detail.setText(item.getHarga_barang()+"");
                                 unit_detail.setText(item.getUnit()+"");
                                 namaPerusahaan_detail.setText(item.getNamaPerusahaan());
+                                IDPenjual = item.getUserId();
                                 Glide.with(imageBarang_detail.getContext())
                                         .load(item.getImageItemUrl())
                                         .into(imageBarang_detail);
@@ -124,6 +128,21 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                                     beliButton_do.setVisibility(View.GONE);
                                     chatButton.setVisibility(View.GONE);
                                 }
+                            }if (task.isSuccessful() && task.isComplete()){
+                                firestore.collection("Users").document(IDPenjual).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()){
+                                            DocumentSnapshot snapshot1 = task.getResult();
+                                            block = snapshot1.getBoolean("Block");
+                                        }
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Crashlytics.logException(e);
+                                    }
+                                });
                             }
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -140,7 +159,12 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
         beliButton_do.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                popupBuyCart();
+                if (block){
+                    Toast.makeText(getApplicationContext(),"Penjual ini sudah di blokir",Toast.LENGTH_LONG).show();
+                }else {
+                    popupBuyCart();
+                }
+
             }
         });
         chatButton.setOnClickListener(new View.OnClickListener() {

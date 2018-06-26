@@ -65,7 +65,9 @@
         <activity android:name=".POBuyer" />
         <activity android:name=".BuyerSearchResult" />
         <activity android:name=".AdminActivity" />
-        <activity android:name=".BlockRequest"></activity>
+        <activity android:name=".BlockRequest" />
+        <activity android:name=".BlockedList" />
+        <activity android:name=".CompanyList_admin"></activity>
     </application>
 
 </manifest>

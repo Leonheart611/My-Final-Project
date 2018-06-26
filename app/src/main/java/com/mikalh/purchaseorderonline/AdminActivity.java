@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.InterruptedIOException;
+
 public class AdminActivity extends AppCompatActivity implements View.OnClickListener{
     ImageView companyList_admin,blockedList_admin, blockRequest_admin;
     TextView companyListTxt_admin,blockedListTxt_admin,blockRequestTxt_admin;
@@ -34,12 +36,19 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         if (v == companyList_admin || v== companyListTxt_admin){
-
+            Intent i = new Intent(this, CompanyList_admin.class);
+            startActivity(i);
         }if (v == blockedList_admin || v == blockedListTxt_admin){
-
+            Intent i = new Intent(this,BlockedList.class);
+            startActivity(i);
         }if (v == blockRequest_admin || v == blockRequestTxt_admin){
             Intent i = new Intent(this,BlockRequest.class);
             startActivity(i);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 }

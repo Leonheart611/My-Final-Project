@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
                                         boolean blocked = snapshot.getBoolean("Block").booleanValue();
                                         if (blocked){
                                             Toast.makeText(getApplicationContext(),"Akun Anda Terblokir",Toast.LENGTH_LONG).show();
+                                            customDialog.dismiss();
                                         }else {
                                             popRole(user);
                                         }
@@ -198,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
 
     }
+
 
     @Override
     public void onBackPressed() {

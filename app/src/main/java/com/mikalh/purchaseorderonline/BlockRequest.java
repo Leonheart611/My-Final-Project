@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -53,7 +54,9 @@ public class BlockRequest extends AppCompatActivity implements BlockRequestAdapt
         LinearLayoutManager llm = new LinearLayoutManager(BlockRequest.this);
         llm.setSmoothScrollbarEnabled(true);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(blockRequestRV_admin.getContext(), llm.getOrientation());
         blockRequestRV_admin.setLayoutManager(llm);
+        blockRequestRV_admin.addItemDecoration(itemDecoration);
     }
 
     @Override

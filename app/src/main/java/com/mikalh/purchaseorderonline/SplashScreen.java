@@ -37,16 +37,27 @@ public class SplashScreen extends AppCompatActivity {
                         Intent i = new Intent(SplashScreen.this,MainActivity.class);
                         startActivity(i);
                     }else {
-                        User user1ogin = snapshot.toObject(User.class);
+                        try{
+                            Boolean block = snapshot.getBoolean("Block");
+                            if (block){
+                                Intent i = new Intent(SplashScreen.this,MainActivity.class);
+                                startActivity(i);
+                            }else {
+                                User user1ogin = snapshot.toObject(User.class);
 
-                        if (user1ogin.getRoleActive().equals("Penjual")) {
-                            Intent i = new Intent(SplashScreen.this, newUserUI.class);
-                            startActivity(i);
-                        } else if (user1ogin.getRoleActive().equals("Pembeli")) {
-                            Intent i = new Intent(SplashScreen.this, buyerActivity.class);
+                                if (user1ogin.getRoleActive().equals("Penjual")) {
+                                    Intent i = new Intent(SplashScreen.this, newUserUI.class);
+                                    startActivity(i);
+                                } else if (user1ogin.getRoleActive().equals("Pembeli")) {
+                                    Intent i = new Intent(SplashScreen.this, buyerActivity.class);
+                                    startActivity(i);
+                                }
+                            }
+                        }catch (Exception e){
+                            Crashlytics.logException(e);
+                            Intent i = new Intent(SplashScreen.this,MainActivity.class);
                             startActivity(i);
                         }
-
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
