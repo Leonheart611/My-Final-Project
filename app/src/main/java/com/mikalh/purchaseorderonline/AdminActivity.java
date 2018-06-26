@@ -19,7 +19,7 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
         companyListTxt_admin = findViewById(R.id.companyListTxt_admin);
         blockedList_admin = findViewById(R.id.blockedList_admin);
         blockedListTxt_admin = findViewById(R.id.blockedListTxt_admin);
-        blockRequest_admin = findViewById(R.id.blockRequestRV_admin);
+        blockRequest_admin = findViewById(R.id.blockRequest_admin);
         blockRequestTxt_admin = findViewById(R.id.blockRequestTxt_admin);
 
         companyList_admin.setOnClickListener(this);
