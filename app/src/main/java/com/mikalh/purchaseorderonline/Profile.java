@@ -21,6 +21,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -318,6 +321,24 @@ public class Profile extends AppCompatActivity implements TabLayout.OnTabSelecte
     public void onClick(View view) {
         if (view == changeImage_profile){
             popUpAddFoto();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.goto_cataloge,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.itemCataloge_profile:
+
+                return true;
+                default:
+                    return false;
         }
     }
 }
