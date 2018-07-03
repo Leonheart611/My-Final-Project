@@ -44,7 +44,7 @@ public class registerCompanyProfile extends android.support.v4.app.Fragment impl
             "Banten" ,
             "Bengkulu" ,
             "Gorontalo" ,
-            "Jakarta" ,
+            "DKI Jakarta" ,
             "Jambi" ,
             "Jawa Barat" ,
             "Jawa Tengah" ,

@@ -20,10 +20,6 @@ public class Cart extends Item {
         return TotalHargaBarang;
     }
 
-    public void setTotalHargaBarang(int totalHargaBarang) {
-        TotalHargaBarang = totalHargaBarang;
-    }
-
     public Cart() {
     }
 
@@ -32,7 +28,5 @@ public class Cart extends Item {
         return quantitas_banyakBarang;
     }
 
-    public void setQuantitas_banyakBarang(int quantitas_banyakBarang) {
-        this.quantitas_banyakBarang = quantitas_banyakBarang;
-    }
+
 }

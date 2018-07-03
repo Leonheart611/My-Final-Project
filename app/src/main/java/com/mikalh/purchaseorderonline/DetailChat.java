@@ -279,6 +279,20 @@ public class DetailChat extends AppCompatActivity implements ChatAdapter.OnChatL
                     customDialog.show();
                     if (sellerID.equals(user.getUid())){
                         BlockId = buyyerID;
+                        firestore.collection("Users").document(BlockId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()){
+                                    DocumentSnapshot documentSnapshot = task.getResult();
+                                    nama = documentSnapshot.get("nama_perusahaan").toString();
+                                }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Crashlytics.logException(e);
+                            }
+                        });
                     }else {
                         BlockId = sellerID;
                     }

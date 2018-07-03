@@ -3,7 +3,6 @@ package com.mikalh.purchaseorderonline;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -106,7 +105,7 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
-        ID = getActivity().getIntent().getExtras().getString(SendPO.KEY_UID);
+        ID = getActivity().getIntent().getExtras().getString(CartBuyer.KEY_UID);
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMMM-yyyy");
         tanggal = df.format(c);

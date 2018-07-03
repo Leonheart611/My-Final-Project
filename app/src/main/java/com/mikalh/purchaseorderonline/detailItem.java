@@ -128,13 +128,13 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                                     beliButton_do.setVisibility(View.GONE);
                                     chatButton.setVisibility(View.GONE);
                                 }
-                            }if (task.isSuccessful() && task.isComplete()){
+                            }if (task.isSuccessful()){
                                 firestore.collection("Users").document(IDPenjual).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                         if (task.isSuccessful()){
                                             DocumentSnapshot snapshot1 = task.getResult();
-                                            block = snapshot1.getBoolean("Block");
+                                            block = (Boolean) snapshot1.get("Block");
                                         }
                                     }
                                 }).addOnFailureListener(new OnFailureListener() {
@@ -249,6 +249,8 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
         saveToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dialog.dismiss();
+                customDialog.show();
                 int pcs = Integer.parseInt(banyakPCS_popCart.getText().toString());
                 BigDecimal harga = new BigDecimal(item.getHarga_barang().replace(".",""));
                 final BigDecimal totalHarga = totalCost(pcs,harga);
@@ -295,7 +297,7 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                                                                     public void onComplete(@NonNull Task<Void> task) {
                                                                         if (task.isSuccessful()){
                                                                             Toast.makeText(detailItem.this,"berhasil memasukan data cart",Toast.LENGTH_LONG).show();
-                                                                            dialog.dismiss();
+                                                                            customDialog.dismiss();
                                                                         }
                                                                     }
                                                                 }).addOnFailureListener(new OnFailureListener() {
@@ -309,6 +311,8 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                                                     }).addOnFailureListener(new OnFailureListener() {
                                                         @Override
                                                         public void onFailure(@NonNull Exception e) {
+                                                            Crashlytics.logException(e);
+                                                            customDialog.dismiss();
                                                         }
                                                     });
                                                 }

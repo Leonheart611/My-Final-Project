@@ -68,7 +68,7 @@ public class Transaction_buyyer extends Fragment implements TransactionAdapter.O
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
         query = firestore.collection("Cart")
-                .whereEqualTo("MakePO",true).whereEqualTo("IDPembeli",user.getUid());
+                .whereEqualTo("MakePO",true).whereEqualTo("IDPembeli",user.getUid()).orderBy("tanggalPembuatanPO", Query.Direction.ASCENDING);
     }
 
     @Override

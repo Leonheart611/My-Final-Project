@@ -12,6 +12,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -30,7 +31,7 @@ import com.mikalh.purchaseorderonline.Pager.MainPager;
 
 import io.fabric.sdk.android.Fabric;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     Button register_login, loginDo;
     EditText email_login, password_login;
     FirebaseAuth auth;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore firebaseFirestore;
     CustomDialog customDialog;
     TextInputLayout tilPassword;
+    TextView forgotPassword;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         password_login = findViewById(R.id.password_login);
         loginDo = findViewById(R.id.loginDo);
         tilPassword = findViewById(R.id.tilPassword);
+        forgotPassword = findViewById(R.id.forgotPassword);
+        forgotPassword.setOnClickListener(this);
         loginDo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -204,5 +208,56 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         moveTaskToBack(true);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == forgotPassword){
+            popUpForgotPass();
+        }
+    }
+    void popUpForgotPass(){
+        final Dialog dialog = new Dialog(this);
+        /* dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);*/
+        dialog.setContentView(R.layout.forgot_password);
+        dialog.setCanceledOnTouchOutside(false);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+//This makes the dialog take up the full width
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(lp);
+
+        final EditText email_forgotPassword = dialog.findViewById(R.id.email_forgotPassword);
+        Button submit_forgotPassword = dialog.findViewById(R.id.submit_forgotPassword);
+        submit_forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String email = email_forgotPassword.getText().toString();
+
+                if (!email.isEmpty()){
+                    dialog.dismiss();
+                    customDialog.show();
+                    auth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                Toast.makeText(getApplicationContext(),"Silahkan Cek Email anda",Toast.LENGTH_LONG).show();
+                                customDialog.dismiss();
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Crashlytics.logException(e);
+                            customDialog.dismiss();
+                            Toast.makeText(getApplicationContext(),"email anda salah atau tidak terdaftar",Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        });
+        dialog.show();
     }
 }

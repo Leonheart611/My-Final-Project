@@ -66,7 +66,7 @@ public class Transaction_fragment extends android.support.v4.app.Fragment implem
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         query = FirebaseFirestore.getInstance().collection("Cart").whereEqualTo("IDPenjual",user.getUid())
-                .whereEqualTo("MakePO",true);
+                .whereEqualTo("MakePO",true).orderBy("tanggalPembuatanPO", Query.Direction.ASCENDING);
         
     }
 

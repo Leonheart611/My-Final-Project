@@ -242,7 +242,7 @@ public class DetailPesanan_DataItem extends Fragment implements CreatePOAdapter.
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()){
                                             dialog.dismiss();
-                                            Intent i = new Intent(getActivity(),SendPO.class);
+                                            Intent i = new Intent(getActivity(),CartBuyer.class);
                                             startActivity(i);
                                             Toast.makeText(getActivity(),"Cart Kosong",Toast.LENGTH_LONG).show();
                                         }

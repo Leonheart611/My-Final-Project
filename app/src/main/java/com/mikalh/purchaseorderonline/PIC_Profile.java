@@ -50,7 +50,7 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
     FirebaseFirestore firestore;
     CollectionReference users;
     TextInputEditText picName_profile,picPosition_profile
-            ,telephone_profile,username_profile,email_profile;
+            ,telephone_profile,email_profile;
     User userProfile;
     CustomDialog customDialog;
     Button saveButton_profile,changePassword_profile;
@@ -92,7 +92,6 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
         saveButton_profile = v.findViewById(R.id.saveButton_profile);
         changePassword_profile = v.findViewById(R.id.changePassword_profile);
         email_profile = v.findViewById(R.id.email_profile);
-        username_profile = v.findViewById(R.id.username_profile);
         TIL_email = v.findViewById(R.id.TIL_email);
         TIL_picName = v.findViewById(R.id.TIL_picName);
         TIL_picPos = v.findViewById(R.id.TIL_picPosition);
@@ -147,8 +146,6 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
             telephone_profile.setFocusable(false);
             email_profile.setEnabled(false);
             email_profile.setFocusable(false);
-            username_profile.setEnabled(false);
-            username_profile.setFocusable(false);
             saveButton_profile.setVisibility(View.INVISIBLE);
             changePassword_profile.setVisibility(View.INVISIBLE);
 
@@ -165,7 +162,6 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
                     picPosition_profile.setText(userProfile.getJabatan_PIC(), TextView.BufferType.EDITABLE);
                     telephone_profile.setText(userProfile.getNomorTelphone(), TextView.BufferType.EDITABLE);
                     email_profile.setText(userProfile.getEmail(), TextView.BufferType.EDITABLE);
-                    username_profile.setText(userProfile.getUsername(), TextView.BufferType.EDITABLE);
                     customDialog.dismiss();
                 }
             }
@@ -195,7 +191,7 @@ public class PIC_Profile extends android.support.v4.app.Fragment {
         update.put("jabatan_PIC",picPosition_profile.getText().toString());
         update.put("nomorTelphone",telephone_profile.getText().toString());
         update.put("email",email);
-        update.put("username",username_profile.getText().toString());
+        update.put("username","");
         users.document(user.getUid()).update(update).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {

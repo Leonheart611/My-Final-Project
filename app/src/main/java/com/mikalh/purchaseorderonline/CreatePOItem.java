@@ -1,8 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -93,7 +91,7 @@ public class CreatePOItem extends Fragment {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
-        ID = getActivity().getIntent().getExtras().getString(SendPO.KEY_UID);
+        ID = getActivity().getIntent().getExtras().getString(CartBuyer.KEY_UID);
         myCalendar = Calendar.getInstance();
         Date c = myCalendar.getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMMM-yyyy");
@@ -168,6 +166,9 @@ public class CreatePOItem extends Fragment {
                                             DocumentSnapshot snapshot = task.getResult();
                                             NotificationTarget = snapshot.get("PenjualNotif").toString();
                                             new Sendnotif().execute();
+                                            Intent i = new Intent(getActivity(),buyerActivity.class);
+                                            startActivity(i);
+                                            Toast.makeText(getActivity(),"PO Berhasil di kirim, Untuk update cek Bagian Transaksi",Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
@@ -256,9 +257,7 @@ public class CreatePOItem extends Fragment {
                 JSONObject jsonObject = new JSONObject(result);
                 int Success = jsonObject.getInt("success");
                 if (Success==1){
-                    Intent i = new Intent(getActivity(),buyerActivity.class);
-                    startActivity(i);
-                    Toast.makeText(getActivity(),"PO Berhasil di kirim, Untuk update cek Bagian Transaksi",Toast.LENGTH_LONG).show();
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

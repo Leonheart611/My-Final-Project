@@ -126,7 +126,7 @@ public class home_buyyer extends Fragment implements View.OnClickListener{
             Intent i = new Intent(getActivity(),Search.class);
             startActivity(i);
         }if (v == send_po || v == sent_buyyerTxt){
-            Intent i = new Intent(getActivity(),SendPO.class);
+            Intent i = new Intent(getActivity(),CartBuyer.class);
             startActivity(i);
         }
     }

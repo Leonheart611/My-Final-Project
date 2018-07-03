@@ -38,25 +38,17 @@ public class Item  {
         return notificationId;
     }
 
-    public void setNotificationId(String notificationId) {
-        this.notificationId = notificationId;
-    }
 
     public String getNamaPerusahaan() {
         return namaPerusahaan;
     }
 
-    public void setNamaPerusahaan(String namaPerusahaan) {
-        this.namaPerusahaan = namaPerusahaan;
-    }
+
 
     public String getImageItemUrl() {
         return imageItemUrl;
     }
 
-    public void setImageItemUrl(String imageItemUrl) {
-        this.imageItemUrl = imageItemUrl;
-    }
 
     public Item() {
     }
@@ -81,15 +73,8 @@ public class Item  {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getHarga_barang() {
         return harga_barang;
     }
 
-    public void setHarga_barang(String harga_barang) {
-        this.harga_barang = harga_barang;
-    }
 }

@@ -191,10 +191,6 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
                 TIL_passRegis.setErrorEnabled(true);
                 TIL_passRegis.setError("Semua Data Harap diisi");
                 register = false;
-            }if (username_register.getText().toString().isEmpty()){
-                TIL_passRegis.setErrorEnabled(true);
-                TIL_passRegis.setError("Semua Data Harap diisi");
-                register = false;
             }if (password_register.getText().toString().isEmpty()){
                 TIL_passRegis.setErrorEnabled(true);
                 TIL_passRegis.setError("Semua Data Harap diisi");
@@ -225,7 +221,7 @@ public class registerUser extends android.support.v4.app.Fragment implements Vie
             final String Email = email_register.getText().toString();
             final String PICName = name_register.getText().toString();
             final String PICPossition = position_register.getText().toString();
-            final String Username = username_register.getText().toString();
+            final String Username = "";
             String Password = password_register.getText().toString();
 
             auth.createUserWithEmailAndPassword(Email, Password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {

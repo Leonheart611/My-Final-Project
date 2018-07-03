@@ -36,6 +36,7 @@ public class BlockRequest extends AppCompatActivity implements BlockRequestAdapt
         firestore = FirebaseFirestore.getInstance();
         query = firestore.collection("BlockRequest").whereEqualTo("Done",false);
         setContentView(R.layout.activity_block_request);
+        setTitle("Block Request");
         customDialog = new CustomDialog(this);
         adapter = new BlockRequestAdapter(query,this){
             @Override
@@ -97,6 +98,27 @@ public class BlockRequest extends AppCompatActivity implements BlockRequestAdapt
         TextView reason_aceptAdmin = dialog.findViewById(R.id.reason_aceptAdmin);
         reason_aceptAdmin.setText(alasan);
         Button submit_aceptAdmin = dialog.findViewById(R.id.submit_aceptAdmin);
+        Button reject_admin = dialog.findViewById(R.id.reject_admin);
+        reject_admin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firestore.collection("BlockRequest").document(id).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            dialog.dismiss();
+                            Toast.makeText(getApplicationContext(),"Block Request Rejected",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Crashlytics.logException(e);
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
         submit_aceptAdmin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
