@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,6 +10,9 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -114,10 +118,7 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
     @Override
     public void onClick(View view) {
         if (view == logoutImage || view == logoutTxt){
-            FirebaseAuth.getInstance().signOut();
-            Intent i = new Intent(getActivity(),MainActivity.class);
-            Toast.makeText(getActivity(),"Success Sign Out",Toast.LENGTH_LONG).show();
-            startActivity(i);
+           logOut("Are You Sure Want Log Out?");
         }
         if (view == catalogImage || view == catalogTxt){
             Intent i = new Intent(getActivity(),myCatalogue.class);
@@ -132,17 +133,40 @@ public class home extends android.support.v4.app.Fragment implements View.OnClic
             mainPagger.setCurrentItem(1,true);
         }
     }
+    void logOut(String judul){
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.log_out_dialog);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+//This makes the dialog take up the full width
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(lp);
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+        TextView judulTxt = dialog.findViewById(R.id.judulTxt);
+        judulTxt.setText(judul);
+        Button ok_button = dialog.findViewById(R.id.ok_button);
+        ok_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent i = new Intent(getActivity(),MainActivity.class);
+                Toast.makeText(getActivity(),"Success Sign Out",Toast.LENGTH_LONG).show();
+                startActivity(i);
+            }
+        });
+        Button cancel_popUp = dialog.findViewById(R.id.cancel_popUp);
+        cancel_popUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+        dialog.show();
+    }
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);

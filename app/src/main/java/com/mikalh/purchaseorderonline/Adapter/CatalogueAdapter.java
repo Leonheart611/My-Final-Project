@@ -44,12 +44,14 @@ public class CatalogueAdapter extends FirestoreAdapter<CatalogueAdapter.Catalogu
 
     public static class CatalogueHolder extends RecyclerView.ViewHolder {
         ImageView img_catalogue;
-        TextView namaBarang_catalogue,kategori_catalogue;
+        TextView namaBarang_catalogue,kategori_catalogue,satuanBarang_catalogue,harga_catalogue;
         public CatalogueHolder(View itemView) {
             super(itemView);
             img_catalogue = itemView.findViewById(R.id.img_catalogue);
             namaBarang_catalogue = itemView.findViewById(R.id.namaBarang_catalogue);
             kategori_catalogue = itemView.findViewById(R.id.kategori_catalogue);
+            satuanBarang_catalogue = itemView.findViewById(R.id.satuanBarang_catalogue);
+            harga_catalogue = itemView.findViewById(R.id.harga_catalogue);
         }
         public void bind(final DocumentSnapshot snapshot, final OnClickCatalogueListener listener){
             Item item = snapshot.toObject(Item.class);
@@ -60,7 +62,8 @@ public class CatalogueAdapter extends FirestoreAdapter<CatalogueAdapter.Catalogu
             }
             namaBarang_catalogue.setText(item.getNama_barang());
             kategori_catalogue.setText(item.getKategori());
-
+            satuanBarang_catalogue.setText(item.getUnit());
+            harga_catalogue.setText(item.getHarga_barang());
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

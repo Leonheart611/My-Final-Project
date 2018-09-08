@@ -17,6 +17,10 @@ import com.google.firebase.firestore.Query;
 import com.mikalh.purchaseorderonline.Model.Item;
 import com.mikalh.purchaseorderonline.R;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Created by mika.frentzen on 06/02/2018.
  */
@@ -49,7 +53,7 @@ public class ItemAdapter extends FirestoreAdapter<ItemAdapter.ViewHolder> {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView namaBarang_list, jenisBarang_list, hargaBarang_list;
+        TextView namaBarang_list, satuanBarang_list, hargaBarang_list;
         ImageView barangImage_list;
 
         public ViewHolder(View itemView) {
@@ -57,7 +61,7 @@ public class ItemAdapter extends FirestoreAdapter<ItemAdapter.ViewHolder> {
             namaBarang_list = itemView.findViewById(R.id.namaBarang_list);
             hargaBarang_list = itemView.findViewById(R.id.hargaBarang_list);
             barangImage_list = itemView.findViewById(R.id.barangImage_list);
-
+            satuanBarang_list = itemView.findViewById(R.id.satuanBarang_list);
         }
 
         public void bind(final DocumentSnapshot snapshot,
@@ -69,9 +73,10 @@ public class ItemAdapter extends FirestoreAdapter<ItemAdapter.ViewHolder> {
                         .load(item.getImageItemUrl())
                         .into(barangImage_list);
             }
+
             namaBarang_list.setText(item.getNama_barang());
             hargaBarang_list.setText(item.getHarga_barang()+"");
-
+            satuanBarang_list.setText(item.getUnit());
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

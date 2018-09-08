@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -32,23 +33,20 @@ import com.mikalh.purchaseorderonline.Adapter.CatalogueAdapter;
  * create an instance of this fragment.
  */
 public class catalogueItemSearch extends android.support.v4.app.Fragment  implements CatalogueAdapter.OnClickCatalogueListener{
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     public static final String KEY_ITEM_ID = "keyItemID";
     private String mParam1;
     private String mParam2;
-    String queryBack="";
-    RecyclerView catalogueSearch_rv;
-    CatalogueAdapter adapter;
-    FirebaseFirestore firestore;
-    Query query;
-    FirebaseAuth auth;
-    FirebaseUser user;
+
+
+
     private OnFragmentInteractionListener mListener;
+
+
+
 
     public catalogueItemSearch() {
         // Required empty public constructor
@@ -71,7 +69,14 @@ public class catalogueItemSearch extends android.support.v4.app.Fragment  implem
         fragment.setArguments(args);
         return fragment;
     }
-
+    String queryBack="";
+    RecyclerView catalogueSearch_rv;
+    CatalogueAdapter adapter;
+    FirebaseFirestore firestore;
+    Query query;
+    FirebaseAuth auth;
+    FirebaseUser user;
+    CollectionReference itemCollection;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +85,7 @@ public class catalogueItemSearch extends android.support.v4.app.Fragment  implem
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         firestore = FirebaseFirestore.getInstance();
+        itemCollection = firestore.collection("Items");
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         Intent intent = getActivity().getIntent();
@@ -87,9 +93,9 @@ public class catalogueItemSearch extends android.support.v4.app.Fragment  implem
             queryBack = intent.getStringExtra(SearchManager.QUERY);
         }
         if (!queryBack.isEmpty()){
-            query = firestore.collection("Items").whereGreaterThanOrEqualTo("nama_barang",queryBack).whereLessThan("userId",user.getUid());
+            query = itemCollection.whereGreaterThanOrEqualTo("nama_barang",queryBack).whereLessThan("userId",user.getUid());
         }else {
-            query = firestore.collection("Items");
+            query = itemCollection;
         }
     }
 

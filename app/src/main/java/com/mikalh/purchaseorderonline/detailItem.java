@@ -76,12 +76,13 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
     public static final String USER_ID = "userID";
     public static final String NAMAPERUSAHAAN = "perusahaan";
     User userModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setTitle("Detail Item");
         setContentView(R.layout.activity_detail_item);
-        customDialog = new CustomDialog(detailItem.this);
+        customDialog = new CustomDialog(this);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         namaBarang_detail = findViewById(R.id.namaBarang_detail);
@@ -295,9 +296,9 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                                                                 firestore.collection("Cart").document(curr).update(dataUPdate).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                     @Override
                                                                     public void onComplete(@NonNull Task<Void> task) {
+                                                                        customDialog.dismiss();
                                                                         if (task.isSuccessful()){
                                                                             Toast.makeText(detailItem.this,"berhasil memasukan data cart",Toast.LENGTH_LONG).show();
-                                                                            customDialog.dismiss();
                                                                         }
                                                                     }
                                                                 }).addOnFailureListener(new OnFailureListener() {
@@ -396,7 +397,8 @@ public class detailItem extends AppCompatActivity implements View.OnClickListene
                                                                                             @Override
                                                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                                                 if (task.isSuccessful()) {
-                                                                                                    Toast.makeText(detailItem.this,"Data berhasil di Simpan",Toast.LENGTH_LONG).show();
+                                                                                                    customDialog.dismiss();
+                                                                                                    Toast.makeText(detailItem.this,"berhasil memasukan data cart",Toast.LENGTH_LONG).show();
                                                                                                     dialog.dismiss();
                                                                                                 }
                                                                                             }

@@ -55,7 +55,8 @@ public class CreatePOAdapter  extends FirestoreAdapter<CreatePOAdapter.CreatePOA
         }
         public void bind(final DocumentSnapshot snapshot, final OnCreatePOSelectedListener listener){
             Cart cart = snapshot.toObject(Cart.class);
-            String totalHarga = formatRP(cart.getTotalHargaBarang());
+            int total = snapshot.getLong("totalHargaBarang").intValue();
+            String totalHarga = formatRP(total);
             namaItem_PO.setText(cart.getNama_barang());
             banyakBarang_PO.setText(cart.getQuantitas_banyakBarang()+"");
             totalHarga_PO.setText(totalHarga);

@@ -1,5 +1,6 @@
 package com.mikalh.purchaseorderonline;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,8 +8,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -113,9 +118,7 @@ public class home_buyyer extends Fragment implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         if (v == logout_buyyer || v == logOut_buyyerTxt){
-            auth.signOut();
-            Intent i = new Intent(getActivity(),MainActivity.class);
-            startActivity(i);
+            logOut("Are You Sure Want Log Out?");
         }
         if (v == myProfile_buyyer || v == profileBuyyer_txt){
             Intent i = new Intent(getActivity(),Profile.class);
@@ -129,6 +132,39 @@ public class home_buyyer extends Fragment implements View.OnClickListener{
             Intent i = new Intent(getActivity(),CartBuyer.class);
             startActivity(i);
         }
+    }
+    void logOut(String judul){
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.log_out_dialog);
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+//This makes the dialog take up the full width
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(lp);
+
+        TextView judulTxt = dialog.findViewById(R.id.judulTxt);
+        judulTxt.setText(judul);
+        Button ok_button = dialog.findViewById(R.id.ok_button);
+        ok_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent i = new Intent(getActivity(),MainActivity.class);
+                Toast.makeText(getActivity(),"Success Sign Out",Toast.LENGTH_LONG).show();
+                startActivity(i);
+            }
+        });
+        Button cancel_popUp = dialog.findViewById(R.id.cancel_popUp);
+        cancel_popUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+        dialog.show();
     }
 
     public interface OnFragmentInteractionListener {

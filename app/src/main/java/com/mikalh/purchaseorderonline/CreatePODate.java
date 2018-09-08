@@ -31,6 +31,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -62,6 +63,20 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
 
     private String mParam1;
     private String mParam2;
+
+    public CreatePODate() {
+        // Required empty public constructor
+    }
+
+
+    public static CreatePODate newInstance(String param1, String param2) {
+        CreatePODate fragment = new CreatePODate();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
     SharedPreferences mPrefs;
     private OnFragmentInteractionListener mListener;
     // Variable
@@ -81,20 +96,7 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
     Random rand = new Random();
     int TotalHarga;
     int  n = rand.nextInt(100) + 1;
-    public CreatePODate() {
-        // Required empty public constructor
-    }
-
-
-    public static CreatePODate newInstance(String param1, String param2) {
-        CreatePODate fragment = new CreatePODate();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    CollectionReference cartCollection;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,6 +107,7 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
+        cartCollection = firestore.collection("Cart");
         ID = getActivity().getIntent().getExtras().getString(CartBuyer.KEY_UID);
         Date c = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMMM-yyyy");
@@ -115,40 +118,9 @@ public class CreatePODate extends Fragment implements CreatePOAdapter.OnCreatePO
         tanggalbulan = bulan.format(c);
         tanggaltahun = tahun.format(c);
         tanggalDepan = tanggalDepanf.format(c);
-        query = firestore.collection("Cart").document(ID).collection("ItemList").orderBy("nama_barang");
+        query = cartCollection.document(ID).collection("ItemList").orderBy("nama_barang");
         createPOPagger = getActivity().findViewById(R.id.createPoPagger);
         mPrefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-        // Counter TODO:buat nanti kalau sempat aja lol
-        /*final DocumentReference reference = firestore.collection("Counter").document();
-        getCount(reference).addOnCompleteListener(new OnCompleteListener<Integer>() {
-            @Override
-            public void onComplete(@NonNull Task<Integer> task) {
-                if (task.isSuccessful()){
-                    int i = task.getResult();
-                    if (i == 0){
-                        createCounter(reference,1).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    Log.e("Berhasil","Buat data cek di Firestore");
-                                }
-                            }
-                        });
-                    }
-                    Log.e("Data hasil dari i",i+"");
-                }else {
-                    Log.e("Gagal Ambil data","Find Another Way");
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Crashlytics.logException(e);
-            }
-        });*/
-
-
-
 
     }
     public Task<Integer> getCount(final DocumentReference ref) {

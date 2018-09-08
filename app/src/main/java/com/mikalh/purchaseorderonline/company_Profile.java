@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.mikalh.purchaseorderonline.Model.User;
+import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import java.util.HashMap;
 
@@ -38,10 +40,47 @@ public class company_Profile extends android.support.v4.app.Fragment implements 
     FirebaseFirestore firestore;
     CollectionReference users;
     TextInputEditText companyName_profile, address_profile,
-            province_profile,city_profile,fax_profile;
+            city_profile,fax_profile;
     Button btnSave;
     User profileUser;
+    SearchableSpinner province_profile;
+    String[] listProvince = new String[]{
+            "Aceh" ,
+            "Bali" ,
+            "Banten" ,
+            "Bengkulu" ,
+            "Gorontalo" ,
+            "DKI Jakarta" ,
+            "Jambi" ,
+            "Jawa Barat" ,
+            "Jawa Tengah" ,
+            "Jawa Timur" ,
+            "Kalimantan Barat" ,
+            "Kalimantan Selatan" ,
+            "Kalimantan Tengah" ,
+            "Kalimantan Timur" ,
+            "Kalimantan Utara" ,
+            "Kepulauan Bangka Belitung" ,
+            "Kepulauan Riau" ,
+            "Lampung" ,
+            "Maluku" ,
+            "Maluku Utara" ,
+            "Nusa Tenggara Barat" ,
+            "Nusa Tenggara Timur" ,
+            "Papua" ,
+            "Papua Barat" ,
+            "Riau" ,
+            "Sulawesi Barat" ,
+            "Sulawesi Selatan" ,
+            "Sulawesi Tengah" ,
+            "Sulawesi Tenggara" ,
+            "Sulawesi Utara" ,
+            "Sumatera Barat" ,
+            "Sumatera Selatan" ,
+            "Sumatera Utara" ,
+            "Yogyakarta"
 
+    };
     private String mParam1;
     private String mParam2;
     String userID;
@@ -76,7 +115,7 @@ public class company_Profile extends android.support.v4.app.Fragment implements 
         users = firestore.collection("Users");
         customDialog = new CustomDialog(getActivity());
     }
-    TextInputLayout TIL_CompanyName,TIL_address,TIL_province,TIL_city,TIL_fax;
+    TextInputLayout TIL_CompanyName,TIL_address,TIL_city,TIL_fax;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -87,6 +126,8 @@ public class company_Profile extends android.support.v4.app.Fragment implements 
         companyName_profile = v.findViewById(R.id.companyName_profile);
         address_profile = v.findViewById(R.id.address_profile);
         province_profile = v.findViewById(R.id.province_profile);
+        ArrayAdapter adapter = new ArrayAdapter(getActivity(),android.R.layout.simple_spinner_dropdown_item,listProvince);
+        province_profile.setAdapter(adapter);
         city_profile = v.findViewById(R.id.city_profile);
         fax_profile = v.findViewById(R.id.fax_profile);
         btnSave = v.findViewById(R.id.btnSave);
@@ -94,7 +135,6 @@ public class company_Profile extends android.support.v4.app.Fragment implements 
         TIL_CompanyName = v.findViewById(R.id.TIL_CompanyName);
         TIL_fax = v.findViewById(R.id.TIL_fax);
         TIL_city = v.findViewById(R.id.TIL_city);
-        TIL_province = v.findViewById(R.id.TIL_province);
         TIL_address = v.findViewById(R.id.TIL_address);
         if (!userID.equals(user.getUid())){
             companyName_profile.setEnabled(false);
@@ -117,9 +157,16 @@ public class company_Profile extends android.support.v4.app.Fragment implements 
                 if (task.isSuccessful()){
                     DocumentSnapshot documentSnapshot = task.getResult();
                     profileUser = documentSnapshot.toObject(User.class);
+                    int provincePos = 0;
+                    for (int i = 0 ; i < listProvince.length ; i++){
+                        if (listProvince[i].equals(profileUser.getProvinsi())){
+                            provincePos = i;
+                            break;
+                        }
+                    }
                     companyName_profile.setText(profileUser.getNama_perusahaan(), TextView.BufferType.EDITABLE);
                     address_profile.setText(profileUser.getAlamat_perusahaan(), TextView.BufferType.EDITABLE);
-                    province_profile.setText(profileUser.getProvinsi(), TextView.BufferType.EDITABLE);
+                    province_profile.setSelection(provincePos);
                     city_profile.setText(profileUser.getKota(), TextView.BufferType.EDITABLE);
                     fax_profile.setText(profileUser.getNo_fax(), TextView.BufferType.EDITABLE);
                 }
@@ -166,8 +213,8 @@ public class company_Profile extends android.support.v4.app.Fragment implements 
             TIL_CompanyName.setErrorEnabled(false);
             TIL_address.setError(null);
             TIL_address.setErrorEnabled(false);
-            TIL_province.setError(null);
-            TIL_province.setErrorEnabled(false);
+            /*TIL_province.setError(null);
+            TIL_province.setErrorEnabled(false);*/
             TIL_city.setError(null);
             TIL_city.setErrorEnabled(false);
             TIL_fax.setError(null);
@@ -180,11 +227,11 @@ public class company_Profile extends android.support.v4.app.Fragment implements 
                 TIL_address.setErrorEnabled(true);
                 TIL_address.setError("Harus Diisi");
                 lanjutkan = false;
-            }if (province_profile.getText().toString().isEmpty()){
+            }/*if (province_profile.getText().toString().isEmpty()){
                 TIL_province.setErrorEnabled(true);
                 TIL_province.setError("Harus Diisi");
                 lanjutkan = false;
-            }if (city_profile.getText().toString().isEmpty()){
+            }*/if (city_profile.getText().toString().isEmpty()){
                 TIL_city.setErrorEnabled(true);
                 TIL_city.setError("Harus Diisi");
                 lanjutkan = false;
@@ -204,7 +251,7 @@ public class company_Profile extends android.support.v4.app.Fragment implements 
         update.put("alamat_perusahaan",address_profile.getText().toString());
         update.put("nama_perusahaan",companyName_profile.getText().toString());
         update.put("no_fax",fax_profile.getText().toString());
-        update.put("Provinsi",province_profile.getText().toString());
+        update.put("Provinsi","");
         update.put("historyUpdate", FieldValue.serverTimestamp());
 
         users.document(user.getUid()).update(update).addOnCompleteListener(new OnCompleteListener<Void>() {
